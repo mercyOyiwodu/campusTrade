@@ -13,23 +13,28 @@ module.exports = {
         defaultValue: UUIDV4
       },
       price: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL,
+        allowNull: false
       },
       detail: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       category: {
-        type: Sequelize.ARRAY
+        type: Sequelize.ARRAY,
+        allowNull: false
       },
       media: {
         type: Sequelize.STRING,
         allowNull: false
       },
       sellerId: {
-        type: Sequelize.UUID
+        type: Sequelize.UUID,
+        allowNull: false
       },
       timeCreated: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
