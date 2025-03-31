@@ -23,6 +23,9 @@ User.init(
           isVerified: {
             type: DataTypes.BOOLEAN
           },
+          phoneNumber: {
+            type: DataTypes.NUMBER
+          },
   },
   {
     // Other model options go here
