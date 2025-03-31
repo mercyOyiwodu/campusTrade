@@ -9,31 +9,41 @@ Product.init(
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: UUIDV4
+      defaultValue: UUIDV4,
+      allowNull: false
     },
     price: {
-      type: DataTypes.DECIMAL
+      type: DataTypes.DECIMAL,
+      allowNull: false
     },
     detail: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false
     },
     category: {
-      type: DataTypes.ARRAY
+      type: DataTypes.ARRAY,
+      allowNull: false
     },
     media: {
       type: DataTypes.STRING,
       allowNull: false
     },
     sellerId: {
-      type: DataTypes.UUID
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: "Sellers", 
+        key: "id",
+      },
     },
     timeCreated: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
+      allowNull: false
     },
   },
   {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
+
+    sequelize, 
     modelName: 'Product', 
     tableName: 'Products'
   },

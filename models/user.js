@@ -12,24 +12,29 @@ User.init(
             defaultValue: UUIDV4
           },
           fullName: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
           },
           email: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
           },
           password: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: false
           },
           isVerified: {
-            type: DataTypes.BOOLEAN
+            type: DataTypes.BOOLEAN,
+            allowNull: false
           },
           phoneNumber: {
-            type: DataTypes.NUMBER
+            type: DataTypes.NUMBER,
+            allowNull: false
           },
   },
   {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
+
+    sequelize, 
     modelName: 'User', 
     tableName: 'Users'
   },
