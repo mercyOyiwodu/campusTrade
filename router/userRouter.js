@@ -1,16 +1,16 @@
 const router = require ('express').Router()
 //const {register, verifyUser,  login,  resendVerificationEmail,getAll,  makeAdmin} = require('../controllers/userController');
-const {authenticate, superAdminAuth} = require('../middlewares/authentication');
+const {authenticate, adminAuth} = require('../middlewares/authentication');
 const { signUpValidation } = require('../middlewares/validator');
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 
-router.post('/register', signUpValidation, register);
-router.get('/verify-user/:token', verifyUser);
-router.post('/resendlink', resendVerificationEmail)
-router.post('/login', login)
-router.get('/users', authenticate, getAll)
-router.patch('/make-admin/:id', authenticate, superAdminAuth, makeAdmin)
+// router.post('/register', signUpValidation, register);
+// router.get('/verify-user/:token', verifyUser);
+// router.post('/resendlink', resendVerificationEmail)
+// router.post('/login', login)
+// router.get('/users', authenticate, getAll)
+// router.patch('/make-admin/:id', authenticate, adminAuth, makeAdmin)
 
 
 router.get('/google-authenticate', passport.authenticate('google',{ scope:['profile', 'email'] }));
