@@ -75,7 +75,7 @@ const html = (verifyLink, firstName) => {
 
         <div class="container">
             <div class="header">
-                Welcome to Our Platform!
+                Welcome to Campus Trade!
             </div>
             <div class="content">
                 <p>Hello ${firstName},</p>
@@ -89,7 +89,7 @@ const html = (verifyLink, firstName) => {
                 <p>Best regards,<br>Team</p>
             </div>
             <div class="footer">
-                &copy; ${new Date().getFullYear()} Our Platform. All rights reserved.
+                &copy; ${new Date().getFullYear()} Campus Trade. All rights reserved.
             </div>
         </div>
 

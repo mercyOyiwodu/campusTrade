@@ -24,34 +24,18 @@ Buyer.init(
       type: DataTypes.STRING,
       allowNull:false
     },
-    // isVerified: {
-    //   type: DataTypes.BOOLEAN,
-    //   allowNull:false
-    // },
-    // isAdmin: {
-    //   type: DataTypes.BOOLEAN,
-
-    // },
-    // school: {
-    //   type: DataTypes.STRING,
-    //   allowNull:false
-    // },
     location: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull:false
     },
     password: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull:false
     },
-    createdAt: {
-      allowNull: false,
-      type: Sequelize.DATE
+    isLoggedIn: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
-    updatedAt: {
-      allowNull: false,
-      type: Sequelize.DATE
-    }
   },
   {
     // Other model options go here

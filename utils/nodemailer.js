@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-
+require("dotenv").config();
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -15,7 +15,7 @@ const sendEmail = async (options) => {
     async function main() {
         // send mail with defined transport object
         const info = await transporter.sendMail({
-            from: `"Chidera" <${process.env.APP_EMAIL}>`, // sender address
+            from: `"CampusTrade" <${process.env.APP_EMAIL}>`, // sender address
             to: options.email, // list of receivers
             subject: options.subject,
             html: options.html, // html body
