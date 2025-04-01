@@ -5,24 +5,34 @@ module.exports = {
     await queryInterface.createTable('buyers', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
+
+      },
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      phoneNumber: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      amountPaid: {
-        type: Sequelize.STRING
+      location: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      ref: {
-        type: Sequelize.STRING
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      status: {
-        type: Sequelize.STRING
-      },
-      paymentDate: {
-        type: Sequelize.STRING
+      isLoggedIn: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
