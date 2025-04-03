@@ -25,12 +25,13 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      productInfo: {
-        type: Sequelize.STRING,
+      itemCondition: {
+        type: Sequelize.ENUM('Used',"New"),
         allowNull: false,
       },
       availability: {
         type: Sequelize.ENUM('In Stock', 'Sold'),
+        allowNull: false
       },
       media: {
         type: Sequelize.STRING,
