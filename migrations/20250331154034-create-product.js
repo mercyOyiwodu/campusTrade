@@ -10,19 +10,27 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: UUIDV4
+        defaultValue: UUIDV4,
+        allowNull: false
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: false, 
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false,  
       },
       price: {
-        type: Sequelize.DECIMAL,
-        allowNull: false
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
       },
-      detail: {
+      productInfo: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      category: {
-        type: Sequelize.ARRAY,
-        allowNull: false
+      availability: {
+        type: Sequelize.ENUM('In Stock', 'Sold'),
       },
       media: {
         type: Sequelize.STRING,
@@ -30,13 +38,26 @@ module.exports = {
       },
       sellerId: {
         type: Sequelize.UUID,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: "Sellers", 
+          key: "id",
+        },
       },
+        categoryId: {
+          type: Sequelize.UUID,
+          allowNull: false,  
+          references: {
+            model: 'Categories', 
+            key: 'id',
+          },
+        },
+      
       timeCreated: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      createdAt: {
+       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
