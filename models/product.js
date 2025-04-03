@@ -24,15 +24,13 @@ Product.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    productInfo: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     itemCondition:{
       type: DataTypes.ENUM('Used','New'),
+      allowNull: false
     },
     availability: {
       type: DataTypes.ENUM('In Stock', 'Sold'),
+      allowNull: false
     },
     media: {
       type: DataTypes.STRING,

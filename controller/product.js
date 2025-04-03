@@ -6,7 +6,7 @@ const fs = require("fs");
 
 exports.createProduct = async (req, res) => {
     try {
-        const { price, media, detail, category } = req.body;
+        const { price, media, detail, category, description } = req.body;
         const { sellerId } = req.params;
         const postFee = 500;
 
