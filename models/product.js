@@ -12,17 +12,27 @@ Product.init(
       defaultValue: UUIDV4,
       allowNull: false
     },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: false
-    },
-    detail: {
+    title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false, 
     },
-    category: {
-      type: DataTypes.ARRAY,
-      allowNull: false
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,  
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    productInfo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    itemCondition:{
+      type: DataTypes.ENUM('Used','New'),
+    },
+    availability: {
+      type: DataTypes.ENUM('In Stock', 'Sold'),
     },
     media: {
       type: DataTypes.STRING,
@@ -36,6 +46,15 @@ Product.init(
         key: "id",
       },
     },
+      categoryId: {
+        type: DataTypes.UUID,
+        allowNull: false,  
+        references: {
+          model: 'Categories', 
+          key: 'id',
+        },
+      },
+    
     timeCreated: {
       type: DataTypes.DATE,
       allowNull: false
@@ -48,5 +67,8 @@ Product.init(
     tableName: 'Products'
   },
 );
+
+Product.belongsTo(Category, { foreignKey: 'categoryId' });
+Category.hasMany(Product, { foreignKey: 'categoryId' });
 
 module.exports= Product

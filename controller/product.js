@@ -1,5 +1,5 @@
 const Product = require('../models/product');
-const Transaction = require("../models/transactionModel");
+const Transaction = require("../models/transaction");
 const Seller = require("../models/seller");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
