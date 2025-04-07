@@ -13,11 +13,11 @@ module.exports = {
         defaultValue: UUIDV4,
         allowNull: false
       },
-      title: {
+      productName: {
         type: Sequelize.STRING,
         allowNull: false, 
       },
-      description: {
+      school: {
         type: Sequelize.STRING,
         allowNull: false,  
       },
@@ -25,13 +25,9 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
-      itemCondition: {
+      condition: {
         type: Sequelize.ENUM('Used',"New"),
         allowNull: false,
-      },
-      availability: {
-        type: Sequelize.ENUM('In Stock', 'Sold'),
-        allowNull: false
       },
       media: {
         type: Sequelize.STRING,
