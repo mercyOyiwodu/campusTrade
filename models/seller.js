@@ -10,12 +10,19 @@ Seller.init(
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
-
     },
     fullName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isVerified:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    },
+  profilePic: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -24,8 +31,8 @@ Seller.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    profilePic: {
-      type: DataTypes.STRING,
+    jambRegNo: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     description: {

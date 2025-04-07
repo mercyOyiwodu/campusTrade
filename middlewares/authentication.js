@@ -1,65 +1,65 @@
-const userModel = require ('../models/user')
-const jwt = require('jsonwebtoken');
- 
+const JWT = require('jsonwebtoken');
+const Seller = require('../models/seller');
 
-
-exports.authenticate = async (req, res, next)=>{
+exports.authenticateSeller = async (req, res, next) => {
     try {
-        const auth = req.header('Authorization')
+        // Get the token from the request header
+        const auth = req.header('Authorization');
         if (auth == undefined) {
             return res.status(401).json({
-                message: 'token not found'
-            })
+                message: 'Authentication required'
+            });
         }
-        const token = auth.split(' ')[1]
+        
+        const token = auth.split(' ')[1];
         if (token == undefined) {
             return res.status(401).json({
-                message: 'token not found'
-            })
+                message: 'Invalid token'
+            });
         }
-       const decodedToken = jwt.verify(token, process.env.SECRET)
-console.log(decodedToken)
-       const user = await userModel.findById(decodedToken.userId)
-       if (user == null) {
-        return res.status(404).json({
-            message: 'authentication failed: user not found'
-        })
-       }
-    //    if (!user.isAdmin) {
-    //     return res.status(404).json({
-    //         message: 'authentication failed: user not found'
-    //     })
-    //    }
-       req.user = decodedToken
+        
+        const decodedToken = await JWT.verify(token, process.env.JWT_SECRET);
+        
+        // Check if token is for seller
+        if (decodedToken.type !== 'seller') {
+            return res.status(403).json({
+                message: 'Seller privileges required'
+            });
+        }
+        
+        // Check for the seller and throw error if not found
+        const seller = await Seller.findByPk(decodedToken.sellerId);
+        if (seller == null) {
+            return res.status(404).json({
+                message: 'Authentication failed: seller not found'
+            });
+        }
+        
+        // Attach only necessary seller data to request
+        req.seller = {
+            id: seller.id,
+            email: seller.email,
+            password: hashedPassword
+            // Add other relevant seller fields
+        };
 
-       next()
-
+        next();
     } catch (error) {
-        if (error instanceof jwt.TokenExpiredError){
+        if (error instanceof JWT.TokenExpiredError) {
             return res.status(401).json({
-                message: 'session timed out'
-            })
+                message: 'Session timed-out, please login'
+            });
         }
-       console.log(error.message) 
-       res.status(401).json({
-        message: 'internal server error'
-       })
+        
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                message: 'Invalid token'
+            });
+        }
+        
+        console.log(error.message);
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
     }
-}
-
-exports.adminAuth = async (req, res, next)=>{
-try {
-    if (req.user.isAdmin == true ){
-     next()   
-    }else{
-        res.status(403).json({
-            message:"unauthorized: not an admin"
-        })
-    }
-} catch (error) {
-    console.log(error.message)
-   res.status(500).json({
-    message:'internal server error'
-   }) 
-}
-}
+};

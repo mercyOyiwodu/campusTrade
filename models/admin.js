@@ -1,22 +1,17 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
 
-class Buyer extends Model {}
+class Admin extends Model {}
 
-Buyer.init(
+Admin.init(
   {
     id: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
-
     },
     fullName: {
-      type: DataTypes.STRING,
-      allowNull:false
-    },
-    phoneNumber: {
       type: DataTypes.STRING,
       allowNull:false
     },
@@ -24,25 +19,33 @@ Buyer.init(
       type: DataTypes.STRING,
       allowNull:false
     },
-    location: {
-      type: DataTypes.STRING,
-      allowNull:false
-    },
     password: {
       type: DataTypes.STRING,
       allowNull:false
     },
-    isLoggedIn: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    isAdmin: {
+      type:DataTypes.BOOLEAN,
+      defaultValue:false,
     },
+    isSuperAdmin:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    }
   },
   {
     // Other model options go here
     sequelize, // We need to pass the connection instance
-    modelName: 'Buyer', 
-    tableName: 'Buyers'
+    modelName: 'Admin', 
+    tableName: 'Admins'
   },
 );
 
-module.exports= Buyer
+module.exports= Admin

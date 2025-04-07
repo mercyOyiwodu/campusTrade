@@ -7,22 +7,34 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: false
+        defaultValue:Sequelize.UUIDV4
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      amountPaid: {
-        type: Sequelize.STRING
+      amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+
       },
-      ref: {
-        type: Sequelize.STRING
-      },
-      status: {
-        type: Sequelize.STRING
+      reference: {
+        type: Sequelize.STRING,
+        allowNull: false,
+
       },
       paymentDate: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: Sequelize.ENUM('Pending', 'Success', 'Failed'),
+        allowNull: false,
+        defaultValue: 'Pending'
       },
       createdAt: {
         allowNull: false,

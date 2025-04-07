@@ -37,22 +37,22 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      sellerId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Sellers", 
-          key: "id",
-        },
-      },
-        categoryId: {
-          type: Sequelize.UUID,
-          allowNull: false,  
-          references: {
-            model: 'Categories', 
-            key: 'id',
-          },
-        },
+      // sellerId: {
+      //   type: Sequelize.UUID,
+      //   allowNull: false,
+      //   references: {
+      //     model: "Sellers", 
+      //     key: "id",
+      //   },
+      // },
+      //   categoryId: {
+      //     type: Sequelize.UUID,
+      //     allowNull: false,  
+      //     references: {
+      //       model: 'Categories', 
+      //       key: 'id',
+      //     },
+      //   },
       
       timeCreated: {
         type: Sequelize.DATE,
