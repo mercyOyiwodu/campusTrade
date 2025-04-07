@@ -9,7 +9,7 @@ exports.createProduct = async (req, res) => {
         const { productName, price, media, condition, school, description } = req.body;
         const {categoryId} = req.params
         const { sellerId } = req.params;
-        const postFee = 500;
+        const postFee = price * 0.1;
 
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
@@ -27,7 +27,7 @@ exports.createProduct = async (req, res) => {
         if (!totalPaid || totalPaid < postFee) {
             if (req.file) fs.unlinkSync(req.file.path);
             return res.status(403).json({
-                message: "Sellers must pay at least ₦500 before posting a product.",
+                message:   `Sellers must pay at least ₦${postFee} before posting a product.`,
             });
         }
 
