@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model, UUIDV4, Transaction } = require('sequelize');
+const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
 
 class Transaction extends Model {}
