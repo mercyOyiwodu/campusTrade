@@ -6,59 +6,57 @@ const fs = require("fs");
 
 exports.createProduct = async (req, res) => {
     try {
-        const { productName, price, media, condition, school, description } = req.body;
-        const {categoryId} = req.params
-        const { sellerId } = req.params;
-        const postFee = price * 0.1;
-
-        const seller = await Seller.findByPk(sellerId);
-        if (!seller) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            return res.status(404).json({ message: "Seller not found" });
-        }
-
-        const totalPaid = await Transaction.sum("amountPaid", {
-            where: {
-                userId: sellerId,
-                status: "successful",
-            },
+      const { productName, price, condition, school, description } = req.body;
+      const { categoryId, sellerId } = req.params;
+      const postFee = price * 0.1;
+  
+      const seller = await Seller.findByPk(sellerId);
+      if (!seller) {
+        req.files.forEach(file => fs.unlinkSync(file.path));
+        return res.status(404).json({ message: "Seller not found" });
+      }
+  
+      const totalPaid = await Transaction.sum("amountPaid", {
+        where: { userId: sellerId, status: "successful" },
+      });
+  
+      if (!totalPaid || totalPaid < postFee) {
+        req.files.forEach(file => fs.unlinkSync(file.path));
+        return res.status(403).json({
+          message: `Sellers must pay at least ₦${postFee} before posting a product.`,
         });
-
-        if (!totalPaid || totalPaid < postFee) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            return res.status(403).json({
-                message:   `Sellers must pay at least ₦${postFee} before posting a product.`,
-            });
-        }
-
-        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
-        fs.unlinkSync(req.file.path);
-
-        const product = await Product.create({
-            price,
-            productName,
-            school,
-            condition,
-            media : result.secure_url,
-            description,
-            categoryId,
-            sellerId,
-            timeCreated: new Date(),
+      }
+  
+      // Upload multiple files to Cloudinary
+      const uploadedMedia = [];
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          resource_type: "auto",
         });
-
-        res.status(201).json({
-            message: "Post created successfully",
-            data: product,
-        });
+        uploadedMedia.push(result.secure_url);
+        fs.unlinkSync(file.path);
+      }
+  
+      const product = await Product.create({
+        productName,
+        price,
+        condition,
+        school,
+        description,
+        media: uploadedMedia, 
+        categoryId,
+        sellerId,
+        timeCreated: new Date(),
+      });
+  
+      res.status(201).json({ message: "Post created successfully", data: product });
     } catch (error) {
-        console.log(error);
-        if (req.file && req.file.path) {
-            fs.unlinkSync(req.file.path);
-        }
-        res.status(500).json({ message: "Error Creating Post" });
+      console.error(error);
+      if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
+      res.status(500).json({ message: "Error Creating Post" });
     }
-};
-
+  };
+  
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.findAll({
@@ -108,44 +106,53 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { price, media, detail, category } = req.body;
-
-        const product = await Product.findByPk(id);
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+      const { id } = req.params;
+      const { price, productName, condition, school, description, categoryId } = req.body;
+  
+      const product = await Product.findByPk(id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+  
+      let mediaUrls = [];
+      if (req.files && req.files.length > 0) {
+        // Upload each file sequentially
+        for (let file of req.files) {
+          const uploadResult = await cloudinary.uploader.upload(file.path, { resource_type: "auto" });
+          mediaUrls.push(uploadResult.secure_url);
+          // Remove the local file after uploading
+          fs.unlinkSync(file.path);
         }
-
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, { resource_type: "auto" });
-            fs.unlinkSync(req.file.path);
-            product.media = result.secure_url;
-        }
-
-        product.price = price || product.price;
-        product.detail = detail || product.detail;
-        product.category = category || product.category;
-        product.productName = productName || product.productName;
-        product.price = price || product.price
-        product.media = media || product.media;
-        product.condition = condition || product.condition;
-        product.school =  school || product.school;
-        product.description = description || product.description;
-
-        await product.save();
-
-        res.status(200).json({
-            message: "Product updated successfully",
-            data: product,
-        });
+  
+        // Update the media field with the uploaded URLs
+        product.media = mediaUrls;
+      }
+  
+      // Update other fields if provided
+      product.price = price || product.price;
+      product.productName = productName || product.productName;
+      product.condition = condition || product.condition;
+      product.school = school || product.school;
+      product.description = description || product.description;
+      if (categoryId) {
+        product.categoryId = categoryId;
+      }
+  
+      await product.save();
+  
+      res.status(200).json({
+        message: "Product updated successfully",
+        data: product,
+      });
     } catch (error) {
-        console.log(error);
-        if (req.file && req.file.path) {
-            fs.unlinkSync(req.file.path);
-        }
-        res.status(500).json({ message: "Error updating product" });
+      console.log(error);
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => fs.unlinkSync(file.path));
+      }
+      res.status(500).json({ message: "Error updating product" });
     }
-}
+  };
+  
 
 exports.deleteProduct = async (req, res) => {
     try {

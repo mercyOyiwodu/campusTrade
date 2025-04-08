@@ -14,6 +14,14 @@ Category.init(
     name: {
       type: DataTypes.STRING
     },
+    parentCategoryId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'Categories',
+        key: 'id',
+      },
+    },
   },
   {
 
@@ -23,5 +31,7 @@ Category.init(
   },
 );
 
+Category.hasMany(Category, { foreignKey: 'parentCategoryId', as: 'subCategories' });
+Category.belongsTo(Category, { foreignKey: 'parentCategoryId', as: 'parentCategory' });
 
 module.exports= Category

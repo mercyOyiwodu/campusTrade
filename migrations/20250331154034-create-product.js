@@ -11,48 +11,48 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: UUIDV4,
-        allowNull: false
+        allowNull: false,
       },
       productName: {
         type: Sequelize.STRING,
-        allowNull: false, 
+        allowNull: false,
       },
-      school: {
+      description: {
         type: Sequelize.STRING,
-        allowNull: false,  
+        allowNull: false,
       },
       price: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
       condition: {
-        type: Sequelize.ENUM('Used',"New"),
+        type: Sequelize.ENUM('Used', 'New'),
         allowNull: false,
       },
       media: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.JSON,
+        allowNull: false,
       },
-      // sellerId: {
-      //   type: Sequelize.UUID,
-      //   allowNull: false,
-      //   references: {
-      //     model: "Sellers", 
-      //     key: "id",
-      //   },
-      // },
-      //   categoryId: {
-      //     type: Sequelize.UUID,
-      //     allowNull: false,  
-      //     references: {
-      //       model: 'Categories', 
-      //       key: 'id',
-      //     },
-      //   },
-      
+      sellerId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Sellers',
+          key: 'id',
+        },
+      },
+      categoryId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Categories',
+          key: 'id',
+        },
+      },
       timeCreated: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
        createdAt: {
         allowNull: false,

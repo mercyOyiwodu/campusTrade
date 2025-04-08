@@ -6,7 +6,7 @@ const sequelize = require('./database/sequelize')
 const sellerRouter = require('./router/sellerRouter');
 const adminRouter = require('./router/adminRouter');
 
-const secret = process.env.Express_session_secret;
+const secret = process.env.EXPRESS_SESSION_SECRET;
 const session = require('express-session')
 const PORT = process.env.PORT;
 const passport = require('passport');
@@ -14,12 +14,13 @@ require('./middlewares/passport')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express')
 const productRouter = require('./router/productRouter')
+const categoryRouter = require('./router/category')
 
 
 const app = express();
 
 app.use(express.json());
-app.use(cors({origin:"*"}));
+app.use(cors({ origin: "*" }));
 app.use(morgan('dev'));
 app.use(session({
   secret: secret,
@@ -46,16 +47,16 @@ const swaggerDefinition = {
       url: 'https://jsonplaceholder.typicode.com',
     },
   },
-  "components":{
-      "securitySchema":{
-          "BearerAuth":{
-              "type": "http",
-              "schema": "bearer",
-              "bearerFormat": "JWT"
-          }
+  "components": {
+    "securitySchema": {
+      "BearerAuth": {
+        "type": "http",
+        "schema": "bearer",
+        "bearerFormat": "JWT"
       }
+    }
   },
-  security:[{BearerAuth: [] }],
+  security: [{ BearerAuth: [] }],
   servers: [
     {
       // for production  it is from render
@@ -81,31 +82,32 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1', sellerRouter);
 app.use('/api/v1', adminRouter)
 app.use('/api/v1', productRouter)
+app.use('/api/v1', categoryRouter)
 
 app.use('/', (req, res) => {
   res.send('Welcome To Campus Trade')
-  
+
 })
 
 app.use((error, req, res, next) => {
-  if(error){
-     return res.status(400).json({message:  error.message})
+  if (error) {
+    return res.status(400).json({ message: error.message })
   }
   next()
 })
 
-const server = async()=>{
-    try {
-        await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
-      } catch (error) {
-        console.error('Unable to connect to the database:', error);
-      }
+const server = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 }
 server()
 
 
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
 
-    console.log(`Server is listening to PORT: ${PORT}`);
+  console.log(`Server is listening to PORT: ${PORT}`);
 })
