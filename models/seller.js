@@ -22,7 +22,7 @@ Seller.init(
     },
   profilePic: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true
   },
     phoneNumber: {
       type: DataTypes.STRING,
@@ -45,8 +45,8 @@ Seller.init(
       allowNull: true,
     },
     school: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.ENUM('LASU', 'UNILAG', 'LAUTECH'),
+      defaultValue: 'UNILAG',
     },
     location: {
       type: DataTypes.STRING,
@@ -64,9 +64,11 @@ Seller.init(
       type: DataTypes.UUID,
       allowNull: true,
       references: {
-        model: 'Admins',
+        model: 'Admin',
         key: 'id'
-      }
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
     },
     verifiedAt: {
       type: DataTypes.DATE,

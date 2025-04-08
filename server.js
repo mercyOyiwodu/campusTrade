@@ -30,55 +30,72 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// for swagger documentation
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Swagger Documentation',
-    version: '1.0.0',
-    description:
-      'Swagger docs usage',
-    license: {
-      name: 'Licensed Under MIT',
-      url: 'https://spdx.org/licenses/MIT.html',
-    },
-    contact: {
-      name: 'Campus Trade',
-      url: 'https://jsonplaceholder.typicode.com',
-    },
+      title: 'Campus trade documentation',
+      version: '1.0.0',
+      description:
+          'Documentation for Campus trade API for TCA Cohort 5',
+      license: {
+          name: 'Licensed Under MIT',
+        url: 'https://spdx.org/licenses/MIT.html',
+      },
+      contact: {
+          name: 'Campus Trade',
+          url: 'https://jsonplaceholder.typicode.com',
+      }
   },
   "components": {
-    "securitySchema": {
-      "BearerAuth": {
-        "type": "http",
-        "schema": "bearer",
-        "bearerFormat": "JWT"
+      "securitySchemes": {
+          "BearerAuth": {
+              "type": "http",
+              "scheme": "bearer",
+              "bearerFormat": "JWT"
+          }
       }
     }
   },
   security: [{ BearerAuth: [] }],
   servers: [
-    {
-      // for production  it is from render
-      url: 'http://localhost:4444',
-      description: 'Production server',
-    },
-    {
-      // for development it is from localhost url 
-      url: 'http://localhost:1709',
-      description: 'Development server',
-    },
+      {
+          url: 'http://localhost:4444',
+          description: 'Production server',
+      },
+      {
+          url: 'http://localhost:1709',
+          description: 'Development server',
+      },
   ],
 };
 
 const options = {
   swaggerDefinition,
   // Paths to files containing OpenAPI definitions
-  apis: ['./routes/*.js'],
+  apis: ['./router/*.js', 'server.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+* @swagger
+* /:
+*   get:
+*     summary: The Home Page of the app
+*     description: Returns a welcome message from Campus Trade.
+*     security: []  # This ensures the route is public (no authentication required)
+*     tags:
+*       - Home
+*     responses:
+*       200:
+*         description: Successfully loads the home page.
+*         content:
+*           text/plain:
+*             schema:
+*               type: string
+*               example: Welcome to the Campus Trade Home Page
+*/
 app.use('/api/v1', sellerRouter);
 app.use('/api/v1', adminRouter)
 app.use('/api/v1', productRouter)
@@ -89,25 +106,30 @@ app.use('/', (req, res) => {
 
 })
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Campus Trade Home Page');
+});
 app.use((error, req, res, next) => {
   if (error) {
+
     return res.status(400).json({ message: error.message })
   }
-  next()
 })
 
-const server = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
-}
+app.use('/api/v1', adminRouter);
+app.use('/api/v1', sellerRouter);
+
+const server = async()=>{
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+      } catch (error) {
+        console.error('Unable to connect to the database:', error);
+      }
+  
 server()
 
 
-app.listen(PORT, () => {
-
-  console.log(`Server is listening to PORT: ${PORT}`);
+app.listen(PORT,()=>{
+    console.log(`Server is listening to PORT: ${PORT}`);
 })

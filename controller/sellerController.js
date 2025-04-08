@@ -21,7 +21,7 @@ exports.register = async(req, res) => {
             req.body.fullName = toPascalCase(req.body.fullName);
         }
         
-        const {phoneNumber, email, fullName, password,} = req.body;
+        const {email, fullName, password, profilePic} = req.body;
         
         // Validate required fields
         if (!email || !fullName || !password) {
@@ -41,28 +41,32 @@ exports.register = async(req, res) => {
             });
         }
 
-        // Use Cloudinary promise-based approach
-        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' });
-        
-        // Unlink the file from our local storage after upload
-        fs.unlinkSync(req.file.path);
         
         // Encrypt the user's password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
+        // Use Cloudinary promise-based approach
+        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' }, (error, data) => {
+            if (error) {
+                return res.status(400).json({
+                    message: error.message
+                })
+            } else {
+                return data
+            }
+        });
+        
+        // Unlink the file from our local storage after upload
+        fs.unlinkSync(req.file.path);
+
+
         // Create the user details
         const seller = await Seller.create({
             fullName,
             password: hashedPassword,
             email: email.toLowerCase(),
-            phoneNumber,
-            profilePic: result.secure_url,
-            jambRegNo,
-            location, 
-            school,
-            connectLink,
-            description
+            profilePic: secure_url
         });
         
         // Generate a token
@@ -73,7 +77,7 @@ exports.register = async(req, res) => {
         );
         
         // Create the verify link with the token generated
-        const link = `${req.protocol}://${req.get('host')}/api/v1/sellers/verify/${token}`;
+        const link = `${req.protocol}://${req.get('host')}/api/v1/sellers/verify-user/${token}`;
         const firstName = seller.fullName.split(' ')[0];
         
         // Create the email details
