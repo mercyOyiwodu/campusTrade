@@ -36,8 +36,7 @@ const swaggerDefinition = {
   info: {
     title: 'Swagger Documentation',
     version: '1.0.0',
-    description:
-      'Swagger docs usage',
+    description: 'Swagger docs usage',
     license: {
       name: 'Licensed Under MIT',
       url: 'https://spdx.org/licenses/MIT.html',
@@ -47,34 +46,33 @@ const swaggerDefinition = {
       url: 'https://jsonplaceholder.typicode.com',
     },
   },
-  "components": {
-    "securitySchema": {
-      "BearerAuth": {
-        "type": "http",
-        "schema": "bearer",
-        "bearerFormat": "JWT"
-      }
-    }
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
   },
   security: [{ BearerAuth: [] }],
   servers: [
     {
-      // for production  it is from render
       url: 'http://localhost:4444',
       description: 'Production server',
     },
     {
-      // for development it is from localhost url 
       url: 'http://localhost:1709',
       description: 'Development server',
     },
   ],
 };
 
+
 const options = {
   swaggerDefinition,
   // Paths to files containing OpenAPI definitions
-  apis: ['./routes/*.js'],
+  apis: ['./doumentation'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
