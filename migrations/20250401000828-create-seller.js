@@ -38,8 +38,8 @@ module.exports = {
             allowNull: true,
           },
           school: {
-            type: Sequelize.STRING,
-            allowNull: false,
+            type: Sequelize.ENUM('LASU', 'UNILAG', 'LAUTECH'),
+            defaultValue: 'UNILAG',
           },
           location: {
             type: Sequelize.STRING,
