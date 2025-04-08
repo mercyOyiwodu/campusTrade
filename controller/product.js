@@ -6,9 +6,10 @@ const fs = require("fs");
 
 exports.createProduct = async (req, res) => {
     try {
-        const { price, media, detail, category, description } = req.body;
+        const { productName, price, media, condition, school, description } = req.body;
+        const {categoryId} = req.params
         const { sellerId } = req.params;
-        const postFee = 500;
+        const postFee = price * 0.1;
 
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
@@ -26,7 +27,7 @@ exports.createProduct = async (req, res) => {
         if (!totalPaid || totalPaid < postFee) {
             if (req.file) fs.unlinkSync(req.file.path);
             return res.status(403).json({
-                message: "Sellers must pay at least ₦500 before posting a product.",
+                message:   `Sellers must pay at least ₦${postFee} before posting a product.`,
             });
         }
 
@@ -35,9 +36,12 @@ exports.createProduct = async (req, res) => {
 
         const product = await Product.create({
             price,
-            media: result.secure_url,
-            detail,
-            category,
+            productName,
+            school,
+            condition,
+            media : result.secure_url,
+            description,
+            categoryId,
             sellerId,
             timeCreated: new Date(),
         });
@@ -121,6 +125,12 @@ exports.updateProduct = async (req, res) => {
         product.price = price || product.price;
         product.detail = detail || product.detail;
         product.category = category || product.category;
+        product.productName = productName || product.productName;
+        product.price = price || product.price
+        product.media = media || product.media;
+        product.condition = condition || product.condition;
+        product.school =  school || product.school;
+        product.description = description || product.description;
 
         await product.save();
 
