@@ -22,7 +22,7 @@ Seller.init(
     },
   profilePic: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true
   },
     phoneNumber: {
       type: DataTypes.STRING,

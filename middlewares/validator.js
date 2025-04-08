@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 exports.registerValidation = (req, res, next) => {
+  console.log(req)
     const schema = Joi.object({
       fullName: Joi.string()
         .min(3)
