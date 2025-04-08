@@ -1,7 +1,7 @@
 const express = require('express')
 const sequelize = require('./database/sequelize')
 require('dotenv').config()
-const productRouter = require('./router/productRouter')
+// const productRouter = require('./router/productRouter')
 
 
 const port = process.env.PORT
@@ -18,10 +18,10 @@ const server = async()=>{
 }
 server()
 
-app.use(express.json())
-app.use("api/v1",productRouter)
+// app.use(express.json())
+// app.use("api/v1",productRouter)
 
-app.listen(port,()=>{
-    console.log(`My Server Is Up And Running On Port ${port}`);
+// app.listen(port,()=>{
+//     console.log(`My Server Is Up And Running On Port ${port}`);
     
-})
+// })
