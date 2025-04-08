@@ -1,4 +1,4 @@
-const {Sequelize} = require('sequelize')
+// const {Sequelize} = require('sequelize')
 // require('dotenv').config()
 // const host = process.env.DATABASE_HOST
 // const dialect = process.env.DATABASE_DIALECT
