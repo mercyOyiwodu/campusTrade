@@ -13,10 +13,11 @@ const passport = require('passport');
 require('./middlewares/passport')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express')
-// const productRouter = require('./router/productRouter'
+const productRouter = require('./router/productRouter')
 
 
 const app = express();
+
 app.use(express.json());
 app.use(cors({origin:"*"}));
 app.use(morgan('dev'));
@@ -79,6 +80,7 @@ const swaggerSpec = swaggerJSDoc(options);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1', sellerRouter);
 app.use('/api/v1', adminRouter)
+app.use('/api/v1', productRouter)
 
 app.use('/', (req, res) => {
   res.send('Welcome To Campus Trade')
@@ -104,11 +106,6 @@ server()
 
 
 app.listen(PORT,()=>{
-    console.log(`Server is listening to PORT: ${PORT}`);
-// app.use(express.json())
-// app.use("api/v1",productRouter)
 
-// app.listen(port,()=>{
-//     console.log(`My Server Is Up And Running On Port ${port}`);
-    
-// })
+    console.log(`Server is listening to PORT: ${PORT}`);
+})
