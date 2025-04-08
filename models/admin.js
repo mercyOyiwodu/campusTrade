@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
+const Seller = require('./seller');
 
 class Admin extends Model {}
 
@@ -31,6 +32,16 @@ Admin.init(
       type:DataTypes.BOOLEAN,
       defaultValue:false
     },
+    sellerId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: "Sellers", 
+          key: "id",
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE
@@ -47,5 +58,6 @@ Admin.init(
     tableName: 'Admins'
   },
 );
+
 
 module.exports= Admin

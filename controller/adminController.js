@@ -1,5 +1,5 @@
 const Seller = require('../models/seller')
-// const Product = require('../models/')
+const Admin =require('../models/admin')
  //is the model routing correcting since i am importing seller and product models
 const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');

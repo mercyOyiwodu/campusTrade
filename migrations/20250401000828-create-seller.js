@@ -45,6 +45,22 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: false,
           },
+          isVerified:{
+          type:Sequelize.BOOLEAN,
+          defaultValue:false
+          },
+          verifiedBy: {
+            type: Sequelize.UUID,
+            allowNull: true,
+            references: {
+              model: 'Admins', 
+              key: 'id'
+            }
+          },
+          verifiedAt: {
+            type: Sequelize.DATE,
+            allowNull: true
+          },
           password: {
             type: Sequelize.STRING,
             allowNull: false,

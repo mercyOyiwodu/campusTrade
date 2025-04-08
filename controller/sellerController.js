@@ -8,7 +8,7 @@ const {signUpTemplate, forgotTemplate} = require('../utils/signUp');
 const fs = require('fs');
 
 
-exports.createSellers = async(req, res) => {
+exports.register = async(req, res) => {
     try {
         // Check if file exists
         if (!req.file) {
@@ -259,7 +259,7 @@ exports.resetPassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         // Update the user's password to the new password
-        user.password = hashedPassword;
+        seller.password = hashedPassword;
         // Send a success response
         res.status(200).json({
             message: 'Password reset successful'
@@ -297,7 +297,7 @@ exports.login = async (req, res)=>{
         // check the password if it is correct
         const isPasswordCorrect = await bcrypt.compare(password, seller.password);
         if (isPasswordCorrect === false){
-            return re.status(400).json({
+            return res.status(400).json({
                 message: 'Invalid password'
             });
         };
@@ -316,20 +316,20 @@ exports.login = async (req, res)=>{
         })
     }
 }
-exports.getAll = async (req, res)=>{
-    try {
-        const getSellers = await Seller.findAll();
-        res.status(200).json({
-            message: 'All registered seller in the platform',
-            data: getSellers,
-        })
+// exports.getAll = async (req, res)=>{
+//     try {
+//         const getSellers = await Seller.findAll();
+//         res.status(200).json({
+//             message: 'All registered seller in the platform',
+//             data: getSellers,
+//         })
 
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Internal server error' + ' ' + error.message
-        })
-    }
-}
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: 'Internal server error' + ' ' + error.message
+//         })
+//     }
+// }
 
 exports.updateSeller = async (req, res) => {
     try {

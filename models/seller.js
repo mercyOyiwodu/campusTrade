@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
+const Admin = require('./admin');
 
 class Seller extends Model {}
 
@@ -59,6 +60,18 @@ Seller.init(
       allowNull: false,
       type: DataTypes.DATE
     },
+    verifiedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'Admins',
+        key: 'id'
+      }
+    },
+    verifiedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE
@@ -71,5 +84,10 @@ Seller.init(
     tableName: 'Sellers'
   },
 );
+
+  Seller.belongsTo(Admin, {foreignKey: 'sellerId', as: 'admins'});
+  Admin.hasMany(Seller, { foreignKey: 'sellerId', as: 'seller' });
+
+
 
 module.exports= Seller

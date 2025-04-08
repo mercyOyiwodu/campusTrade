@@ -10,7 +10,7 @@ const secret = process.env.Express_session_secret;
 const session = require('express-session')
 const PORT = process.env.PORT;
 const passport = require('passport');
-require('./middleware/passport')
+require('./middlewares/passport')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express') 
 
