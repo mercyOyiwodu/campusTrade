@@ -4,7 +4,7 @@ const { toPascalCase } = require('../utils/stringHelpers')
 const cloudinary = require('../config/cloudinary');
 const JWT = require('jsonwebtoken');
 const sendEmail = require('../utils/nodemailer');
-const {signUpTemplate, forgotTemplate} = require('../utils/signUp');
+const signUpTemplate = require('../utils/signUp');
 const fs = require('fs');
 
 
@@ -21,7 +21,7 @@ exports.register = async(req, res) => {
             req.body.fullName = toPascalCase(req.body.fullName);
         }
         
-        const {email, fullName, password, profilePic} = req.body;
+        const {email, fullName, password, phoneNumber, location, description, jambRegNo, school, connectLink, } = req.body;
         
         // Validate required fields
         if (!email || !fullName || !password) {
@@ -66,7 +66,13 @@ exports.register = async(req, res) => {
             fullName,
             password: hashedPassword,
             email: email.toLowerCase(),
-            profilePic: secure_url
+            profilePic: result.secure_url,
+            location,
+            school,
+            jambRegNo,
+            phoneNumber,
+            connectLink,
+            description
         });
         
         // Generate a token
@@ -110,9 +116,9 @@ exports.register = async(req, res) => {
             }
         }
         
-        res.status(500).json({ 
-            message: 'Error creating Seller: ' + error.message 
-        });
+        //res.status(500).json({ 
+          //  message: 'Error creating Seller: ' + error.message 
+       // });
     }
 };
 

@@ -9,7 +9,7 @@ exports.registerValidation = (req, res, next) => {
         .pattern(/^[A-Za-z ]+$/)
         .required()
         .messages({
-          "any.required": 'Fullname is required',
+          "any.required": 'Fullname is required here',
           'string.empty': 'Fullname cannot be empty',
           'string.pattern.base': "Fullname should only contain alphabets",
           "string.min": "Fullname should not be less than 3 letters"

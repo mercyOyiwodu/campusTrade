@@ -15,7 +15,7 @@ const sellerRouter = require('express').Router();
 /**
  * @swagger
  * paths:
- *   /api/v1/sellers/register:
+ *   /api/v1/register:
  *     post:
  *       summary: Register a new seller
  *       description: Creates a new seller account, uploads profile image, hashes password, and sends a verification email.
@@ -131,11 +131,10 @@ const sellerRouter = require('express').Router();
  *                     example: "Error creating Seller: Something went wrong"
  */
 
-sellerRouter.post('/register', registerValidation, upload.single('profilePic'), register);
+sellerRouter.post('/register', upload.single('profilePic'), register);
 
 /**
  * @swagger
- * paths:
  *   /api/v1/verify-user/{token}:
  *     get:
  *       summary: Verify seller email
@@ -197,8 +196,7 @@ sellerRouter.get('/verify-user/:token', verify);
 
 /**
  * @swagger
- * paths:
- *   /api/v1/sellers/forget:
+ *   /api/v1/forget:
  *     post:
  *       summary: Initiate password reset
  *       description: Sends a password reset link to the seller's email if the account exists.
@@ -263,8 +261,7 @@ sellerRouter.post('/forget', forgotPassword);
 
 /**
  * @swagger
- * paths:
- *   /api/v1/sellers/reset:
+ *   /api/v1/reset:
  *     post:
  *       summary: Reset seller password
  *       description: Resets the seller's password using a token from the email reset link.
@@ -339,7 +336,7 @@ sellerRouter.post('/reset', resetPassword);
 /**
  * @swagger
  * paths:
- *   /api/v1/sellers/login:
+ *   /api/v1/login:
  *     post:
  *       summary: Seller login
  *       description: Authenticates a seller and returns a JWT token.
@@ -421,7 +418,7 @@ sellerRouter.post('/login', login);
 /**
  * @swagger
  * paths:
- *   /api/v1/sellers/edit-profile:
+ *   /api/v1/edit-profile:
  *     patch:
  *       summary: Update seller profile
  *       description: Updates a seller's profile including full name, email, and optionally profile picture.
@@ -494,12 +491,12 @@ sellerRouter.post('/login', login);
  *                     example: "Internal Server Error: [error details]"
  */
 
-sellerRouter.patch('edit-profile', updateSeller)
+sellerRouter.patch('/edit-profile', updateSeller)
 
 /**
  * @swagger
  * paths:
- *   /api/v1/sellers/remove:
+ *   /api/v1/remove:
  *     delete:
  *       summary: Delete seller account
  *       description: Deletes a seller account and removes associated profile pictures from the server.
@@ -546,7 +543,7 @@ sellerRouter.patch('edit-profile', updateSeller)
  *                     example: "Internal Server Error: [error details]"
  */
 
-sellerRouter.delete('remove', deleteSeller)
+sellerRouter.delete('/remove', deleteSeller)
 
 /**
  * @swagger

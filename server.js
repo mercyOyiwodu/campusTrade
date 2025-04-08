@@ -54,12 +54,11 @@ const swaggerDefinition = {
               "bearerFormat": "JWT"
           }
       }
-    }
-  },
-  security: [{ BearerAuth: [] }],
+    },
+    security: [{ BearerAuth: [] }],
   servers: [
       {
-          url: 'http://localhost:4444',
+          url: '',
           description: 'Production server',
       },
       {
@@ -67,7 +66,8 @@ const swaggerDefinition = {
           description: 'Development server',
       },
   ],
-};
+  }
+
 
 const options = {
   swaggerDefinition,
@@ -116,7 +116,7 @@ app.use((error, req, res, next) => {
   }
 })
 
-app.use('/api/v1', adminRouter);
+// app.use('/api/v1', adminRouter);
 app.use('/api/v1', sellerRouter);
 
 const server = async()=>{
@@ -126,7 +126,7 @@ const server = async()=>{
       } catch (error) {
         console.error('Unable to connect to the database:', error);
       }
-  
+}
 server()
 
 
