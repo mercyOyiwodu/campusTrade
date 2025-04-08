@@ -32,7 +32,7 @@ const router = require('express').Router();
  *           schema:
  *             type: string
  *           description: ID of the seller
- *           example: "123"
+ *           example: "60d0fe4f5311236168a109cb"
  *       requestBody:
  *         required: true
  *         content:

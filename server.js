@@ -60,7 +60,7 @@ const swaggerDefinition = {
   servers: [
       {
           url: '',
-          description: 'Production server',
+          description: 'https://campustrade-kku1.onrender.com',
       },
       {
           url: 'http://localhost:1709',
