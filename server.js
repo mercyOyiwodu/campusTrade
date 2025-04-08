@@ -112,7 +112,16 @@ app.use('/api/v1', adminRouter);
 app.use('/api/v1', categoryRouter);
 app.use('/api/v1', sellerRouter);
 app.use('/api/v1', productRouter);
+const server = async () => {
+  try {
+      await sequelize.authenticate();
+      console.log('Connection to database has been established successfully.');
+  } catch (error) {
+      console.error('Unable to connect to the database:', error.message);
+  }
+};
 
+server();
 app.listen(PORT, () => {
     console.log(`Server is listening to PORT: ${PORT}`)
 })
