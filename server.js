@@ -33,6 +33,7 @@ app.use(passport.session());
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
+
       title: 'Campus trade documentation',
       version: '1.0.0',
       description:
@@ -66,8 +67,10 @@ const swaggerDefinition = {
           url: 'http://localhost:1709',
           description: 'Development server',
       },
+
   ],
 };
+
 
 const options = {
   swaggerDefinition,
