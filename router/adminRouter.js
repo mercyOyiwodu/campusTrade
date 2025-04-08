@@ -44,6 +44,7 @@ const JWT = require('jsonwebtoken');
 
 // adminRouter.patch('/make-super/:id', authenticateAdmin, adminController.makeSuperAdmin);
 adminRouter.post('/login', adminController.loginAdmin);
+
 adminRouter.get('/sellers/:id/verify', authenticateAdmin, adminAuth, adminController.verifySeller);
 
 // Export router
