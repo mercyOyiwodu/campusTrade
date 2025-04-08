@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
-const Category = require('../models/category')
+const Category = require('../models/category');
+const Seller = require('../models/seller'); // Assuming you have a Seller model
 
 class Product extends Model {}
 
@@ -11,59 +12,61 @@ Product.init(
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
-      allowNull: false
+      allowNull: false,
     },
     productName: {
       type: DataTypes.STRING,
-      allowNull: false, 
+      allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,  
+      allowNull: false,
     },
     price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    condition:{
-      type: DataTypes.ENUM('Used','New'),
-      allowNull: false
+    condition: {
+      type: DataTypes.ENUM('Used', 'New'),
+      allowNull: false,
     },
     media: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.JSON,
+      allowNull: false,
     },
-    // sellerId: {
-    //   type: DataTypes.UUID,
-    //   allowNull: false,
-    //   references: {
-    //     model: "Sellers", 
-    //     key: "id",
-    //   },
-    // },
-    //   categoryId: {
-    //     type: DataTypes.UUID,
-    //     allowNull: false,  
-    //     references: {
-    //       model: 'Categories', 
-    //       key: 'id',
-    //     },
-    //   },
-    
-     timeCreated: {
+    sellerId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Sellers',
+        key: 'id',
+      },
+    },
+    categoryId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Categories',
+        key: 'id',
+      },
+    },
+    timeCreated: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: Sequelize.NOW, // Automatically sets the creation time
     },
   },
   {
-
-    sequelize, 
-    modelName: 'Product', 
-    tableName: 'Products'
-  },
+    sequelize,
+    modelName: 'Product',
+    tableName: 'Products',
+  }
 );
 
 Product.belongsTo(Category, { foreignKey: 'categoryId' });
 Category.hasMany(Product, { foreignKey: 'categoryId' });
 
-module.exports= Product
+Product.belongsTo(Seller, { foreignKey: 'sellerId' }); 
+Seller.hasMany(Product, { foreignKey: 'sellerId' }); 
+
+module.exports = Product;

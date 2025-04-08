@@ -1,6 +1,6 @@
-const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
-const Seller = require('./seller');
+const Seller = require('../models/seller');
 
 class Admin extends Model {}
 
