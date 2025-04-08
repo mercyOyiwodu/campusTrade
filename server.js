@@ -59,7 +59,7 @@ const swaggerDefinition = {
   security: [{ BearerAuth: [] }],
   servers: [
     {
-      url: 'http://localhost:4444',
+      url: 'https://campustrade-kku1.onrender.com',
       description: 'Production server',
     },
     {
@@ -71,7 +71,7 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ['./router/*.js', 'server.js'],
+  apis: ['./router/*.js', 'server.js',"./routes/product.js"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
