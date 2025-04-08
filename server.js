@@ -12,7 +12,8 @@ const PORT = process.env.PORT;
 const passport = require('passport');
 require('./middlewares/passport')
 const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express') 
+const swaggerUi = require('swagger-ui-express')
+// const productRouter = require('./router/productRouter'
 
 
 const app = express();
@@ -101,7 +102,13 @@ const server = async()=>{
 }
 server()
 
+
 app.listen(PORT,()=>{
     console.log(`Server is listening to PORT: ${PORT}`);
+// app.use(express.json())
+// app.use("api/v1",productRouter)
+
+// app.listen(port,()=>{
+//     console.log(`My Server Is Up And Running On Port ${port}`);
     
-})
+// })

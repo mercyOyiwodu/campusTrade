@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
+const Category = require('../models/category')
 
 class Product extends Model {}
 
@@ -12,7 +13,7 @@ Product.init(
       defaultValue: UUIDV4,
       allowNull: false
     },
-    title: {
+    productName: {
       type: DataTypes.STRING,
       allowNull: false, 
     },
@@ -24,12 +25,8 @@ Product.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    itemCondition:{
+    condition:{
       type: DataTypes.ENUM('Used','New'),
-      allowNull: false
-    },
-    availability: {
-      type: DataTypes.ENUM('In Stock', 'Sold'),
       allowNull: false
     },
     media: {
@@ -53,7 +50,7 @@ Product.init(
     //     },
     //   },
     
-    timeCreated: {
+     timeCreated: {
       type: DataTypes.DATE,
       allowNull: false
     },
