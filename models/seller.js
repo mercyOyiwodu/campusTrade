@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
+const Admin = require('./admin');
 
 class Seller extends Model {}
 
@@ -10,12 +11,19 @@ Seller.init(
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
-
     },
     fullName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isVerified:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    },
+  profilePic: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -24,8 +32,8 @@ Seller.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    profilePic: {
-      type: DataTypes.STRING,
+    jambRegNo: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     description: {
@@ -52,6 +60,18 @@ Seller.init(
       allowNull: false,
       type: DataTypes.DATE
     },
+    verifiedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'Admins',
+        key: 'id'
+      }
+    },
+    verifiedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE
@@ -64,5 +84,10 @@ Seller.init(
     tableName: 'Sellers'
   },
 );
+
+  Seller.belongsTo(Admin, {foreignKey: 'sellerId', as: 'admins'});
+  Admin.hasMany(Seller, { foreignKey: 'sellerId', as: 'seller' });
+
+
 
 module.exports= Seller

@@ -1,31 +1,36 @@
-const nodemailer = require("nodemailer");
-require("dotenv").config();
-const sendEmail = async (options) => {
+const nodemailer = require('nodemailer');
+
+const sendEmail = async (options)=>{
+    console.log(process.env.pass)
+    console.log(process.env.user)
+    //sending a mail to a particlar user/receipent by invoking options
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
-        service: process.env.SERVICE,
+        service: process.env.service,
         port: 587,
         secure: false, // true for port 465, false for other ports
         auth: {
-            user: process.env.APP_USER,
-            pass: process.env.APP_PASSWORD,
+          user: process.env.user,
+         //generate password from gmail
+          pass: process.env.pass,
         },
+        // tls: {
+        //     rejectUnauthorized: false, // to bypass ssl verification
+        // }
+});
+
+async function main() {
+    //send mail witbh defined transport object
+
+    const info = await transporter.sendMail({
+        from: `"Campus Trade" <${process.env.user}>`, // sender address
+        to: options.email, // list of receivers
+        subject: options.subject, 
+        html: options.html,
     });
-    // async..await is not allowed in global scope, must use a wrapper
-    async function main() {
-        // send mail with defined transport object
-        const info = await transporter.sendMail({
-            from: `"CampusTrade" <${process.env.APP_EMAIL}>`, // sender address
-            to: options.email, // list of receivers
-            subject: options.subject,
-            html: options.html, // html body
-        });
-
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
-    }
-
-    main().catch(console.error);
+     console.log("Message sent: %s", info.messageId)
 }
+main().catch(console.error);
 
-module.exports = sendEmail;
+}
+module.exports = {sendEmail};
