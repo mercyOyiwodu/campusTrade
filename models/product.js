@@ -33,22 +33,22 @@ Product.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    sellerId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "Sellers", 
-        key: "id",
-      },
-    },
-      categoryId: {
-        type: DataTypes.UUID,
-        allowNull: false,  
-        references: {
-          model: 'Categories', 
-          key: 'id',
-        },
-      },
+    // sellerId: {
+    //   type: DataTypes.UUID,
+    //   allowNull: false,
+    //   references: {
+    //     model: "Sellers", 
+    //     key: "id",
+    //   },
+    // },
+    //   categoryId: {
+    //     type: DataTypes.UUID,
+    //     allowNull: false,  
+    //     references: {
+    //       model: 'Categories', 
+    //       key: 'id',
+    //     },
+    //   },
     
      timeCreated: {
       type: DataTypes.DATE,

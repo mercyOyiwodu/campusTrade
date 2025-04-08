@@ -1,29 +1,30 @@
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination:(req, file, cb)=>{
+    destination: (req, file, cb)=> {
         cb(null, './uploads')
     },
-    filename: (req, file, cb)=>{
-        // cb(null,file.originalname)
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        const ext = file.mimetype.split('/')[1]
-        cb(null, `${file.fieldname}_${uniqueSuffix}.${ext}`)
+    filename: (req, file, cb)=> {
+        cb(null, file.originalname)
     }
 });
 
-const fileFilter = (req, file, cb)=>{
-    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('application/')) {
+const fileFilter = (req, file, cb)=> {
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
         cb(null, true)
-    } else {
-        cb(new Error('Invalid file format: Image Only'))
+    } else{
+        cb(new Error('Invalid File format: Image or Video Only'))
     }
 };
 
-const limits = {limits: 1024 * 1024 * 2};
+const limits = {
+    fileSize: 1024 * 1024 * 7
+};
 
 const upload = multer({
-    storage, fileFilter, limits
-})
+    storage,
+    fileFilter,
+    limits
+});
 
 module.exports = upload
