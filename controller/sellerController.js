@@ -21,17 +21,23 @@ exports.register = async(req, res) => {
             req.body.fullName = toPascalCase(req.body.fullName);
         }
         
-        const {email, fullName, password, profilePic} = req.body;
+        const {email, fullName, password, confirmPassword} = req.body;
         
         // Validate required fields
-        if (!email || !fullName || !password) {
+        if (!email || !fullName || !password || !confirmPassword) {
             // Unlink the file from our local storage
             fs.unlinkSync(req.file.path);
             return res.status(400).json({
                 message: 'Email, fullName and password are required'
             });
         }
-        
+
+        if(password !== confirmPassword){
+        return res.status(400).json({
+        message: "password does not match"
+        })
+        }
+
         const sellerExists = await Seller.findOne({ where: { email: email.toLowerCase() } });
         if (sellerExists) {
             // Unlink the file from our local storage
@@ -66,18 +72,14 @@ exports.register = async(req, res) => {
             fullName,
             password: hashedPassword,
             email: email.toLowerCase(),
-            profilePic: secure_url
+            profilePic: result.secure_url,
         });
         
         // Generate a token
-        const token = JWT.sign({ sellerId: seller.id, type: 'seller'
-            }, 
-            process.env.JWT_SECRET, 
-            { expiresIn: '30mins' }
-        );
-        
+        const token = JWT.sign({ sellerId: seller.id}, process.env.JWT_SECRET, { expiresIn: '30mins' });
+    
         // Create the verify link with the token generated
-        const link = `${req.protocol}://${req.get('host')}/api/v1/sellers/verify-user/${token}`;
+        const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
         const firstName = seller.fullName.split(' ')[0];
         
         // Create the email details
@@ -102,14 +104,13 @@ exports.register = async(req, res) => {
 
     } catch (error) {
         // Clean up file if it exists and an error occurred
-        if (req.file && req.file.path) {
-            try {
-                fs.unlinkSync(req.file.path);
-            } catch (unlinkError) {
-                console.error('Error deleting file:', unlinkError);
-            }
-        }
-        
+        // if (req.file && req.file.path) {
+        //     try {
+        //         fs.unlinkSync(req.file.path);
+        //     } catch (unlinkError) {
+        //         console.error('Error deleting file:', unlinkError);
+        //     }
+        // } 
         res.status(500).json({ 
             message: 'Error creating Seller: ' + error.message 
         });
@@ -320,6 +321,64 @@ exports.login = async (req, res)=>{
         })
     }
 }
+
+exports.logOut = async (req, res) => {
+    try {
+        const sellerExists = await Seller.findByPk(req.seller.sellerId);
+        if (!sellerExists) {
+            return res.status(404).json({
+                message: 'user not found'
+            })
+        }
+        sellerExists.isLoggedIn = false
+        await sellerExists.save()
+        res.status(200).json({
+            message: 'user logged out successfully'
+        })
+    } catch (error) {
+        console.log(error);
+        
+        res.status(500).json({
+            message: 'Error Logging out User'
+        });
+    }
+};
+
+exports.changePassword = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { newPassword } = req.body
+        const seller = await Seller.findByPk(id)
+        if (!seller) {
+            return res.status(404).json({
+                message: 'user not found'
+            })
+        }
+        const isMatch = bcrypt.compare(newPassword, seller.password)
+        if (isMatch === null) {
+            return res.status(400).json({
+                message: 'current password is the same as formal one'
+            })
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+        seller.password = hashedPassword
+
+        res.status(200).json({
+            message: 'Password updated successfully'
+        });
+
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: 'Error changing password'
+        });
+    }
+
+}
 // exports.getAll = async (req, res)=>{
 //     try {
 //         const getSellers = await Seller.findAll();
@@ -376,13 +435,13 @@ exports.updateSeller = async (req, res) => {
         const updatedUser = await Seller.update(id, data, { new: true })
         // Send a success response
         res.status(201).json({
-            message: 'User created successfully',
+            message: 'Your information has been updated successfully',
             data: updatedUser
         })
 
     } catch (error) {
         res.status(500).json({
-            message: 'Internal Server Error: ' + error.message
+            message: 'Error updating seller: ' + error.message
         })
     }
 }

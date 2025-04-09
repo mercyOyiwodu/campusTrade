@@ -5,6 +5,8 @@ const morgan = require('morgan')
 const sequelize = require('./database/sequelize')
 const sellerRouter = require('./router/sellerRouter');
 const adminRouter = require('./router/adminRouter');
+const productRouter = require('./router/productRouter')
+const categoryRouter = require('./router/category')
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
 const session = require('express-session')
@@ -13,8 +15,6 @@ const passport = require('passport');
 require('./middlewares/passport')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express')
-const productRouter = require('./router/productRouter')
-const categoryRouter = require('./router/category')
 
 
 const app = express();
@@ -54,8 +54,8 @@ const swaggerDefinition = {
               "bearerFormat": "JWT"
           }
       }
-    }
-  },
+    },
+  
   security: [{ BearerAuth: [] }],
   servers: [
       {
@@ -96,14 +96,10 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 *               type: string
 *               example: Welcome to the Campus Trade Home Page
 */
-app.use('/api/v1', sellerRouter);
-app.use('/api/v1', adminRouter)
-app.use('/api/v1', productRouter)
-app.use('/api/v1', categoryRouter)
 
 app.use('/', (req, res) => {
   res.send('Welcome To Campus Trade')
-
+  
 })
 
 app.get('/', (req, res) => {
@@ -111,13 +107,16 @@ app.get('/', (req, res) => {
 });
 app.use((error, req, res, next) => {
   if (error) {
-
+    
     return res.status(400).json({ message: error.message })
   }
 })
 
-app.use('/api/v1', adminRouter);
 app.use('/api/v1', sellerRouter);
+app.use('/api/v1', adminRouter)
+app.use('/api/v1', productRouter)
+app.use('/api/v1', categoryRouter)
+
 
 const server = async()=>{
     try {
@@ -126,8 +125,9 @@ const server = async()=>{
       } catch (error) {
         console.error('Unable to connect to the database:', error);
       }
+    };
   
-server()
+server();
 
 
 app.listen(PORT,()=>{

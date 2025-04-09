@@ -20,41 +20,21 @@ Seller.init(
       type:DataTypes.BOOLEAN,
       defaultValue:false
     },
-  profilePic: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-    phoneNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    jambRegNo: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    connectLink: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    school: {
-      type: DataTypes.ENUM('LASU', 'UNILAG', 'LAUTECH'),
-      defaultValue: 'UNILAG',
-    },
-    location: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    isloggedIn:{
+      type:DataTypes.BOOLEAN,
+      allowNull:false
+    },
+    profilePic:{
+      type: DataTypes.STRING,
+      allowNull:false
     },
     createdAt: {
       allowNull: false,
