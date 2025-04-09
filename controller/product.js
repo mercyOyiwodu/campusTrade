@@ -53,7 +53,7 @@ exports.createProduct = async (req, res) => {
     } catch (error) {
       console.error(error);
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
-      res.status(500).json({ message: "Error Creating Post" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   };
   
@@ -74,7 +74,7 @@ exports.getAllProducts = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Error retrieving products" });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -100,7 +100,7 @@ exports.getProductById = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Error retrieving product" });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -116,19 +116,15 @@ exports.updateProduct = async (req, res) => {
   
       let mediaUrls = [];
       if (req.files && req.files.length > 0) {
-        // Upload each file sequentially
         for (let file of req.files) {
           const uploadResult = await cloudinary.uploader.upload(file.path, { resource_type: "auto" });
           mediaUrls.push(uploadResult.secure_url);
-          // Remove the local file after uploading
           fs.unlinkSync(file.path);
         }
   
-        // Update the media field with the uploaded URLs
         product.media = mediaUrls;
       }
   
-      // Update other fields if provided
       product.price = price || product.price;
       product.productName = productName || product.productName;
       product.condition = condition || product.condition;
@@ -149,7 +145,7 @@ exports.updateProduct = async (req, res) => {
       if (req.files && req.files.length > 0) {
         req.files.forEach(file => fs.unlinkSync(file.path));
       }
-      res.status(500).json({ message: "Error updating product" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   };
   
@@ -169,6 +165,6 @@ exports.deleteProduct = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Error deleting product" });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }

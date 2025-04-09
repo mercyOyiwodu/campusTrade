@@ -78,7 +78,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error creating category"
+ *                     example: "Internal Server Error"
  */
 
 /**
@@ -134,7 +134,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error retrieving categories"
+ *                     example: "Internal Server Error"
  */
 
 /**
@@ -207,7 +207,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error retrieving category"
+ *                     example: "Internal Server Error"
  */
 
 /**
@@ -286,7 +286,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error updating category"
+ *                     example: "Internal Server Error"
  */
 
 /**
@@ -337,7 +337,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error deleting category"
+ *                     example: "Internal Server Error"
  */
 
 
