@@ -13,10 +13,6 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: false,
           },
-        profilePic: {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
           phoneNumber: {
             type: Sequelize.STRING,
             allowNull: false,
@@ -25,25 +21,13 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: false,
           },
-          jambRegNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
+          profilePic:{
+            type:Sequelize.STRING,
+            allowNull:false
           },
-          description: {
-            type: Sequelize.STRING,
-            allowNull: false,
-          },
-          connectLink: {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
-          school: {
-            type: Sequelize.ENUM('LASU', 'UNILAG', 'LAUTECH'),
-            defaultValue: 'UNILAG',
-          },
-          location: {
-            type: Sequelize.STRING,
-            allowNull: false,
+          isloggedIn:{
+            type:Sequelize.BOOLEAN,
+            allowNull:false
           },
           isVerified:{
           type:Sequelize.BOOLEAN,

@@ -5,13 +5,18 @@ const morgan = require('morgan');
 const sequelize = require('./database/sequelize');
 const sellerRouter = require('./router/sellerRouter');
 const adminRouter = require('./router/adminRouter');
-const productRouter = require('./router/productRouter');
-const categoryRouter = require('./router/category');
+const productRouter = require('./router/productRouter')
+const categoryRouter = require('./router/category')
+
+const secret = process.env.EXPRESS_SESSION_SECRET;
+const session = require('express-session')
+const PORT = process.env.PORT;
 const session = require('express-session');
 const passport = require('passport');
 require('./middlewares/passport');
 const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const swaggerUi = require('swagger-ui-express')
+
 
 const app = express();
 const PORT = process.env.PORT || 6780;
@@ -56,7 +61,9 @@ const swaggerDefinition = {
           }
       }
     },
-    security: [{ BearerAuth: [] }],
+
+  
+  security: [{ BearerAuth: [] }],
   servers: [
       {
           url: '',
@@ -81,47 +88,60 @@ const swaggerSpec = swaggerJSDoc(options);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
- * @swagger
- * /:
- *   get:
- *     summary: The Home Page of the app
- *     description: Returns a welcome message from Cloud View Hotel.
- *     security: []  # This ensures the route is public (no authentication required)
- *     tags:
- *       - Home
- *     responses:
- *       200:
- *         description: Successfully loads the home page.
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: Welcome to the Cloud View Hotel Home Page
- */
+* @swagger
+* /:
+*   get:
+*     summary: The Home Page of the app
+*     description: Returns a welcome message from Campus Trade.
+*     security: []  # This ensures the route is public (no authentication required)
+*     tags:
+*       - Home
+*     responses:
+*       200:
+*         description: Successfully loads the home page.
+*         content:
+*           text/plain:
+*             schema:
+*               type: string
+*               example: Welcome to the Campus Trade Home Page
+*/
+
+app.use('/', (req, res) => {
+  res.send('Welcome To Campus Trade')
+  
+})
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to the Cloud View Hotel Home Page');
 });
 app.use((error, req, res, next) => {
-    if (error) {
-        return res.status(400).json({ message: error.message })
-    }
-})
 
-app.use('/api/v1', adminRouter);
-app.use('/api/v1', categoryRouter);
-app.use('/api/v1', sellerRouter);
-app.use('/api/v1', productRouter);
-const server = async () => {
-  try {
-      await sequelize.authenticate();
-      console.log('Connection to database has been established successfully.');
-  } catch (error) {
-      console.error('Unable to connect to the database:', error.message);
+  if (error) {
+    
+    return res.status(400).json({ message: error.message })
   }
-};
-
-server();
-app.listen(PORT, () => {
-    console.log(`Server is listening to PORT: ${PORT}`)
 })
+
+app.use('/api/v1', sellerRouter);
+app.use('/api/v1', adminRouter)
+app.use('/api/v1', productRouter)
+app.use('/api/v1', categoryRouter)
+
+
+const server = async()=>{
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+      } catch (error) {
+        console.error('Unable to connect to the database:', error);
+      }
+    };
+  
+server();
+
+
+app.listen(PORT,()=>{
+    console.log(`Server is listening to PORT: ${PORT}`);
+})
+
