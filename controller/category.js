@@ -20,7 +20,7 @@ exports.createCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error creating category' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -39,7 +39,7 @@ exports.getAllCategories = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error fetching categories' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -63,7 +63,7 @@ exports.getCategoryById = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error fetching category' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -89,7 +89,7 @@ exports.updateCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error updating category' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -103,7 +103,6 @@ exports.deleteCategory = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    // Delete subcategories first, if they exist
     await category.getSubCategories().then(subCategories => {
       subCategories.forEach(async subCategory => {
         await subCategory.destroy();
@@ -117,6 +116,6 @@ exports.deleteCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Error deleting category' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
