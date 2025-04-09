@@ -1,6 +1,5 @@
 'use strict';
 
-const { UUIDV4 } = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -10,7 +9,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
       },
       productName: {
@@ -36,18 +35,10 @@ module.exports = {
       sellerId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: {
-          model: 'Sellers',
-          key: 'id',
-        },
       },
       categoryId: {
         type: Sequelize.UUID,
         allowNull: false,
-        references: {
-          model: 'Categories',
-          key: 'id',
-        },
       },
       timeCreated: {
         type: Sequelize.DATE,

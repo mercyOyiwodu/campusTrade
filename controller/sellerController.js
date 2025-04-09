@@ -4,7 +4,7 @@ const { toPascalCase } = require('../utils/stringHelpers')
 const cloudinary = require('../config/cloudinary');
 const JWT = require('jsonwebtoken');
 const sendEmail = require('../utils/nodemailer');
-const {signUpTemplate, forgotTemplate} = require('../utils/signUp');
+const signUpTemplate = require('../utils/signUp');
 const fs = require('fs');
 
 
@@ -21,6 +21,7 @@ exports.register = async(req, res) => {
             req.body.fullName = toPascalCase(req.body.fullName);
         }
         
+
         const {email, fullName, password, confirmPassword} = req.body;
         
         // Validate required fields
@@ -104,6 +105,7 @@ exports.register = async(req, res) => {
 
     } catch (error) {
         // Clean up file if it exists and an error occurred
+
         // if (req.file && req.file.path) {
         //     try {
         //         fs.unlinkSync(req.file.path);
@@ -114,6 +116,7 @@ exports.register = async(req, res) => {
         res.status(500).json({ 
             message: 'Error creating Seller: ' + error.message 
         });
+    
     }
 };
 

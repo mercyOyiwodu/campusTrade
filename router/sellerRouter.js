@@ -133,9 +133,9 @@ const sellerRouter = require('express').Router();
 
 sellerRouter.post('/register',  upload.single('profilePic'), registerValidation, register);
 
+
 /**
  * @swagger
- * paths:
  *   /api/v1/verify-user/{token}:
  *     get:
  *       summary: Verify seller email
@@ -197,7 +197,6 @@ sellerRouter.get('/verify-user/:token', verify);
 
 /**
  * @swagger
- * paths:
  *   /api/v1/forget:
  *     post:
  *       summary: Initiate password reset
@@ -263,7 +262,6 @@ sellerRouter.post('/forget', forgetPasswords, forgotPassword);
 
 /**
  * @swagger
- * paths:
  *   /api/v1/reset:
  *     post:
  *       summary: Reset seller password
@@ -496,7 +494,7 @@ sellerRouter.patch('/change/:id', changePassword);
  *                     example: "Internal Server Error: [error details]"
  */
 
-sellerRouter.patch('edit-profile', updateSeller)
+sellerRouter.patch('/edit-profile', updateSeller)
 
 /**
  * @swagger
@@ -548,7 +546,7 @@ sellerRouter.patch('edit-profile', updateSeller)
  *                     example: "Internal Server Error: [error details]"
  */
 
-sellerRouter.delete('remove', deleteSeller)
+sellerRouter.delete('/remove', deleteSeller)
 
 /**
  * @swagger

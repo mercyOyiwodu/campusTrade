@@ -36,10 +36,6 @@ module.exports = {
           verifiedBy: {
             type: Sequelize.UUID,
             allowNull: true,
-            references: {
-              model: 'Admins', 
-              key: 'id'
-            }
           },
           verifiedAt: {
             type: Sequelize.DATE,
