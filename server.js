@@ -11,7 +11,6 @@ const categoryRouter = require('./router/category')
 const secret = process.env.EXPRESS_SESSION_SECRET;
 const session = require('express-session')
 const PORT = process.env.PORT;
-const session = require('express-session');
 const passport = require('passport');
 require('./middlewares/passport');
 const swaggerJSDoc = require('swagger-jsdoc');
@@ -20,8 +19,6 @@ const swaggerUi = require('swagger-ui-express')
 
 
 const app = express();
-const PORT = process.env.PORT || 6780;
-const secret = process.env.EXPRESS_SESSION_SECRET;
 
 // Middlewares
 app.use(express.json());
