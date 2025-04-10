@@ -1,5 +1,5 @@
-const { verify, forgotPassword, resetPassword, login, register, updateSeller, deleteSeller } = require('../controller/sellerController');
-const { registerValidation } = require('../middlewares/validator');
+const { verify, forgotPassword, resetPassword, login, register, updateSeller, deleteSeller, logOut, changePassword } = require('../controller/sellerController');
+const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
 const JWT = require('jsonwebtoken');
@@ -131,7 +131,8 @@ const sellerRouter = require('express').Router();
  *                     example: "Error creating Seller: Something went wrong"
  */
 
-sellerRouter.post('/register', upload.single('profilePic'), register);
+sellerRouter.post('/register',  upload.single('profilePic'), registerValidation, register);
+
 
 /**
  * @swagger
@@ -257,7 +258,7 @@ sellerRouter.get('/verify-user/:token', verify);
  *                     type: string
  *                     example: "Internal Server Error"
  */
-sellerRouter.post('/forget', forgotPassword);
+sellerRouter.post('/forget', forgetPasswords, forgotPassword);
 
 /**
  * @swagger
@@ -331,7 +332,7 @@ sellerRouter.post('/forget', forgotPassword);
  *                     type: string
  *                     example: "Internal Server Error"
  */
-sellerRouter.post('/reset', resetPassword);
+sellerRouter.post('/reset', resetPasswords, resetPassword);
 
 /**
  * @swagger
@@ -414,6 +415,8 @@ sellerRouter.post('/reset', resetPassword);
  *                     example: "Internal server error"
  */
 sellerRouter.post('/login', login);
+sellerRouter.post('/signout', logOut);
+sellerRouter.patch('/change/:id', changePassword);
 
 /**
  * @swagger
