@@ -1,3 +1,4 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options)=>{
@@ -33,4 +34,4 @@ async function main() {
 main().catch(console.error);
 
 }
-module.exports = sendEmail
+module.exports = {sendEmail}

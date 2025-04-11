@@ -22,10 +22,15 @@ SellerKYC.init(
     connectLink: {
       type: DataTypes.STRING,
       allowNull: true,
+      defaultValue: true
     },
     school: {
       type: DataTypes.ENUM('LASU', 'UNILAG', 'LAUTECH'),
       defaultValue: 'UNILAG',
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     location: {
       type: DataTypes.STRING,

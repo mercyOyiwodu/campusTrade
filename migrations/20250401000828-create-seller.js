@@ -15,7 +15,7 @@ module.exports = {
           },
           phoneNumber: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           email: {
             type: Sequelize.STRING,
@@ -25,9 +25,10 @@ module.exports = {
             type:Sequelize.STRING,
             allowNull:false
           },
-          isloggedIn:{
-            type:Sequelize.BOOLEAN,
-            allowNull:false
+          isloggedIn: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false, // ✅ Recommended
           },
           isVerified:{
           type:Sequelize.BOOLEAN,

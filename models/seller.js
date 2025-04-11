@@ -24,6 +24,10 @@ Seller.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,  // Allows the phone number to be null
+    },    
     password: {
       type: DataTypes.STRING,
       allowNull: false,
