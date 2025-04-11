@@ -4,7 +4,7 @@ const SellerKYC = require('../models/sellerkyc');
 exports.profileDetails = async(req, res) =>{
     try {
         const {id:sellerId} = req.params;
-        const {jambRegNo, description, school, location, connectLink } = req.body;
+        const {jambRegNo, description, school, location, connectLink, phoneNumber } = req.body;
 
         const userExists = await Seller.findByPk(sellerId);
         if(!userExists){
@@ -19,7 +19,8 @@ exports.profileDetails = async(req, res) =>{
             location,
             id:sellerId,
             description,
-            connectLink
+            connectLink,
+            phoneNumber
         };
         const profile = await SellerKYC.create(data);
         res.status(201).json({

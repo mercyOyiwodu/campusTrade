@@ -5,20 +5,26 @@ const morgan = require('morgan');
 const sequelize = require('./database/sequelize');
 const sellerRouter = require('./router/sellerRouter');
 const adminRouter = require('./router/adminRouter');
-const productRouter = require('./router/productRouter')
-const categoryRouter = require('./router/category')
+const productRouter = require('./router/productRouter');
+const categoryRouter = require('./router/category');
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
-const session = require('express-session')
 const PORT = process.env.PORT;
 const passport = require('passport');
 require('./middlewares/passport');
 const swaggerJSDoc = require('swagger-jsdoc');
 
+const kycRouter = require('./router/kycRouter');
+
+
+
+
+
 const swaggerUi = require('swagger-ui-express')
 
 
 const app = express();
+
 
 // Middlewares
 app.use(express.json());
@@ -64,8 +70,8 @@ const swaggerDefinition = {
   security: [{ BearerAuth: [] }],
   servers: [
       {
-          url: '',
-          description: 'https://campustrade-kku1.onrender.com',
+          url: 'https://campustrade-kku1.onrender.com',
+          description: 'Production server',
       },
       {
           url: 'http://localhost:1709',
@@ -104,11 +110,6 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 *               example: Welcome to the Campus Trade Home Page
 */
 
-app.use('/', (req, res) => {
-  res.send('Welcome To Campus Trade')
-  
-})
-
 
 app.get('/', (req, res) => {
     res.send('Welcome to the Campus Trade Home Page');
@@ -125,6 +126,7 @@ app.use('/api/v1', sellerRouter);
 app.use('/api/v1', adminRouter)
 app.use('/api/v1', productRouter)
 app.use('/api/v1', categoryRouter)
+app.use('/api/v1', kycRouter)
 
 
 const server = async()=>{

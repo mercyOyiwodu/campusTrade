@@ -19,6 +19,7 @@ module.exports = {
       connectLink: {
         type: Sequelize.STRING,
         allowNull: false,
+        defaultValue: true
       },
       school: {
             type: Sequelize.ENUM('LASU', 'UNILAG', 'LAUTECH'),
