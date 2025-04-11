@@ -53,7 +53,7 @@ exports.createProduct = async (req, res) => {
     } catch (error) {
       console.error(error);
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: error.message  });
     }
   };
   
@@ -74,7 +74,7 @@ exports.getAllProducts = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ message: error.message });
     }
 }
 
@@ -100,7 +100,7 @@ exports.getProductById = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ message: error.message  });
     }
 }
 
@@ -145,7 +145,7 @@ exports.updateProduct = async (req, res) => {
       if (req.files && req.files.length > 0) {
         req.files.forEach(file => fs.unlinkSync(file.path));
       }
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: error.message  });
     }
   };
   
@@ -165,6 +165,6 @@ exports.deleteProduct = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ message: error.message  });
     }
 }
