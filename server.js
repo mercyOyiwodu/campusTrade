@@ -9,6 +9,7 @@ const productRouter = require('./router/productRouter');
 const categoryRouter = require('./router/category');
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
+const session = require('express-session');
 const PORT = process.env.PORT;
 const passport = require('passport');
 require('./middlewares/passport');
