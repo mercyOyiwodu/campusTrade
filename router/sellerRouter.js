@@ -26,15 +26,15 @@ const sellerRouter = require('express').Router();
  *               - profilePic
  *             properties:
  *               fullName:
- *                 type: string
+ *                 type: John doe
  *               email:
- *                 type: string
+ *                 type: example@gmail.com
  *               password:
- *                 type: string
+ *                 type: password
  *               confirmPassword:
- *                 type: string
+ *                 type: password
  *               phoneNumber:
- *                 type: string
+ *                 type: 09089378635
  *               profilePic:
  *                 type: string
  *                 format: binary
@@ -82,7 +82,7 @@ sellerRouter.get('/verify-user/:token', verify);
  *             type: object
  *             properties:
  *               email:
- *                 type: string
+ *                 type: example@gmail.com
  *     responses:
  *       200:
  *         description: Email sent
@@ -110,9 +110,9 @@ sellerRouter.post('/forget', forgotPassword);
  *             type: object
  *             properties:
  *               password:
- *                 type: string
+ *                 type: newpassword
  *               confirmPassword:
- *                 type: string
+ *                 type: newpassword
  *     responses:
  *       200:
  *         description: Password reset successful
@@ -134,9 +134,9 @@ sellerRouter.post('/reset/:token', resetPassword);
  *             type: object
  *             properties:
  *               email:
- *                 type: string
+ *                 type: newpassword
  *               password:
- *                 type: string
+ *                 type: newpassword
  *     responses:
  *       200:
  *         description: Login successful
@@ -203,7 +203,7 @@ sellerRouter.patch('/change/:id', changePassword);
  *             type: object
  *             properties:
  *               fullName:
- *                 type: string
+ *                 type: John doe
  *               profilePic:
  *                 type: string
  *                 format: binary

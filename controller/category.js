@@ -20,7 +20,7 @@ exports.createCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -39,7 +39,7 @@ exports.getAllCategories = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: error.message  });
   }
 };
 
@@ -63,7 +63,7 @@ exports.getCategoryById = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: error.message  });
   }
 };
 
@@ -89,7 +89,7 @@ exports.updateCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: error.message  });
   }
 };
 
@@ -116,6 +116,6 @@ exports.deleteCategory = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: error.message  });
   }
 };
