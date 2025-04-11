@@ -10,12 +10,18 @@ const categoryRouter = require('./router/category');
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
 const PORT = process.env.PORT;
-const session = require('express-session');
 const passport = require('passport');
 require('./middlewares/passport');
 const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+
 const kycRouter = require('./router/kycRouter');
+
+
+
+
+
+const swaggerUi = require('swagger-ui-express')
+
 
 const app = express();
 
@@ -106,7 +112,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the Cloud View Hotel Home Page');
+    res.send('Welcome to the Campus Trade Home Page');
 });
 app.use((error, req, res, next) => {
 
