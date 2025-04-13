@@ -1,6 +1,8 @@
 const adminRouter = require('express').Router();
-const adminController = require('../controller/adminController');
-const { authenticateAdmin, isSuperAdmin, adminAuth } = require('../middlewares/adminAuth');
+const {loginAdmin, createAdmin, verifyAdmin, verifySeller}= require('../controller/adminController');
+const { authenticateAdmin, adminAuth } = require('../middlewares/adminAuth');
+const { registerValidation} = require('../middlewares/validator');
+
 const JWT = require('jsonwebtoken');
 
 /**
@@ -40,12 +42,12 @@ const JWT = require('jsonwebtoken');
  *       500:
  *         description: Internal Server Error.
  */
-// adminRouter.patch('/make-admin/:id', authenticateAdmin, isSuperAdmin, adminController.createAdmin);
+adminRouter.post('/createAdmin', registerValidation, createAdmin);
+adminRouter.patch('/verify-seller/:sellerId', authenticateAdmin, verifySeller);
 
-// adminRouter.patch('/make-super/:id', authenticateAdmin, adminController.makeSuperAdmin);
-adminRouter.post('/login', adminController.loginAdmin);
-
-adminRouter.get('/sellers/:id/verify', authenticateAdmin, adminAuth, adminController.verifySeller);
+// adminRouter.patch('/make-admin/:id', authenticateAdmin, adminController.createAdmin);
+adminRouter.get('/verify-admin/:token', verifyAdmin)
+adminRouter.post('/login', loginAdmin);
 
 // Export router
 module.exports = adminRouter ;

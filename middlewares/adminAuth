@@ -41,7 +41,7 @@ exports.authenticateAdmin = async (req, res, next) => {
             id: admin.id,
             email: admin.email,
             isAdmin: admin.isAdmin,
-            isSuperAdmin: admin.isSuperAdmin
+            
         };
 
         next();
@@ -89,26 +89,4 @@ exports.authenticateAdmin = async (req, res, next) => {
     }
   };
   
-  exports.superAdminAuth = (req, res, next) => {
-    try {
-      // Check if admin object exists on request
-      if (!req.admin) {
-        return res.status(401).json({
-          message: 'Authentication required'
-        });
-      }
-      
-      if (req.admin.isSuperAdmin !== true) {
-        return res.status(403).json({
-          message: 'Super admin privileges required'
-        });
-      }
-      
-      next();
-    } catch (error) {
-      console.log(error.message);
-      return res.status(500).json({
-        message: 'Internal server error'
-      });
-    }
-  };
+  
