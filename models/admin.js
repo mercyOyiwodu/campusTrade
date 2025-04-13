@@ -28,20 +28,10 @@ Admin.init(
       type:DataTypes.BOOLEAN,
       defaultValue:false,
     },
-    isSuperAdmin:{
+    isVerified:{
       type:DataTypes.BOOLEAN,
       defaultValue:false
     },
-    sellerId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-          model: "Sellers", 
-          key: "id",
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE

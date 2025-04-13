@@ -62,19 +62,23 @@ exports.verifyPayment = async (req, res)=>{
         const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
             headers:{Authorization: `Bearer ${Secret_key}`}
         });
-        
+        console.log(response)
         //extract the data from the response
         const {data} = response?.data;
         //update your database according to the status of te resonse from KORAPAY API
-        if (data?.status && data?.status === 'success'){
+        if (data?.status === 'success'){
             //update to success if yes
-            const payment = await transactionModel.update({reference}, {status: 'Success'}, {new: true})
+         await transactionModel.update( 
+                {status: 'Success'},{where: {reference}});
+                console.log("Data after pay",data)
+                const updatedPayment = await transactionModel.findOne({ where: { reference } });
             return res.status(200).json({
                 message:'Payment verified successfully',
-                data: payment
+                data: updatedPayment
             }) 
         }else  {
-            const payment = await transactionModel.update({reference}, {status: 'Failed'}, {new: true})
+        await transactionModel.update({where:{reference}}, 
+                {status: 'Failed'})
             return res.status(200).json({
                 message:'Payment verification failed'
             }) 
@@ -82,7 +86,10 @@ exports.verifyPayment = async (req, res)=>{
     } catch (error) {
         console.log(error.message)
         res.status(500).json({
-            message: "Error initializing payment"
+            message: "Error verifying payment"
         })
     }
 }
+
+
+
