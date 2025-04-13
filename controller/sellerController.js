@@ -118,7 +118,7 @@ exports.register = async(req, res) => {
         //     }
         // } 
         res.status(500).json({ 
-            message: 'Error creating Seller: ' + error.message 
+            message: error.message 
         });
     
     }
@@ -198,7 +198,7 @@ exports.verify = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: "Internal server error"  + ' ' + error.message
+            message: error.message
         });
     }
 };
@@ -241,7 +241,7 @@ exports.forgotPassword = async (req, res) => {
     } catch (error) {
         console.log(error.message)
         res.status(500).json({
-            message: 'Internal Server Error'
+            message: error.message 
         })
     }
 };
@@ -286,7 +286,7 @@ exports.resetPassword = async (req, res) => {
             })
         }
         res.status(500).json({
-            message: 'Internal Server Error'
+            message: error.message 
         })
     }
 }
@@ -329,7 +329,7 @@ delete sellerData.password;
         })
     } catch (error) {
         return res.status(500).json({
-            message:"Internal server error" + error.message
+            message: error.message
         })
     }
 }
@@ -351,7 +351,7 @@ exports.logOut = async (req, res) => {
         console.log(error);
         
         res.status(500).json({
-            message: 'Error Logging out User'
+            message: error.message 
         });
     }
 };
@@ -386,7 +386,7 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         console.log(error.message);
         res.status(500).json({
-            message: 'Error changing password'
+            message: error.message 
         });
     }
 
@@ -443,7 +443,7 @@ exports.updateSeller = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({
-            message: 'Error updating seller: ' + error.message
+            message: error.message
         });
     }
 };
@@ -475,7 +475,7 @@ exports.deleteSeller = async (req, res) => {
         })
     } catch (error) {
        res.status(500).json({
-        message: 'Internal Server Error ' + error.message 
+        message: error.message 
        }) 
     }
 }

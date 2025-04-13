@@ -94,6 +94,7 @@ const sellerRouter = require('express').Router();
  *                     type: string
  *                     example: "Error creating Seller: [error details]"
  */
+
 sellerRouter.post('/register', upload.single('profilePic'), registerValidation, register);
 
 
@@ -478,7 +479,7 @@ sellerRouter.patch('/change/:id', changePassword);
  *             type: object
  *             properties:
  *               fullName:
- *                 type: string
+ *                 type: John doe
  *               profilePic:
  *                 type: array
  *                 items:

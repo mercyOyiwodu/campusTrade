@@ -5,7 +5,7 @@ const router = require('express').Router();
 /**
  * @swagger
  * paths:
- *   /api/v1/payment/initialize:
+ *   /api/v1/initialize:
  *     post:
  *       summary: Initialize a payment
  *       description: Starts a new payment process using customer information and returns a checkout URL.
@@ -81,7 +81,7 @@ router.post('/initialize', initializePayment);
 /**
  * @swagger
  * paths:
- *   /api/v1/payment/verify:
+ *   /api/v1/verify:
  *     get:
  *       summary: Verify a payment
  *       description: Verifies the status of a payment using a reference from the query parameter and updates the transaction record accordingly.
