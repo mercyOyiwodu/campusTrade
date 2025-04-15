@@ -49,7 +49,7 @@ exports.initializePayment = async(req, res) =>{
     } catch (error) {
         console.log(error.message)
         res.status(500).json({
-            message: 'Error initializing payment'
+            message: 'Error initializing payment' +error.message 
         })
     }
 }
@@ -86,7 +86,9 @@ exports.verifyPayment = async (req, res)=>{
     } catch (error) {
         console.log(error.message)
         res.status(500).json({
-            message: "Error verifying payment"
+
+            message: "Error initializing payment" + error.message 
+
         })
     }
 }

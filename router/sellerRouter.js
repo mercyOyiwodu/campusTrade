@@ -5,12 +5,6 @@ const upload = require('../utils/multer');
 const passport = require('passport');
 const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
- 
-
-
-
-
-
 
 /**
  * @swagger
@@ -246,6 +240,13 @@ sellerRouter.post('/signout', logOut);
  *               newPassword:
  *                 type: string
  *                 example: newpassword123
+ *               fullName:
+ *                 type: John doe
+ *               profilePic:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
  *       200:
  *         description: Password changed successfully
