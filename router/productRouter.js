@@ -1,4 +1,4 @@
-const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts } = require('../controller/product');
+const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct } = require('../controller/product');
 const upload = require('../utils/multer');
 const router = require('express').Router();
 
@@ -455,6 +455,56 @@ router.delete('/delete-product/:id', deleteProduct);
 
 /**
  * @swagger
+ * /not-approve/{id}:
+ *   post:
+ *     summary: Reject a product post
+ *     tags:
+ *       - Products
+ *     description: Sets the product status to `not_approved` for a specific product by ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to reject
+ *     responses:
+ *       200:
+ *         description: Product rejected successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Product rejected
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Product not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+/**
+ * @swagger
  * /product/all-approved-product:
  *   get:
  *     summary: Retrieve all approved products
@@ -502,6 +552,7 @@ router.delete('/delete-product/:id', deleteProduct);
  */
 
 router.post('/approve-product/:id', approveProduct);
+router.post('/not-approve/:id',rejectProduct)
 router.get('/all-approved-product', getApprovedProducts);
 router.get('/all-pending-product', getPendingProducts);
 
