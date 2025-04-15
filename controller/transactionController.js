@@ -1,97 +1,85 @@
 const transactionModel = require('../models/transaction');
-const axios = require('axios')
-const otpGenerator = require('otp-generator');
-const otp = otpGenerator.generate(12, {specialChars: false});
-const Secret_key = process.env.Korapay_Secret_Key;
-const ref = `TCA-AF-${otp}`
-const formatedDate = new Date().toLocaleString();
+const koraPayService = require('../services/koraPayService');
 
-exports.initializePayment = async(req, res) =>{
+exports.initializePayment = async (req, res) => {
     try {
-        const {email, amount, name} = req.body;
-        if(!email || !name || !amount){
+        const { email, amount, name } = req.body;
+        
+        if (!email || !name || !amount) {
             return res.status(400).json({
-                message:'Please input all fields'
-            })
-        };
-         const paymentData = {
-            amount,
-            customer:{
-                name,
-                email
-            },
-            currency: "NGN",
-            reference: ref
-         }
-         const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData,{
-            headers:{
-                Authorization: `Bearer ${Secret_key}`
-            }
-         });
-         const {data} = response?.data;
-         const payment = new transactionModel({
-            name, 
+                message: 'Please input all fields'
+            });
+        }
+
+        // Initialize payment with KoraPay service
+        const paymentResponse = await koraPayService.initializePayment({ amount, name, email });
+        const { reference, data } = paymentResponse;
+        
+        // Save transaction to database
+        const payment = new transactionModel({
+            name,
             amount,
             email,
-            reference:paymentData.reference,
-            paymentDate: formatedDate
-         }) 
-
-         await payment.save();
-
-         res.status(200).json({
-            message: 'Payment initialized successfully',
-            data:{
-                reference: data?.reference,
-                checkout_url:data?.checkout_url
-            }
-         })
-    } catch (error) {
-        console.log(error.message)
-        res.status(500).json({
-            message: 'Error initializing payment' +error.message 
-        })
-    }
-}
-
-exports.verifyPayment = async (req, res)=>{
-    try {
-        //extract the reference from the qquery prams
-        const {reference} = req.query;
-        //get the payment data from kora by snding a get method to their api
-        const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
-            headers:{Authorization: `Bearer ${Secret_key}`}
+            reference,
+            paymentDate: new Date().toLocaleString()
         });
-        console.log(response)
-        //extract the data from the response
-        const {data} = response?.data;
-        //update your database according to the status of te resonse from KORAPAY API
-        if (data?.status === 'success'){
-            //update to success if yes
-         await transactionModel.update( 
-                {status: 'Success'},{where: {reference}});
-                console.log("Data after pay",data)
-                const updatedPayment = await transactionModel.findOne({ where: { reference } });
+        
+        await payment.save();
+        
+        // Return response to client
+        res.status(200).json({
+            message: 'Payment initialized successfully',
+            data: {
+                reference: data.reference,
+                checkout_url: data.checkout_url
+            }
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: 'Error initializing payment: ' + error.message
+        });
+    }
+};
+
+exports.verifyPayment = async (req, res) => {
+    try {
+        // Extract the reference from the query params
+        const { reference } = req.query;
+        
+        // Verify payment using KoraPay service
+        const verificationResponse = await koraPayService.verifyPayment(reference);
+        const { data } = verificationResponse;
+        
+        // Update database according to the status of the response
+        if (data.status === 'success') {
+            // Update to success
+            await transactionModel.update(
+                { status: 'Success' },
+                { where: { reference } }
+            );
+            
+            const updatedPayment = await transactionModel.findOne({ where: { reference } });
+            
             return res.status(200).json({
-                message:'Payment verified successfully',
+                message: 'Payment verified successfully',
                 data: updatedPayment
-            }) 
-        }else  {
-        await transactionModel.update({where:{reference}}, 
-                {status: 'Failed'})
+            });
+        } else {
+            // Update to failed
+            await transactionModel.update(
+                { status: 'Failed' },
+                { where: { reference } }
+            );
+            
             return res.status(200).json({
-                message:'Payment verification failed'
-            }) 
+                message: 'Payment verification failed'
+            });
         }
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
         res.status(500).json({
-
-            message: "Error initializing payment" + error.message 
-
-        })
+            message: "Error verifying payment: " + error.message
+        });
     }
-}
-
-
-
+};
