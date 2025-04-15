@@ -47,6 +47,7 @@ exports.createProduct = async (req, res) => {
         categoryId,
         sellerId,
         timeCreated: new Date(),
+        status: 'pending'
       });
   
       res.status(201).json({ message: "Post created successfully", data: product });
@@ -168,3 +169,40 @@ exports.deleteProduct = async (req, res) => {
         res.status(500).json({ message: error.message  });
     }
 }
+
+exports.approveProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.status = "approved";
+    await product.save();
+
+    res.status(200).json({ message: "Product approved", data: product });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getApprovedProducts = async (req, res) => {
+  try {
+    const products = await Product.findAll({ where: { status: 'approved' } });
+    res.status(200).json({ message: "Approved products", data: products });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getPendingProducts = async (req, res) => {
+  try {
+    const products = await Product.findAll({ where: { status: 'pending' } });
+    res.status(200).json({ message: "Pending products", data: products });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

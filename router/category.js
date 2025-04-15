@@ -78,7 +78,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal Server Error"
+ *                     example: "Internal Server Error:<error-message>"
  */
 
 /**
@@ -134,7 +134,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal Server Error"
+ *                     example: "Internal Server Error:<error-message>"
  */
 
 /**
@@ -207,7 +207,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal Server Error"
+ *                     example: "Internal Server Error: <error-message>"
  */
 
 /**
@@ -286,7 +286,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal Server Error"
+ *                     example: "Internal Server Error: <error-message>"
  */
 
 /**
@@ -337,7 +337,7 @@ const router = express.Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal Server Error"
+ *                     example: "Internal Server Error: <error-message>"
  */
 
 

@@ -160,7 +160,7 @@ sellerRouter.post('/register', upload.single('profilePic'), registerValidation, 
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Internal server error TokenExpiredError"
+ *                     example: "Internal server error TokenExpiredError:<error-message>"
  */
 sellerRouter.get('/verify-user/:token', verify);
 
@@ -223,7 +223,7 @@ sellerRouter.get('/verify-user/:token', verify);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Internal Server Error
+ *                   example: "Internal Server Error: <error-message>"
  */
 sellerRouter.post('/forget', forgotPassword);
 
@@ -296,7 +296,7 @@ sellerRouter.post('/forget', forgotPassword);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Internal Server Error
+ *                   example: "Internal Server Error:<error-message>"
  */
 sellerRouter.post('/reset/:token', resetPassword);
 
@@ -377,7 +377,7 @@ sellerRouter.post('/reset/:token', resetPassword);
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: Internal server error: [Error message]
+ *                     example: "Internal server error: [Error message]" 
  */
 sellerRouter.post('/login', login);
 
@@ -423,7 +423,7 @@ sellerRouter.post('/login', login);
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: Error Logging out User
+ *                     example: "Error Logging out User :<error-message>"
  */
 sellerRouter.post('/signout', logOut);
 
@@ -517,7 +517,7 @@ sellerRouter.patch('/change/:id', changePassword);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Error updating seller: <error-message>
+ *                   example: "Error updating seller: <error-message>"
  */
 sellerRouter.patch('/edit-profile/:id', upload.array('profilePic'), updateSeller);
 
