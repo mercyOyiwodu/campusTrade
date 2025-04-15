@@ -7,7 +7,9 @@ const sellerRouter = require('./router/sellerRouter');
 const adminRouter = require('./router/adminRouter');
 const productRouter = require('./router/productRouter');
 const categoryRouter = require('./router/category');
-const transactionRouter = require('./router/transactionRouter')
+const transactionRouter = require('./router/transactionRouter');
+const adRouter = require('./router/adRouter')
+const session = require('express-session');
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
 const PORT = process.env.PORT;
@@ -75,7 +77,7 @@ const swaggerDefinition = {
           description: 'Production server',
       },
       {
-          url: 'http://localhost:4729',
+          url: 'http://localhost:4725',
           description: 'Development server',
       },
 
@@ -124,12 +126,12 @@ app.use((error, req, res, next) => {
 })
 
 app.use('/api/v1', sellerRouter);
-app.use('/api/v1', adminRouter)
-app.use('/api/v1', productRouter)
-app.use('/api/v1', categoryRouter)
-app.use('/api/v1', kycRouter)
-app.use('/api/v1', transactionRouter)
-
+app.use('/api/v1', adminRouter);
+app.use('/api/v1', productRouter);
+app.use('/api/v1', categoryRouter);
+app.use('/api/v1', kycRouter);
+app.use('/api/v1', transactionRouter);
+app.use('/api/v1', adRouter);
 
 const server = async()=>{
     try {
