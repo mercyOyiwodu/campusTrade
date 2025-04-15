@@ -17,7 +17,7 @@ exports.createProduct = async (req, res) => {
       }
   
       const totalPaid = await Transaction.sum("amountPaid", {
-        where: { userId: sellerId, status: "successful" },
+        where: { userId: sellerId, status: "Success" },
       });
   
       if (!totalPaid || totalPaid < postFee) {
@@ -27,7 +27,6 @@ exports.createProduct = async (req, res) => {
         });
       }
   
-      // Upload multiple files to Cloudinary
       const uploadedMedia = [];
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path, {
@@ -188,6 +187,25 @@ exports.approveProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.rejectProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.status = "not_approved";
+    await product.save();
+
+    res.status(200).json({ message: "Product rejected", data: product });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 exports.getApprovedProducts = async (req, res) => {
   try {

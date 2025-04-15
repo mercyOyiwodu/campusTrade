@@ -51,7 +51,7 @@ Product.init(
       },
     },
     status: {
-      type: DataTypes.ENUM('pending', 'approved'),
+      type: DataTypes.ENUM('pending', 'approved','not_approved'),
       defaultValue: 'pending',
     },    
     timeCreated: {
