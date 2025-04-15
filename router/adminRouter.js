@@ -7,47 +7,125 @@ const JWT = require('jsonwebtoken');
 
 /**
  * @swagger
- * tags:
- *   name: Admin
- *   description: Endpoints for admin management
+ * /api/v1/createAdmin:
+ *   post:
+ *     summary: Register a new admin
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullName
+ *               - email
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: Jane Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: jane@example.com
+ *               password:
+ *                 type: string
+ *                 example: secret123
+ *               confirmPassword:
+ *                 type: string
+ *                 example: secret123
+ *     responses:
+ *       201:
+ *         description: Admin created successfully
+ *       400:
+ *         description: Validation error or admin already exists
+ *       500:
+ *         description: Internal server error
  */
+adminRouter.post('/createAdmin', registerValidation, createAdmin);
 
-
-// Authentication routes
 /**
  * @swagger
- * /api/v1/make-admin/{id}:
+ * /api/v1/verify-seller/{sellerId}:
  *   patch:
- *     summary: Make a user an admin
- *     description: Grants admin privileges to a user. **Requires authentication and Super Admin role.**
+ *     summary: Verify a seller account
  *     tags: [Admin]
  *     security:
- *       - BearerAuth: []  # Requires authentication
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: sellerId
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the user to be made an admin
+ *         description: ID of the seller to verify
  *     responses:
  *       200:
- *         description: User successfully promoted to admin.
- *       400:
- *         description: User is already an admin.
- *       401:
- *         description: Unauthorized - No token provided or insufficient privileges.
+ *         description: Seller verified successfully
  *       404:
- *         description: User not found.
+ *         description: Seller not found
  *       500:
- *         description: Internal Server Error.
+ *         description: "Internal server error:<error-message>"
  */
-adminRouter.post('/createAdmin', registerValidation, createAdmin);
 adminRouter.patch('/verify-seller/:sellerId', authenticateAdmin, verifySeller);
 
-// adminRouter.patch('/make-admin/:id', authenticateAdmin, adminController.createAdmin);
-adminRouter.get('/verify-admin/:token', verifyAdmin)
+/**
+ * @swagger
+ * /api/v1/verify-admin/{token}:
+ *   get:
+ *     summary: Verify admin email via token
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Verification token sent via email
+ *     responses:
+ *       200:
+ *         description: Account verified successfully
+ *       400:
+ *         description: Already verified or link expired
+ *       404:
+ *         description: Admin not found
+ *       500:
+ *         description: "Internal server error: <error-message>"
+ */
+adminRouter.get('/verify-admin/:token', verifyAdmin);
+
+/**
+ * @swagger
+ * /api/v1/login:
+ *   post:
+ *     summary: Admin login
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: admin@example.com
+ *               password:
+ *                 type: string
+ *                 example: secret123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: "Internal server error:<error-message>"
+ */
 adminRouter.post('/login', loginAdmin);
 
-// Export router
 module.exports = adminRouter ;

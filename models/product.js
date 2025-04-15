@@ -50,10 +50,14 @@ Product.init(
         key: 'id',
       },
     },
+    status: {
+      type: DataTypes.ENUM('pending', 'approved'),
+      defaultValue: 'pending',
+    },    
     timeCreated: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.NOW, // Automatically sets the creation time
+      defaultValue: Sequelize.NOW, 
     },
   },
   {

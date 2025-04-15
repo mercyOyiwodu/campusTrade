@@ -1,4 +1,4 @@
-const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct } = require('../controller/product');
+const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts } = require('../controller/product');
 const upload = require('../utils/multer');
 const router = require('express').Router();
 
@@ -123,7 +123,7 @@ const router = require('express').Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error creating product"
+ *                     example: "Error creating product: <error-message>"
  */
 
 /**
@@ -183,7 +183,7 @@ const router = require('express').Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error retrieving products"
+ *                     example: "Error retrieving products: <error-message>"
  */
 
 /**
@@ -259,7 +259,7 @@ const router = require('express').Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error retrieving product"
+ *                     example: "Error retrieving product: <error-message>"
  */
 
 /**
@@ -363,7 +363,7 @@ const router = require('express').Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error updating product"
+ *                     example: "Error updating product: <error-message>"
  */
 
 /**
@@ -413,18 +413,96 @@ const router = require('express').Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: "Error deleting product"
+ *                     example: "Error deleting product: <error-message>"
  */
 
 
 router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
-
 router.get('/products', getAllProducts);
-
 router.get('/oneproduct/:id', getProductById);
-
 router.put('/update-product/:id', upload.array('media', 5), updateProduct);
-
 router.delete('/delete-product/:id', deleteProduct);
+/**
+ * @swagger
+ * /product/approve-product/{id}:
+ *   patch:
+ *     summary: Approve a product post
+ *     tags: [Product]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the product to approve
+ *     responses:
+ *       200:
+ *         description: Product approved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: "Server error:<error-message>"
+ */
+
+/**
+ * @swagger
+ * /product/all-approved-product:
+ *   get:
+ *     summary: Retrieve all approved products
+ *     tags: [Product]
+ *     responses:
+ *       200:
+ *         description: List of approved products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: "Server error:<error-message>"
+ */
+
+/**
+ * @swagger
+ * /product/all-pending-product:
+ *   get:
+ *     summary: Retrieve all pending products
+ *     tags: [Product]
+ *     responses:
+ *       200:
+ *         description: List of pending products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: "Server error:<error-message>"
+ */
+
+router.post('/approve-product/:id', approveProduct);
+router.get('/all-approved-product', getApprovedProducts);
+router.get('/all-pending-product', getPendingProducts);
 
 module.exports = router;
