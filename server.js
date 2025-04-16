@@ -126,11 +126,11 @@ app.use((error, req, res, next) => {
   }
 })
 
-app.use('/api/v1', sellerRouter);
+app.use('/api/v1/seller', sellerRouter);
 app.use('/api/v1', adminRouter);
 app.use('/api/v1', productRouter);
 app.use('/api/v1', categoryRouter);
-app.use('/api/v1', kycRouter);
+app.use('/api/v1/kyc', kycRouter);
 app.use('/api/v1', transactionRouter);
 app.use('/api/v1', adRouter);
 app.use('/api/v1', subCategoryRouter)
