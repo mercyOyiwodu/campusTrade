@@ -10,6 +10,7 @@ const categoryRouter = require('./router/category');
 const transactionRouter = require('./router/transactionRouter');
 const adRouter = require('./router/adRouter')
 const session = require('express-session');
+const subCategoryRouter = require('./router/subCategory')
 
 const secret = process.env.EXPRESS_SESSION_SECRET;
 const PORT = process.env.PORT;
@@ -132,6 +133,7 @@ app.use('/api/v1', categoryRouter);
 app.use('/api/v1', kycRouter);
 app.use('/api/v1', transactionRouter);
 app.use('/api/v1', adRouter);
+app.use('/api/v1', subCategoryRouter)
 
 const server = async()=>{
     try {
@@ -144,6 +146,11 @@ const server = async()=>{
   
 server();
 
+console.log({
+  host: sequelize.options.host,
+  username: sequelize.options.username,
+  password: sequelize.options.password,
+});
 
 app.listen(PORT,()=>{
     console.log(`Server is listening to PORT: ${PORT}`);

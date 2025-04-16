@@ -85,6 +85,7 @@ sellerRouter.post('/register', registerValidation, register);
  *             example:
  *               message: "Invalid or expired token"
  */
+ 
 sellerRouter.get('/verify-user/:token', verify);
 
 /**
@@ -118,7 +119,7 @@ sellerRouter.get('/verify-user/:token', verify);
  *             example:
  *               message: "Seller with this email does not exist"
  */
-sellerRouter.post('/forget', forgetPasswords, forgotPassword);
+sellerRouter.post('/forget', forgetPasswords, forgotPassword); 
 
 /**
  * @swagger
