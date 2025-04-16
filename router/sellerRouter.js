@@ -26,7 +26,7 @@ const sellerRouter = require('express').Router();
 
 /**
  * @openapi
- * /api/v1/seller/register:
+ * api/v1/seller/register:
  *   post:
  *     summary: Register a new seller
  *     tags:
