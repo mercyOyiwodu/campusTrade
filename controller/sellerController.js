@@ -1,7 +1,6 @@
 const Seller = require('../models/seller');
 const bcrypt = require('bcryptjs');
 const { toPascalCase } = require('../utils/stringHelpers')
-const cloudinary = require('../config/cloudinary');
 const JWT = require('jsonwebtoken');
 const {sendEmail} = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
@@ -11,26 +10,14 @@ const fs = require('fs');
 
 exports.register = async(req, res) => {
     try {
-        // Check if file exists
-        if (!req.file) {
-            return res.status(400).json({
-                message: 'Profile image is required'
-            });
-        }
-
-        if (req.body.fullName) {
-            req.body.fullName = toPascalCase(req.body.fullName);
-        }
-        
-
-        const {email, fullName, password, confirmPassword, phoneNumber} = req.body;
+        const {email, password, confirmPassword } = req.body;
         
         // Validate required fields
-        if (!email || !fullName || !password || !confirmPassword) {
+        if (!email || !password || !confirmPassword) {
             // Unlink the file from our local storage
             fs.unlinkSync(req.file.path);
             return res.status(400).json({
-                message: 'Email, fullName and password are required'
+                message: 'Email and password are required'
             });
         }
 
@@ -54,29 +41,12 @@ exports.register = async(req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        // Use Cloudinary promise-based approach
-        const result = await cloudinary.uploader.upload(req.file.path, { resource_type: 'auto' }, (error, data) => {
-            if (error) {
-                return res.status(400).json({
-                    message: error.message
-                })
-            } else {
-                return data
-            }
-        });
         
-        // Unlink the file from our local storage after upload
-        fs.unlinkSync(req.file.path);
-
-
         // Create the user details
         const seller = await Seller.create({
-            fullName,
             password: hashedPassword,
             email: email.toLowerCase(),
-            profilePic: result.secure_url,
             isloggedIn: false,
-            phoneNumber
         });
         
         // Generate a token
@@ -108,15 +78,6 @@ exports.register = async(req, res) => {
         });
 
     } catch (error) {
-        // Clean up file if it exists and an error occurred
-
-        // if (req.file && req.file.path) {
-        //     try {
-        //         fs.unlinkSync(req.file.path);
-        //     } catch (unlinkError) {
-        //         console.error('Error deleting file:', unlinkError);
-        //     }
-        // } 
         res.status(500).json({ 
             message: error.message 
         });
@@ -358,30 +319,34 @@ exports.logOut = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
     try {
-        const { id } = req.params
-        const { newPassword } = req.body
-        const seller = await Seller.findByPk(id)
+        // Extract the token from the params
+        const { token } = req.params;
+        // Extract the passwod and confirm password from the request body
+        const { password, confirmPassword } = req.body;
+        // Verify if the token is still valid
+        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
+        // Check if the user is still existsing
+        const seller = await Seller.findByPk(sellerId);
         if (!seller) {
             return res.status(404).json({
-                message: 'user not found'
+                message: 'User not found'
             })
         }
-        const isMatch = await bcrypt.compare(newPassword, seller.password)
-        if (isMatch) {
+        // Confirm that the password matches
+        if (password !== confirmPassword) {
             return res.status(400).json({
-                message: 'current password is the same as formal one'
+                message: 'Password does not match'
             })
         }
-
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(newPassword, salt)
-
-        seller.password = hashedPassword
+        // Generate a salt and hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        // Update the user's password to the new password
+        seller.password = hashedPassword;
         await seller.save()
         res.status(200).json({
             message: 'Password updated successfully'
         });
-
 
     } catch (error) {
         console.log(error.message);
@@ -390,63 +355,81 @@ exports.changePassword = async (req, res) => {
         });
     }
 
-}
-// exports.getAll = async (req, res)=>{
-//     try {
-//         const getSellers = await Seller.findAll();
-//         res.status(200).json({
-//             message: 'All registered seller in the platform',
-//             data: getSellers,
-//         })
-
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: 'Internal server error' + ' ' + error.message
-//         })
-//     }
-// }
-
-
-exports.updateSeller = async (req, res) => {
+}                                                                                                                                                                                                     // // In sellerController.js
+exports.getSellerDashboard = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { fullName } = req.body;
-
-        const seller = await Seller.findByPk(id);
-        if (!seller) {
-            return res.status(404).json({
-                message: 'User not found'
-            });
+      const sellerId = req.seller.id;
+      
+      const totalProducts = await Product.count({ where: { sellerId } });
+      const pendingProducts = await Product.count({ 
+        where: { 
+          sellerId,
+          approvalStatus: 'pending' 
+        } 
+      });
+      const approvedProducts = await Product.count({ 
+        where: { 
+          sellerId,
+          approvalStatus: 'approved' 
+        } 
+      });
+      
+      res.status(200).json({
+        message: 'Dashboard data retrieved successfully',
+        data: {
+          products: {
+            total: totalProducts,
+            pending: pendingProducts,
+            approved: approvedProducts
+          },
+          verificationStatus: req.seller.isVerified
         }
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal Server Error: " + error.message
+      });
+    }
+  };
 
-        const data = {
-            fullName,
-             profilePic: seller.profilePic };
 
-        if (req.files && req.files.length > 0) {
-            const oldFilePath = seller.profilePic;
-            if (oldFilePath && fs.existsSync(oldFilePath)) {
-                fs.unlinkSync(oldFilePath);
-            }
-
-            const files = req.files.map((file) => file.filename);
-            data.profilePic = files.length === 1 ? files[0] : files;
-        }
-
-        await Seller.update(data, { where: { id } });
-        const updatedUser = await Seller.findByPk(id);
-
+exports.getAll = async (req, res)=>{
+    try {
+        const getSellers = await Seller.findAll();
         res.status(200).json({
-            message: 'Your information has been updated successfully',
-            data: updatedUser
-        });
+            message: 'All registered seller in the platform',
+            data: getSellers,
+            total: getSellers.length
+        })
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        return res.status(500).json({
+            message: 'Internal server error' + ' ' + error.message
+        })
+  }
+}
+exports.searchSellers = async (req, res) => {
+    try {
+       const {location, school} = req.query;
+
+       let query = {};
+
+       if (location){
+        query.location = location;
+       }
+       if (school){
+        query.school = school;
+       }
+
+       const sellers = await Seller.findAll({where: query});
+
+       return res.status(200).json(sellers);
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Error serching for sellers' + ' '+ error.message
+        })
     }
-};
+}
 
 
 exports.deleteSeller = async (req, res) => {

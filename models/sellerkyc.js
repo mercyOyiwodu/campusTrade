@@ -15,6 +15,14 @@ SellerKYC.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    fullName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        profilePic:{
+          type: DataTypes.STRING,
+          allowNull:false
+        },
     description: {
       type: DataTypes.STRING,
       allowNull: false,

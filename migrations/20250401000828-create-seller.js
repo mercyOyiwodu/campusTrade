@@ -9,21 +9,9 @@ module.exports = {
             type: Sequelize.UUID,
             defaultValue:Sequelize.UUIDV4
           },
-          fullName: {
-            type: Sequelize.STRING,
-            allowNull: false,
-          },
-          phoneNumber: {
-            type: Sequelize.STRING,
-            allowNull: true,
-          },
           email: {
             type: Sequelize.STRING,
             allowNull: false,
-          },
-          profilePic:{
-            type:Sequelize.STRING,
-            allowNull:false
           },
           isloggedIn: {
             type: Sequelize.BOOLEAN,

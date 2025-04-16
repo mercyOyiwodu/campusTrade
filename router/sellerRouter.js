@@ -1,178 +1,100 @@
-const { verify, forgotPassword, resetPassword, login, register, updateSeller, deleteSeller, logOut, changePassword } = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, updateSeller, deleteSeller, logOut, changePassword, searchSellers,getAll , getSellerDashboard } = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
+const { authenticateAdmin } = require('../middlewares/adminAuth')
 const upload = require('../utils/multer');
 const passport = require('passport');
 const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
- 
 
 /**
  * @swagger
- * paths:
- *   /api/v1/register:
- *     post:
- *       summary: Register a new seller
- *       description: Registers a new seller with required details and a profile image. Sends a verification email after registration.
- *       tags:
- *         - Seller
- *       requestBody:
- *         required: true
- *         content:
- *           multipart/form-data:
- *             schema:
- *               type: object
- *               required:
- *                 - fullName
- *                 - email
- *                 - password
- *                 - confirmPassword
- *                 - profilePic
- *               properties:
- *                 fullName:
- *                   type: string
- *                   example: "John Doe"
- *                 email:
- *                   type: string
- *                   format: email
- *                   example: "john@example.com"
- *                 password:
- *                   type: string
- *                   format: password
- *                   example: "StrongPassword123"
- *                 confirmPassword:
- *                   type: string
- *                   format: password
- *                   example: "StrongPassword123"
- *                 phoneNumber:
- *                   type: string
- *                   example: "08012345678"
- *                 profilePic:
- *                   type: string
- *                   format: binary
- *                   description: Seller's profile picture (required)
- *       responses:
- *         "201":
- *           description: Seller registered successfully
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Seller created successfully. Please check your email to verify your account."
- *                   data:
- *                     type: object
- *                     example:
- *                       id: "1"
- *                       fullName: "John Doe"
- *                       email: "john@example.com"
- *                       profilePic: "https://res.cloudinary.com/your-cloud/image/upload/v1/profile.jpg"
- *                       isloggedIn: false
- *                       phoneNumber: "08012345678"
- *                   token:
- *                     type: string
- *                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *         "400":
- *           description: Bad request (validation failure, existing user, or missing fields)
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Profile image is required"
- *         "500":
- *           description: Internal Server Error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error creating Seller: [error details]"
- */
-
-sellerRouter.post('/register', upload.single('profilePic'), registerValidation, register);
-
-
-/**
- * @swagger
- * paths:
- *   /api/v1/verify-user/{token}:
- *     get:
- *       summary: Verify seller's email
- *       description: Verifies the seller's account using a JWT token sent to their email. If the token is expired, a new one is issued and emailed.
- *       tags:
- *         - Seller
- *       parameters:
- *         - name: token
- *           in: path
- *           required: true
- *           description: JWT token sent via email for account verification
+ * /api/v1/register:
+ *   post:
+ *     tags:
+ *       - Seller
+ *     summary: Register a new seller
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
  *           schema:
- *             type: string
- *             example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *       responses:
- *         "200":
- *           description: Verification status response
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 oneOf:
- *                   - properties:
- *                       message:
- *                         type: string
- *                         example: "Account verified successfully"
- *                   - properties:
- *                       message:
- *                         type: string
- *                         example: "Link expired: A new verification link was sent, please check your email"
- *         "400":
- *           description: Invalid or already verified token / seller not found
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Seller already verified, please login"
- *         "404":
- *           description: Seller not found
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Seller not found"
- *         "500":
- *           description: Internal server error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Internal server error TokenExpiredError:<error-message>"
- */
-sellerRouter.get('/verify-user/:token', verify);
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "example@email.com"
+ *               password:
+ *                 type: string
+ *                 example: "yourPassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "yourPassword123"
+ *               profilePic:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Seller registered successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller created successfully. Please check your email to verify your account."
+ *               data:
+ *                 id: 1
+ *                 email: "example@email.com"
+ *               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Email and password are required"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Error creating Seller: [error message]"
+ */
+sellerRouter.post('/register', registerValidation, register);
 
+/**
+ * @swagger
+ * /api/v1/verify-user/{token}:
+ *   get:
+ *     tags:
+ *       - Seller
+ *     summary: Verify seller account via token
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Seller verified successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Account verified successfully"
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Invalid or expired token"
+ */
+ 
+sellerRouter.get('/verify-user/:token', verify);
 
 /**
  * @swagger
  * /api/v1/forget:
  *   post:
- *     summary: Initiate password reset
- *     description: Sends a password reset link to the seller's email address.
  *     tags:
  *       - Seller
+ *     summary: Send password reset link
  *     requestBody:
  *       required: true
  *       content:
@@ -184,260 +106,34 @@ sellerRouter.get('/verify-user/:token', verify);
  *                 type: string
  *                 example: johndoe@example.com
  *     responses:
- *       "200":
- *         description: Password reset link sent successfully
+ *       200:
+ *         description: Password reset link sent
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password reset initiated, Please check your email for the reset link
- *       "400":
- *         description: Email not provided
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Please input your email
- *       "404":
+ *             example:
+ *               message: "Password reset link sent"
+ *       404:
  *         description: Seller not found
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User not found
- *       "500":
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal Server Error: <error-message>"
- */
-sellerRouter.post('/forget', forgotPassword);
-
+ *             example:
+ *               message: "Seller with this email does not exist"
+ */
+sellerRouter.post('/forget', forgetPasswords, forgotPassword); 
 
 /**
  * @swagger
  * /api/v1/reset/{token}:
  *   post:
- *     summary: Reset seller's password
- *     description: Allows a seller to reset their password using a valid token sent to their email.
  *     tags:
  *       - Seller
+ *     summary: Reset password using token
  *     parameters:
  *       - in: path
  *         name: token
  *         required: true
- *         description: JWT token from the password reset email
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               password:
- *                 type: string
- *                 example: newStrongPassword123
- *               confirmPassword:
- *                 type: string
- *                 example: newStrongPassword123
- *     responses:
- *       "200":
- *         description: Password reset successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password reset successful
- *       "400":
- *         description: Passwords do not match or link expired
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password does not match
- *       "404":
- *         description: Seller not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User not found
- *       "500":
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Internal Server Error:<error-message>"
- */
-sellerRouter.post('/reset/:token', resetPassword);
-
-
-/**
- * @swagger
- * paths:
- *   /api/v1/login:
- *     post:
- *       summary: Seller login
- *       description: Authenticates a seller using email and password, returning a token upon successful login.
- *       tags:
- *         - Seller
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               required:
- *                 - email
- *                 - password
- *               properties:
- *                 email:
- *                   type: string
- *                   format: email
- *                   example: johndoe@example.com
- *                 password:
- *                   type: string
- *                   example: mySecurePassword123
- *       responses:
- *         "200":
- *           description: Login successful
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Login successful
- *                   data:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       fullName:
- *                         type: string
- *                       email:
- *                         type: string
- *                       profilePic:
- *                         type: string
- *                       isVerified:
- *                         type: boolean
- *                       phoneNumber:
- *                         type: string
- *                       isAdmin:
- *                         type: boolean
- *                   token:
- *                     type: string
- *                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *         "400":
- *           description: Missing credentials, user not found or invalid password
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Seller not found
- *         "500":
- *           description: Internal server error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Internal server error: [Error message]" 
- */
-sellerRouter.post('/login', login);
-
-
-/**
- * @swagger
- * paths:
- *   /api/v1/signout:
- *     post:
- *       summary: Seller logout
- *       description: Logs out a seller by setting their isLoggedIn status to false.
- *       tags:
- *         - Seller
- *       security:
- *         - bearerAuth: []
- *       responses:
- *         "200":
- *           description: Logout successful
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: user logged out successfully
- *         "404":
- *           description: Seller not found
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: user not found
- *         "500":
- *           description: Server error during logout
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error Logging out User :<error-message>"
- */
-sellerRouter.post('/signout', logOut);
-
-
-/**
- * @swagger
- * /change/{id}:
- *   patch:
- *     summary: Change seller password
- *     tags: [Seller]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
  *     requestBody:
  *       required: true
  *       content:
@@ -447,37 +143,104 @@ sellerRouter.post('/signout', logOut);
  *             properties:
  *               newPassword:
  *                 type: string
+ *                 example: newpassword123
  *     responses:
  *       200:
- *         description: Password updated
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Password has been reset successfully"
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Invalid or expired token"
  */
-sellerRouter.patch('/change/:id', changePassword);
-
+sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
 
 /**
  * @swagger
- * /api/v1/edit-profile/{id}:
- *   patch:
- *     summary: Update seller profile
- *     description: Updates seller profile information such as full name and profile picture.
+ * /api/v1/login:
+ *   post:
  *     tags:
  *       - Seller
- *     security:
- *       - bearerAuth: []
+ *     summary: Login seller
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: johndoe@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Login successful"
+ *               data:
+ *                 token: JWT_TOKEN
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Invalid email or password"
+ */
+sellerRouter.post('/login', login);
+
+/**
+ * @swagger
+ * /api/v1/signout:
+ *   post:
+ *     tags:
+ *       - Seller
+ *     summary: Sign out seller
+ *     responses:
+ *       200:
+ *         description: Signed out successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Logout successful"
+ */
+sellerRouter.post('/signout', logOut);
+
+/**
+ * @swagger
+ * /api/v1/change/{id}:
+ *   patch:
+ *     tags:
+ *       - Seller
+ *     summary: Change seller password
  *     parameters:
- *       - name: id
- *         in: path
+ *       - in: path
+ *         name: id
  *         required: true
- *         description: ID of the seller to update
  *         schema:
  *           type: string
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: oldpassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newpassword123
  *               fullName:
  *                 type: John doe
  *               profilePic:
@@ -486,54 +249,127 @@ sellerRouter.patch('/change/:id', changePassword);
  *                   type: string
  *                   format: binary
  *     responses:
- *       "200":
- *         description: Seller profile updated successfully
+ *       200:
+ *         description: Password changed successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Your information has been updated successfully
- *                 data:
- *                   $ref: '#/components/schemas/Seller'
- *       "404":
- *         description: Seller not found
+ *             example:
+ *               message: "Password changed successfully"
+ *       400:
+ *         description: Incorrect old password
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User not found
- *       "500":
- *         description: Error updating seller
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error updating seller: <error-message>"
- */
-sellerRouter.patch('/edit-profile/:id', upload.array('profilePic'), updateSeller);
+ *             example:
+ *               message: "Old password is incorrect"
+ */
 
+sellerRouter.patch('/change/:id', changePassword);
 
 /**
  * @swagger
- * /remove:
+ * /api/v1/remove:
  *   delete:
- *     summary: Delete seller
- *     tags: [Seller]
+ *     tags:
+ *       - Seller
+ *     summary: Delete seller account
  *     responses:
  *       200:
- *         description: Seller deleted
+ *         description: Seller deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller account deleted successfully"
  */
 sellerRouter.delete('/remove', deleteSeller);
 
+/**
+ * @swagger
+ * /api/v1/searchSellers:
+ *   get:
+ *     tags:
+ *       - Seller
+ *     summary: Search for sellers by school or location
+ *     parameters:
+ *       - in: query
+ *         name: school
+ *         schema:
+ *           type: string
+ *         description: Name of the school
+ *       - in: query
+ *         name: location
+ *         schema:
+ *           type: string
+ *         description: Seller location
+ *     responses:
+ *       200:
+ *         description: Sellers retrieved successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Sellers retrieved successfully"
+ *               data:
+ *                 - id: 1
+ *                   fullName: John Doe
+ *                   school: UNILAG
+ *                   location: Lagos
+ *       404:
+ *         description: No sellers found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "No sellers found"
+ */
+sellerRouter.get('/searchSellers', searchSellers);
+ 
+/**
+ * @swagger
+ * /api/v1/getSellerDashboard:
+ *   get:
+ *     tags:
+ *       - Seller
+ *     summary: Get seller dashboard details
+ *     responses:
+ *       200:
+ *         description: Seller dashboard retrieved successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller dashboard retrieved successfully"
+ *               data:
+ *                 totalProducts: 5
+ *                 totalOrders: 12
+ *                 totalRevenue: 34000
+ *       401:
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Unauthorized access"
+ */
+sellerRouter.get('/getSellerDashboard', getSellerDashboard);
+
+/**
+ * @swagger
+ * /api/v1/getAll:
+ *   get:
+ *     tags:
+ *       - Seller (Admin)
+ *     summary: Get all sellers (Admin only)
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all sellers
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "All sellers retrieved successfully"
+ *               data:
+ *                 - id: 1
+ *                   fullName: John Doe
+ *                   email: johndoe@example.com
+ */             
+sellerRouter.get('/getAll', authenticateAdmin, getAll);
 
 sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope: ['profile', 'email']}));
 
@@ -548,4 +384,6 @@ sellerRouter.get('/auth/google/login', passport.authenticate('google'), async (r
         token
     });
 })
+
+
 module.exports = sellerRouter;

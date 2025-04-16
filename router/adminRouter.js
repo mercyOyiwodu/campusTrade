@@ -2,7 +2,6 @@ const adminRouter = require('express').Router();
 const {loginAdmin, createAdmin, verifyAdmin, verifySeller}= require('../controller/adminController');
 const { authenticateAdmin, adminAuth } = require('../middlewares/adminAuth');
 const { registerValidation} = require('../middlewares/validator');
-
 const JWT = require('jsonwebtoken');
 
 /**

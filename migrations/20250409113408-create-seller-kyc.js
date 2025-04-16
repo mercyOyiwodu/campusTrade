@@ -16,6 +16,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      profilePic:{
+        type:Sequelize.STRING,
+        allowNull:false
+      },
       connectLink: {
         type: Sequelize.STRING,
         allowNull: false,

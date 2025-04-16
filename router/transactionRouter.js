@@ -1,5 +1,4 @@
 const { initializePayment, verifyPayment } = require('../controller/transactionController');
-
 const router = require('express').Router();
 
 /**

@@ -12,10 +12,6 @@ Seller.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    fullName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     isVerified:{
       type:DataTypes.BOOLEAN,
       defaultValue:false
@@ -23,21 +19,13 @@ Seller.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    phoneNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,  // Allows the phone number to be null
-    },    
+    }, 
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     isloggedIn:{
       type:DataTypes.BOOLEAN,
-      allowNull:false
-    },
-    profilePic:{
-      type: DataTypes.STRING,
       allowNull:false
     },
     createdAt: {

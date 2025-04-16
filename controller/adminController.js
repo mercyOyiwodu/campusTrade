@@ -43,20 +43,20 @@ exports.createAdmin = async (req, res) => {
       password: hashedPassword,
 
     });
+    
+// Generate a token
+const token = JWT.sign({ id: newAdmin.id}, process.env.JWT_SECRET, { expiresIn: '30mins' });
+    
+// Create the verify link with the token generated
+const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${token}`;
+const firstName =  newAdmin.fullName.split(' ')[0] 
 
-    // Generate a token
-    const token = JWT.sign({ id: Admin.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
-
-    // Create the verify link with the token generated
-    const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${token}`;
-    const firstName = newAdmin.fullName.split(' ')[0]
-
-    // Create the email details
-    const mailDetails = {
-      to: newAdmin.email,
-      subject: 'Welcome to Campus Trade',
-      html: signUpTemplate(link, firstName)
-    };
+// Create the email details
+const mailDetails = {
+    to: newAdmin.email,
+    subject: 'Welcome to Campus Trade',
+    html: signUpTemplate(link, firstName)
+};
 
     // Send the verification email
     await sendEmail(mailDetails);
@@ -234,3 +234,122 @@ exports.verifySeller = async (req, res) => {
     });
   }
 };
+
+
+// exports.getPendingSellers = async (req, res) => {
+//   try {
+//     const pendingSellers = await Seller.findAll({
+//       where: { isVerified: false }
+//     });
+    
+//     res.status(200).json({
+//       message: 'Pending sellers retrieved successfully',
+//       count: pendingSellers.length,
+//       data: pendingSellers
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Internal Server Error: " + error.message
+//     });
+//   }
+// };
+
+
+// // // Approve or reject a product
+// exports.reviewProduct = async (req, res) => {
+//   try {
+//     const { productId } = req.params;
+//     const { status, feedback } = req.body;
+    
+//     if (!['approved', 'rejected'].includes(status)) {
+//       return res.status(400).json({
+//         message: 'Status must be either "approved" or "rejected"'
+//       });
+//     }
+//     const product = await Product.findByPk(productId);
+//     if (!product) {
+//       return res.status(404).json({
+//         message: 'Product not found'
+//       });
+//     }
+    
+//     // Update the product status
+//     await product.update({
+//       approvalStatus: status,
+//       isApproved: status === 'approved',
+//       isVerified: status === 'approved',
+//       adminFeedback: feedback || null,
+//       approvedBy: req.admin.id,
+//       approvedAt: new Date()
+//     });
+    
+//     res.status(200).json({
+//       message: `Product ${status} successfully`,
+//       data: product
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Internal Server Error: " + error.message
+//     });
+//   }
+// };
+
+// // Get pending product approvals
+// exports.getPendingProducts = async (req, res) => {
+//   try {
+//     const pendingProducts = await Product.findAll({
+//       where: { approvalStatus: 'pending' },
+//       include: [
+//         {
+//           model: Seller,
+//           as: 'seller',
+//           attributes: ['fullName', 'email']
+//         }
+//       ]
+//     });
+    
+//     res.status(200).json({
+//       message: 'Pending products retrieved successfully',
+//       count: pendingProducts.length,
+//       data: pendingProducts
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Internal Server Error: " + error.message
+//     });
+//   }
+// };
+
+
+// // Get admin dashboard stats
+// exports.getDashboardStats = async (req, res) => {
+//   try {
+//     const totalProducts = await Product.count();
+//     const pendingProducts = await Product.count({ where: { approvalStatus: 'pending' } });
+//     const approvedProducts = await Product.count({ where: { approvalStatus: 'approved' } });
+//     const rejectedProducts = await Product.count({ where: { approvalStatus: 'rejected' } });
+//     const totalSellers = await Seller.count();
+//     const totalBuyers = await Buyer.count();
+    
+//     res.status(200).json({
+//       message: 'Dashboard stats retrieved successfully',
+//       data: {
+//         products: {
+//           total: totalProducts,
+//           pending: pendingProducts,
+//           approved: approvedProducts,
+//           rejected: rejectedProducts
+//         },
+//         users: {
+//           sellers: totalSellers,
+//           buyers: totalBuyers
+//         }
+//       }
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Internal Server Error: " + error.message
+//     });
+//   }
+// };
+
