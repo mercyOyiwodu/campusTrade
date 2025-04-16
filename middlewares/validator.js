@@ -52,8 +52,8 @@ exports.registerValidation = (req, res, next) => {
                 "string.pattern.base":
                   "Invalid email. Use a valid Gmail address with at least 6 characters before '@gmail.com' (e.g., johndoe@gmail.com). Only lowercase letters, numbers, and optional dots are allowed."
               }),
-        
         })
+next()
     }  
 
 exports.resetPasswords = (req, res, next)=>{
@@ -66,5 +66,5 @@ const schema = Joi.object().keys({
       "Invalid email. Use a valid Gmail address with at least 6 characters before '@gmail.com' (e.g., johndoe@gmail.com). Only lowercase letters, numbers, and optional dots are allowed."
   }),
 })
-
+next()
 }

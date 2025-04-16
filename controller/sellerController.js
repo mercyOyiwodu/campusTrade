@@ -158,6 +158,7 @@ exports.forgotPassword = async (req, res) => {
                 message: 'Please input your email'
             })
         }
+
         //  Check for the user
         const seller = await Seller.findOne({ where: { email: email.toLowerCase() } });
         if (!seller) {
@@ -165,20 +166,23 @@ exports.forgotPassword = async (req, res) => {
                 message: 'User not found'
             })
         }
+       
         // Generate a token for the user
         const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '10mins' });
         // Create the reset link
         const link = `${req.protocol}://${req.get('host')}/api/v1/forget/${token}`;
-        const firstName = seller.fullName.split(' ')[0];
+        // const firstName = seller.fullName.split(' ')[0];
         // configure the email details
+        
         const mailDetails = {
             subject: 'Password Reset',
             email: seller.email,
-            html: forgotTemplate(link, firstName)
+            html: forgotTemplate(link, 'User')
         }
+        
         // Await nodemailer to send the user an email
         await sendEmail(mailDetails);
-
+        
         // Send a success response
         res.status(200).json({
             message: 'Password reset initiated, Please check your email for the reset link',
