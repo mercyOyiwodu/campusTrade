@@ -3,17 +3,17 @@ const Joi = require('joi');
 exports.registerValidation = (req, res, next) => {
   console.log(req)
     const schema = Joi.object({
-      fullName: Joi.string()
-        .min(3)
-        .trim()
-        .pattern(/^[A-Za-z ]+$/)
-        .required()
-        .messages({
-          "any.required": 'Fullname is required here',
-          'string.empty': 'Fullname cannot be empty',
-          'string.pattern.base': "Fullname should only contain alphabets",
-          "string.min": "Fullname should not be less than 3 letters"
-        }),
+      // fullName: Joi.string()
+      //   .min(3)
+      //   .trim()
+      //   .pattern(/^[A-Za-z ]+$/)
+      //   .required()
+      //   .messages({
+      //     "any.required": 'Fullname is required here',
+      //     'string.empty': 'Fullname cannot be empty',
+      //     'string.pattern.base': "Fullname should only contain alphabets",
+      //     "string.min": "Fullname should not be less than 3 letters"
+      //   }),
         
         email: Joi.string().email().pattern(/^[a-z0-9](\.?[a-z0-9]){5,}@g(oogle)?mail\.com$/).required().messages({
           "string.email": "Invalid email format",
