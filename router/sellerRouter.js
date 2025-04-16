@@ -26,7 +26,7 @@ const sellerRouter = require('express').Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: "example@email.com"
+ *                 example: "example@gmail.com"
  *               password:
  *                 type: string
  *                 example: "yourPassword123"
@@ -42,7 +42,7 @@ const sellerRouter = require('express').Router();
  *               message: "Seller created successfully. Please check your email to verify your account."
  *               data:
  *                 id: 1
- *                 email: "example@email.com"
+ *                 email: "example@gmail.com"
  *                 isloggedIn: false
  *                 createdAt: "2024-01-01T00:00:00.000Z"
  *                 updatedAt: "2024-01-01T00:00:00.000Z"
