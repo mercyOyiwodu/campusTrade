@@ -1,9 +1,10 @@
-const { verify, forgotPassword, resetPassword, login, register, updateSeller, deleteSeller, logOut, changePassword } = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword,getSellerDashboard, getAll} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
 const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
+const {authenticateAdmin} =require('../middlewares/adminAuth')
 
 
 /**
@@ -41,7 +42,7 @@ const sellerRouter = require('express').Router();
  *             example:
  *               message: "Seller created successfully. Please check your email to verify your account."
  *               data:
- *                 id: 1
+ *                 id: "60d0fe4905311236168a109cb"
  *                 email: "example@gmail.com"
  *                 isloggedIn: false
  *                 createdAt: "2024-01-01T00:00:00.000Z"
@@ -88,13 +89,15 @@ sellerRouter.post('/register', registerValidation, register);
  *         description: Internal server error
  */
 
+sellerRouter.get('/verify-user/:token', verify);
+
 /**
- * @openapi
- * /api/v1/seller/forget:
+ * @swagger
+ * /api/v1/forget:
  *   post:
- *     summary: Request password reset link
  *     tags:
  *       - Seller
+ *     summary: Send password reset link
  *     requestBody:
  *       required: true
  *       content:
@@ -104,117 +107,104 @@ sellerRouter.post('/register', registerValidation, register);
  *             properties:
  *               email:
  *                 type: string
- *                 description: The seller's email address
+ *                 example: johndoe@example.com
  *     responses:
- *       '200':
- *         description: Password reset initiated, check your email for the link
- *       '400':
- *         description: Missing email or seller not found
- *       '500':
- *         description: Internal server error
- */
-
-/**
- * @openapi
- * /api/v1/seller/reset/{token}:
- *   post:
- *     summary: Reset password
- *     tags:
- *       - Seller
- *     parameters:
- *       - name: token
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: JWT token for resetting password
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               password:
- *                 type: string
- *                 description: New password
- *               confirmPassword:
- *                 type: string
- *                 description: Confirm the new password
- *     responses:
- *       '200':
- *         description: Password reset successful
- *       '400':
- *         description: Passwords do not match
- *       '404':
+ *       200:
+ *         description: Password reset link sent
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Password reset link sent"
+ *       404:
  *         description: Seller not found
- *       '500':
- *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller with this email does not exist"
  */
+sellerRouter.post('/forget', forgetPasswords, forgotPassword);
 
 /**
- * @openapi
- * /api/v1/seller/login:
- *   post:
- *     summary: Login a seller
- *     tags:
- *       - Seller
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
+ * @swagger
+ * paths:
+ *   /api/v1/sellers/reset/{token}:
+ *     post:
+ *       summary: Reset seller password
+ *       description: Allows a seller to reset their password using a valid token sent to their email.
+ *       tags:
+ *         - Seller Authentication
+ *       parameters:
+ *         - in: path
+ *           name: token
+ *           required: true
  *           schema:
- *             $ref: '#/components/schemas/Seller'
- *     responses:
- *       '200':
- *         description: Login successful
+ *             type: string
+ *           description: JWT token received in the reset password link
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       requestBody:
+ *         required: true
  *         content:
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - password
  *               properties:
- *                 message:
+ *                 password:
  *                   type: string
- *                 data:
- *                   type: object
- *                 token:
- *                   type: string
- *       '400':
- *         description: Invalid email or password
- *       '500':
- *         description: Internal server error
+ *                   example: "NewSecurePassword123"
+ *       responses:
+ *         "200":
+ *           description: Password reset successful
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Password reset successful"
+ *         "400":
+ *           description: Invalid or expired token
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Link expired, Please initiate a link"
+ *         "404":
+ *           description: Seller not found
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "User not found"
+ *         "500":
+ *           description: Internal Server Error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Error resetting password: [error message]"
  */
 
+sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
+
 /**
- * @openapi
- * /api/v1/seller/signout:
+ * @swagger
+ * /api/v1/seller/login:
  *   post:
- *     summary: Logout a seller
  *     tags:
  *       - Seller
- *     responses:
- *       '200':
- *         description: Seller logged out successfully
- *       '404':
- *         description: Seller not found
- *       '500':
- *         description: Internal server error
- */
-
-/**
- * @openapi
- * /api/v1/seller/change/{id}:
- *   patch:
- *     summary: Change seller's password
- *     tags:
- *       - Seller
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: The seller's ID
+ *     summary: Login seller
  *     requestBody:
  *       required: true
  *       content:
@@ -222,38 +212,157 @@ sellerRouter.post('/register', registerValidation, register);
  *           schema:
  *             type: object
  *             properties:
+ *               email:
+ *                 type: string
+ *                 example: johndoe@example.com
  *               password:
  *                 type: string
- *                 description: New password
- *               confirmPassword:
- *                 type: string
- *                 description: Confirm the new password
+ *                 example: password123
  *     responses:
- *       '200':
- *         description: Password changed successfully
- *       '400':
- *         description: Passwords do not match
- *       '404':
- *         description: Seller not found
- *       '500':
- *         description: Internal server error
- */
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Login successful"
+ *               data:
+ *                 token: JWT_TOKEN
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Invalid email or password"
+ */                                                                                                                                                                                               
+ sellerRouter.post('/login', login)
 
 /**
- * @openapi
- * /api/v1/seller/remove:
- *   delete:
- *     summary: Remove a seller's account
+ * @swagger
+ * /api/v1/signout:
+ *   post:
  *     tags:
  *       - Seller
+ *     summary: Sign out seller
  *     responses:
- *       '200':
- *         description: Seller removed successfully
- *       '404':
- *         description: Seller not found
- *       '500':
- *         description: Internal server error
+ *       200:
+ *         description: Signed out successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Logout successful"
  */
+sellerRouter.post('/signout', logOut);
+
+/**
+ * @swagger
+ * /api/v1/change/{id}:
+ *   patch:
+ *     tags:
+ *       - Seller
+ *     summary: Change seller password
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: oldpassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Password changed successfully"
+ *       400:
+ *         description: Incorrect old password
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Old password is incorrect"
+ */
+sellerRouter.patch('/change/:id', changePassword);
+
+/**
+ * @swagger
+ * /api/v1/remove:
+ *   delete:
+ *     tags:
+ *       - Seller
+ *     summary: Delete seller account
+ *     responses:
+ *       200:
+ *         description: Seller deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller account deleted successfully"
+ */                                                                                                                                                                                               
+sellerRouter.delete('/remove', deleteSeller);                                                                                                                                                                     sellerRouter.delete('/remove', deleteSeller);
+
+
+/**
+ * @swagger
+ * /api/v1/getSellerDashboard:
+ *   get:
+ *     tags:
+ *       - Seller
+ *     summary: Get seller dashboard details
+ *     responses:
+ *       200:
+ *         description: Seller dashboard retrieved successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Seller dashboard retrieved successfully"
+ *               data:
+ *                 totalProducts: 5
+ *                 totalOrders: 12
+ *                 totalRevenue: 34000
+ *       401:
+ *         description: Unauthorized access
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Unauthorized access"
+ */
+sellerRouter.get('/getSellerDashboard', getSellerDashboard);
+
+/**
+ * @swagger
+ * /api/v1/getAll:
+ *   get:
+ *     tags:
+ *       - Seller (Admin)
+ *     summary: Get all sellers (Admin only)
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all sellers
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "All sellers retrieved successfully"
+ *               data:
+ *                 - id: 1
+ *                   fullName: John Doe
+ *                   email: johndoe@example.com
+ */                                                                                                                                                                                                        
+sellerRouter.get('/getAll', authenticateAdmin, getAll);
+
 
 /**
  * @openapi
@@ -279,6 +388,7 @@ sellerRouter.post('/register', registerValidation, register);
  *       '500':
  *         description: Internal server error
  */
+sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope: ['profile', 'email']}));
 
 /**
  * @openapi
@@ -304,19 +414,6 @@ sellerRouter.post('/register', registerValidation, register);
  *       '500':
  *         description: Internal server error
  */
-
-
-sellerRouter.post('/register', registerValidation, register);
-sellerRouter.get('/verify-user/:token', verify);
-sellerRouter.post('/forget', forgotPassword);
-sellerRouter.post('/reset/:token', resetPassword);
-sellerRouter.post('/login', login);
-sellerRouter.post('/signout', logOut);
-sellerRouter.patch('/change/:id', changePassword);
-sellerRouter.delete('/remove', deleteSeller);
-
-
-sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope: ['profile', 'email']}));
 
 sellerRouter.get('/auth/google/login', passport.authenticate('google'), async (req, res)=>{
     console.log('Req user:', req.seller);

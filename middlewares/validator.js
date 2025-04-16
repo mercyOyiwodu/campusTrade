@@ -15,7 +15,7 @@ exports.registerValidation = (req, res, next) => {
       //     "string.min": "Fullname should not be less than 3 letters"
       //   }),
         
-        email: Joi.string().email().pattern(/^[a-z0-9](\.?[a-z0-9]){5,}@g(oogle)?mail\.com$/).required().messages({
+        email: Joi.string().email().required().messages({
           "string.email": "Invalid email format",
           "string.empty": "Email cannot be empty",
           "any.required": "Email is required",

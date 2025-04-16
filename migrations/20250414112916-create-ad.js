@@ -17,6 +17,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      date: {
+        type:Sequelize.DATE,
+        allowNull:false
+      },
+      expiresAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
       description: {
         type: Sequelize.TEXT,
         allowNull: true
