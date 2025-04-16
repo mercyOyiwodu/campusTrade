@@ -340,12 +340,13 @@ sellerRouter.delete('/remove', deleteSeller);                                   
 sellerRouter.get('/getSellerDashboard', getSellerDashboard);
 
 /**
- * @openapi
+ * @swagger
  * /api/v1/seller/getAll:
  *   get:
  *     tags:
- *       - Seller
+ *       - Seller (Admin)
  *     summary: Get all sellers (Admin only)
+ *     description: This endpoint retrieves all registered sellers. Only accessible by authenticated admins using a Bearer token.
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -353,14 +354,57 @@ sellerRouter.get('/getSellerDashboard', getSellerDashboard);
  *         description: List of all sellers
  *         content:
  *           application/json:
- *             example:
- *               message: "All sellers retrieved successfully"
- *               data:
- *                 - id: 1
- *                   fullName: John Doe
- *                   email: johndoe@example.com
- */                                                                                                                                                                                                        
-sellerRouter.get('/getAll', authenticateAdmin, getAll);
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "All registered seller in the platform"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: uuid
+ *                         example: "thk890J.iIsInR5cCI6Ikp-XVCJ91"
+ *                       fullName:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       email:
+ *                         type: string
+ *                         example: "johndoe@example.com"
+ *                       phoneNumber:
+ *                         type: string
+ *                         example: "+2348000000000"
+ *                       school:
+ *                         type: string
+ *                         example: "University of Lagos"
+ *                 total:
+ *                   type: string
+ *                   example: "5"
+ *       401:
+ *         description: Unauthorized - Missing or invalid admin token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized: Admin token required"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error: [error message]"
+ */                                                                                                                                                                              
+sellerRouter.get('/getAll', authenticateAdmin, getAll);
 
 
 /**

@@ -1,17 +1,16 @@
 const express = require('express');
 const { createSubCategory, getAllSubCategories, getSubCategoryById, deleteSubCategory, updateSubCategory } = require('../controller/subCategory');
 const router = express.Router()
-
 /**
  * @swagger
  * tags:
  *   name: SubCategory
- *   description: Subcategory management
+ *   description: Endpoints for managing subcategories
  */
 
 /**
  * @swagger
- * /create-subcategory:
+ * /api/v1/create-subcategory:
  *   post:
  *     summary: Create a new subcategory
  *     tags: [SubCategory]
@@ -27,23 +26,21 @@ const router = express.Router()
  *             properties:
  *               name:
  *                 type: string
- *                 example: Sneakers
  *               categoryId:
  *                 type: string
  *                 format: uuid
- *                 example: 123e4567-e89b-12d3-a456-426614174000
  *     responses:
  *       201:
  *         description: Subcategory created successfully
  *       400:
- *         description: Subcategory already exists
+ *         description: Subcategory or category already exists
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
-
+router.get('create-subcategory',createSubCategory)
 /**
  * @swagger
- * /all-subcategory:
+ * /api/v1/all-subcategory:
  *   get:
  *     summary: Get all subcategories
  *     tags: [SubCategory]
@@ -51,12 +48,13 @@ const router = express.Router()
  *       200:
  *         description: List of all subcategories
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+router.get('/all-subcategory', getAllSubCategories);
 /**
  * @swagger
- * /one-subcategory/{id}:
+ * /api/v1/one-subcategory/{id}:
  *   get:
  *     summary: Get a subcategory by ID
  *     tags: [SubCategory]
@@ -74,14 +72,15 @@ const router = express.Router()
  *       404:
  *         description: Subcategory not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+router.get('/one-subcategory/:id', getSubCategoryById);
 /**
  * @swagger
- * /update-subcategory/{id}:
+ * /api/v1/update-subcategory/{id}:
  *   put:
- *     summary: Update a subcategory
+ *     summary: Update a subcategory by ID
  *     tags: [SubCategory]
  *     parameters:
  *       - in: path
@@ -100,25 +99,26 @@ const router = express.Router()
  *             properties:
  *               name:
  *                 type: string
- *                 example: Heels
  *               categoryId:
  *                 type: string
  *                 format: uuid
- *                 example: 123e4567-e89b-12d3-a456-426614174000
  *     responses:
  *       200:
  *         description: Subcategory updated successfully
+ *       400:
+ *         description: Category not found
  *       404:
  *         description: Subcategory not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+router.put('/update-subcategory/:id', updateSubCategory);
 /**
  * @swagger
- * /delete-subcategory/{id}:
+ * /api/v1/delete-subcategory/{id}:
  *   delete:
- *     summary: Delete a subcategory
+ *     summary: Delete a subcategory by ID
  *     tags: [SubCategory]
  *     parameters:
  *       - in: path
@@ -130,17 +130,12 @@ const router = express.Router()
  *         description: Subcategory ID
  *     responses:
  *       200:
- *         description: Subcategory (and its children) deleted successfully
+ *         description: Subcategory deleted successfully
  *       404:
  *         description: Subcategory not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
-
-router.post('/create-subcategory', createSubCategory);
-router.get('/all-subcategory', getAllSubCategories);
-router.get('/one-subcategory/:id', getSubCategoryById);
-router.put('/update-subcategory/:id', updateSubCategory);
 router.delete('/delete-subcategory/:id', deleteSubCategory);
 
 
