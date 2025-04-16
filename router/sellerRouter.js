@@ -93,7 +93,7 @@ sellerRouter.get('/verify-user/:token', verify);
 
 /**
  * @swagger
- * /api/v1/forget:
+ * /api/v1/seller/forget:
  *   post:
  *     tags:
  *       - Seller
@@ -238,7 +238,7 @@ sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
 
 /**
  * @swagger
- * /api/v1/signout:
+ * /api/v1/seller/signout:
  *   post:
  *     tags:
  *       - Seller
@@ -255,7 +255,7 @@ sellerRouter.post('/signout', logOut);
 
 /**
  * @swagger
- * /api/v1/change/{id}:
+ * /api/v1/seller/change/{id}:
  *   patch:
  *     tags:
  *       - Seller
@@ -297,7 +297,7 @@ sellerRouter.patch('/change/:id', changePassword);
 
 /**
  * @swagger
- * /api/v1/remove:
+ * /api/v1/seller/remove:
  *   delete:
  *     tags:
  *       - Seller
@@ -315,7 +315,7 @@ sellerRouter.delete('/remove', deleteSeller);                                   
 
 /**
  * @swagger
- * /api/v1/getSellerDashboard:
+ * /api/v1/seller/getSellerDashboard:
  *   get:
  *     tags:
  *       - Seller
@@ -342,7 +342,7 @@ sellerRouter.get('/getSellerDashboard', getSellerDashboard);
 
 /**
  * @swagger
- * /api/v1/getAll:
+ * /api/v1/seller/getAll:
  *   get:
  *     tags:
  *       - Seller (Admin)
