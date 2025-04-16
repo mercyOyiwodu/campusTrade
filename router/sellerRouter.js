@@ -7,54 +7,51 @@ const sellerRouter = require('express').Router();
 
 
 /**
- * @openapi
- * components:
- *   schemas:
- *     Seller:
- *       type: object
- *       properties:
- *         email:
- *           type: string
- *           description: The seller's email address
- *         password:
- *           type: string
- *           description: The seller's password
- *         confirmPassword:
- *           type: string
- *           description: The seller's password confirmation
- */
-
-/**
- * @openapi
- * /api/v1/seller/register:
+ * @swagger
+ * /api/v1/register:
  *   post:
- *     summary: Register a new seller
  *     tags:
  *       - Seller
+ *     summary: Register a new seller
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Seller'
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "example@email.com"
+ *               password:
+ *                 type: string
+ *                 example: "yourPassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "yourPassword123"
  *     responses:
- *       '201':
- *         description: Seller created successfully. Please check your email for verification.
+ *       201:
+ *         description: Seller registered successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                 token:
- *                   type: string
- *       '400':
- *         description: Validation error or seller already exists
- *       '500':
+ *             example:
+ *               message: "Seller created successfully. Please check your email to verify your account."
+ *               data:
+ *                 id: 1
+ *                 email: "example@email.com"
+ *               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Email and password are required"
+ *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Error creating Seller: [error message]"
  */
 
 /**
