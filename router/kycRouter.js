@@ -121,4 +121,5 @@ const kycRouter = express.Router();
 kycRouter.patch('/profile/:id', upload.single('profilePic'), registerValidation, profileDetails);
 
 
+
 module.exports = kycRouter;
