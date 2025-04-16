@@ -146,11 +146,11 @@ const server = async()=>{
   
 server();
 
-console.log({
-  host: sequelize.options.host,
-  username: sequelize.options.username,
-  password: sequelize.options.password,
-});
+// console.log({
+//   host: sequelize.options.host,
+//   username: sequelize.options.username,
+//   password: sequelize.options.password,
+// });
 
 app.listen(PORT,()=>{
     console.log(`Server is listening to PORT: ${PORT}`);

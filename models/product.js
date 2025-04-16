@@ -31,7 +31,7 @@ Product.init(
       allowNull: false,
     },
     media: {
-      type: DataTypes.JSON,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     sellerId: {
