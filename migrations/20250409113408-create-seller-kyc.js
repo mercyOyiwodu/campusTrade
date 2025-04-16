@@ -24,19 +24,19 @@ module.exports = {
         type:Sequelize.STRING,
         allowNull:false
       },
-      connectLink: {
+      whatsappLink: {
         type: Sequelize.STRING,
         allowNull: false,
         defaultValue: true
       },
       school: {
-            type: Sequelize.ENUM('LASU', 'UNILAG', 'LAUTECH'),
-            defaultValue: 'UNILAG',
+            type: Sequelize.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology'),
+            defaultValue: 'Lagos State University',
           },
-      location: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
+      gender: {
+        type:Sequelize.ENUM('Female', 'Male'),
+      defaultValue: 'Male'
+    },
       location: {
         type: Sequelize.STRING,
         allowNull: false,

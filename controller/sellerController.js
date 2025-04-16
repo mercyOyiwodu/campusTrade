@@ -1,6 +1,5 @@
 const Seller = require('../models/seller');
 const bcrypt = require('bcryptjs');
-const { toPascalCase } = require('../utils/stringHelpers')
 const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
@@ -46,14 +45,13 @@ exports.register = async (req, res) => {
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
         // Create verification link
-        const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
-        const firstName = seller.email.split('@')[0]; // fallback greeting
+        const link = `${req.protocol}://${req.get('host')}/api/v1/seller/verify-user/${token}`;
 
         // Email details
         const mailDetails = {
             email: seller.email,
             subject: 'Welcome to Campus Trade',
-            html: signUpTemplate(link, firstName),
+            html: signUpTemplate(link, 'User'),
         };
 
         await sendEmail(mailDetails);
@@ -77,9 +75,6 @@ exports.register = async (req, res) => {
 
 exports.verify = async (req, res) => {
     try {
-        if (req.body.fullName) {
-            req.body.fullName = toPascalCase(req.body.fullName);
-        }
         const { token } = req.params;
         // verify the token
         await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
@@ -202,7 +197,7 @@ exports.resetPassword = async (req, res) => {
         // Extract the token from the params
         const { token } = req.params;
         // Extract the passwod and confirm password from the request body
-        const { password, confirmPassword } = req.body;
+        const { password } = req.body;
         // Verify if the token is still valid
         const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
         // Check if the user is still existsing
@@ -212,12 +207,7 @@ exports.resetPassword = async (req, res) => {
                 message: 'User not found'
             })
         }
-        // Confirm that the password matches
-        if (password !== confirmPassword) {
-            return res.status(400).json({
-                message: 'Password does not match'
-            })
-        }
+
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -400,13 +390,10 @@ exports.getAll = async (req, res) => {
 }
 exports.searchSellers = async (req, res) => {
     try {
-        const { location, school } = req.query;
+        const { school } = req.query;
 
         let query = {};
 
-        if (location) {
-            query.location = location;
-        }
         if (school) {
             query.school = school;
         }

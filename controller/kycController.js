@@ -17,7 +17,7 @@ exports.profileDetails = async(req, res) =>{
 
 
         const {id:sellerId} = req.params;
-        const {jambRegNo, description, school, location, connectLink, phoneNumber, fullName } = req.body;
+        const {jambRegNo, description, school, gender , whatsappLink, phoneNumber, fullName } = req.body;
 
         const userExists = await Seller.findByPk(sellerId);
         if(!userExists){
@@ -42,10 +42,10 @@ exports.profileDetails = async(req, res) =>{
         const data = {
             school,
             jambRegNo,
-            location,
             id:sellerId,
             description,
-            connectLink,
+            whatsappLink,
+            gender,
             phoneNumber,
             profilePic: result.secure_url,
             fullName
