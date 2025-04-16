@@ -5,7 +5,7 @@ const JWT = require('jsonwebtoken');
 const {sendEmail} = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
 const forgotTemplate = require('../utils/signUp')
-const fs = require('fs');
+//const fs = require('fs');
 
 
 exports.register = async(req, res) => {
@@ -15,7 +15,7 @@ exports.register = async(req, res) => {
         // Validate required fields
         if (!email || !password || !confirmPassword) {
             // Unlink the file from our local storage
-            fs.unlinkSync(req.file.path);
+            //fs.unlinkSync(req.file.path);
             return res.status(400).json({
                 message: 'Email and password are required'
             });
@@ -30,7 +30,7 @@ exports.register = async(req, res) => {
         const sellerExists = await Seller.findOne({ where: { email: email.toLowerCase() } });
         if (sellerExists) {
             // Unlink the file from our local storage
-            fs.unlinkSync(req.file.path);
+           // fs.unlinkSync(req.file.path);
             return res.status(400).json({
                 message: `Seller with email: ${email} already exists`
             });
@@ -54,13 +54,13 @@ exports.register = async(req, res) => {
     
         // Create the verify link with the token generated
         const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
-        const firstName = seller.fullName.split(' ')[0];
+        //const firstName = seller.fullName.split(' ')[0];
         
         // Create the email details
         const mailDetails = {
             email: seller.email,
             subject: 'Welcome to Campus Trade',
-            html: signUpTemplate(link, firstName)
+            html: signUpTemplate(link) //, firstName)
         };
         
         // Send the verification email
@@ -81,15 +81,15 @@ exports.register = async(req, res) => {
         res.status(500).json({ 
             message: error.message 
         });
-    
+      
     }
 };
 
 exports.verify = async (req, res) => {
     try {
-        if (req.body.fullName) {
-            req.body.fullName = toPascalCase(req.body.fullName);
-          }
+        // if (req.body.fullName) {
+        //     req.body.fullName = toPascalCase(req.body.fullName);
+        //   }
         const { token } = req.params;
         // verify the token
         await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
@@ -117,12 +117,12 @@ exports.verify = async (req, res) => {
                     // dynamically create the link
                     const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
                     // get the seller/user's first name
-                    const firstName = seller.fullName.split(' ')[0];
+                    //const firstName = seller.fullName.split(' ')[0];
                     // create the email details
                     const mailDetails = {
                         email: seller.email,
                         subject: 'Email verification',
-                        html: signUpTemplate(link, firstName)
+                        html: signUpTemplate(link)//, firstName)
                     };
                     // await nodemailer to send the email
                     await sendEmail(mailDetails);

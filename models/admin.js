@@ -12,10 +12,6 @@ Admin.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
     },
-    fullName: {
-      type: DataTypes.STRING,
-      allowNull:false
-    },
     email: {
       type: DataTypes.STRING,
       allowNull:false

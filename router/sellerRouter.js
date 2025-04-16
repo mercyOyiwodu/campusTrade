@@ -6,7 +6,7 @@ const passport = require('passport');
 const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
 
-/**
+/**  
  * @swagger
  * /api/v1/register:
  *   post:
@@ -29,9 +29,6 @@ const sellerRouter = require('express').Router();
  *               confirmPassword:
  *                 type: string
  *                 example: "yourPassword123"
- *               profilePic:
- *                 type: string
- *                 format: binary
  *     responses:
  *       201:
  *         description: Seller registered successfully
@@ -56,7 +53,7 @@ const sellerRouter = require('express').Router();
  *             example:
  *               message: "Error creating Seller: [error message]"
  */
-sellerRouter.post('/register', registerValidation, register);
+sellerRouter.post('/register', register);
 
 /**
  * @swagger
