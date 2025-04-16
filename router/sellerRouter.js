@@ -8,7 +8,7 @@ const sellerRouter = require('express').Router();
 
 /**
  * @swagger
- * /api/v1/register:
+ * /api/v1/seller/register:
  *   post:
  *     tags:
  *       - Seller
@@ -19,6 +19,10 @@ const sellerRouter = require('express').Router();
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - confirmPassword
  *             properties:
  *               email:
  *                 type: string
@@ -39,6 +43,9 @@ const sellerRouter = require('express').Router();
  *               data:
  *                 id: 1
  *                 email: "example@email.com"
+ *                 isloggedIn: false
+ *                 createdAt: "2024-01-01T00:00:00.000Z"
+ *                 updatedAt: "2024-01-01T00:00:00.000Z"
  *               token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *       400:
  *         description: Invalid input
@@ -53,6 +60,8 @@ const sellerRouter = require('express').Router();
  *             example:
  *               message: "Error creating Seller: [error message]"
  */
+
+sellerRouter.post('/register', registerValidation, register);
 
 /**
  * @openapi
@@ -297,7 +306,7 @@ const sellerRouter = require('express').Router();
  */
 
 
-sellerRouter.post('/register', upload.single('profilePic'), registerValidation, register);
+sellerRouter.post('/register', registerValidation, register);
 sellerRouter.get('/verify-user/:token', verify);
 sellerRouter.post('/forget', forgotPassword);
 sellerRouter.post('/reset/:token', resetPassword);
