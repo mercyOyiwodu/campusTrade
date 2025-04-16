@@ -7,81 +7,73 @@ const signUpTemplate = require('../utils/signUp');
 const forgotTemplate = require('../utils/signUp')
 const fs = require('fs');
 
-
 exports.register = async (req, res) => {
     try {
         const { email, password, confirmPassword } = req.body;
 
         // Validate required fields
         if (!email || !password || !confirmPassword) {
-
             return res.status(400).json({
-                message: 'Email and password are required'
+                message: 'All fields are required'
             });
         }
 
         if (password !== confirmPassword) {
             return res.status(400).json({
-                message: "password does not match"
-            })
+                message: 'Passwords do not match'
+            });
         }
 
         const sellerExists = await Seller.findOne({ where: { email: email.toLowerCase() } });
         if (sellerExists) {
-
             return res.status(400).json({
-                message: `Seller with email: ${email} already exists`
+                message: `An account with ${email} already exists`
             });
         }
 
-
-        // Encrypt the user's password
+        // Encrypt password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-
-        // Create the user details
+        // Create seller
         const seller = await Seller.create({
-            password: hashedPassword,
             email: email.toLowerCase(),
+            password: hashedPassword,
             isloggedIn: false,
         });
 
-        // Generate a token
+        // Generate JWT token
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
-        // Create the verify link with the token generated
+        // Create verification link
         const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
-        const firstName = seller.fullName.split(' ')[0];
+        const firstName = seller.email.split('@')[0]; // fallback greeting
 
-        // Create the email details
+        // Email details
         const mailDetails = {
             email: seller.email,
             subject: 'Welcome to Campus Trade',
-            html: signUpTemplate(link, firstName)
+            html: signUpTemplate(link, firstName),
         };
 
-        // Send the verification email
         await sendEmail(mailDetails);
 
-        // Remove password from response
         const sellerData = seller.toJSON();
         delete sellerData.password;
 
-        // Send a success response
-        res.status(201).json({
-            message: 'Seller created successfully. Please check your email to verify your account.',
+        return res.status(201).json({
+            message: 'Account created! Please check your email to verify it.',
             data: sellerData,
             token
         });
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message
+        return res.status(500).json({
+            message: 'Something went wrong. Please try again later.'
         });
-
     }
 };
+
 
 exports.verify = async (req, res) => {
     try {
