@@ -170,7 +170,7 @@ exports.forgotPassword = async (req, res) => {
         // Generate a token for the user
         const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '10mins' });
         // Create the reset link
-        const link = `${req.protocol}://${req.get('host')}/api/v1/forget/${token}`;
+        const link = `${req.protocol}://${req.get('host')}/api/v1/seller/forget/${token}`;
         // const firstName = seller.fullName.split(' ')[0];
         // configure the email details
         
