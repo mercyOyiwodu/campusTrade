@@ -125,75 +125,74 @@ sellerRouter.get('/verify-user/:token', verify);
 sellerRouter.post('/forget', forgetPasswords, forgotPassword);
 
 /**
- * @swagger
- * paths:
- *   /api/v1/sellers/reset/{token}:
- *     post:
- *       summary: Reset seller password
- *       description: Allows a seller to reset their password using a valid token sent to their email.
- *       tags:
- *         - Seller Authentication
- *       parameters:
- *         - in: path
- *           name: token
- *           required: true
- *           schema:
- *             type: string
- *           description: JWT token received in the reset password link
- *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
- *       requestBody:
+ * @openapi
+ * /api/v1/seller/reset/{token}:
+ *   post:
+ *     summary: Reset seller password
+ *     description: Resets a seller's password using a valid reset token.
+ *     tags:
+ *       - Seller
+ *     parameters:
+ *       - in: path
+ *         name: token
  *         required: true
+ *         schema:
+ *           type: string
+ *         description: JWT token received in the reset password link
+ *         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: "NewSecurePassword123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - password
  *               properties:
- *                 password:
+ *                 message:
  *                   type: string
- *                   example: "NewSecurePassword123"
- *       responses:
- *         "200":
- *           description: Password reset successful
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Password reset successful"
- *         "400":
- *           description: Invalid or expired token
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Link expired, Please initiate a link"
- *         "404":
- *           description: Seller not found
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "User not found"
- *         "500":
- *           description: Internal Server Error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error resetting password: [error message]"
+ *                   example: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Link expired, Please initiate a link
+ *       404:
+ *         description: Seller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Error resetting password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error resetting password: <error message>" 
  */
 
 sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
@@ -341,11 +340,11 @@ sellerRouter.delete('/remove', deleteSeller);                                   
 sellerRouter.get('/getSellerDashboard', getSellerDashboard);
 
 /**
- * @swagger
+ * @openapi
  * /api/v1/seller/getAll:
  *   get:
  *     tags:
- *       - Seller (Admin)
+ *       - Seller
  *     summary: Get all sellers (Admin only)
  *     security:
  *       - BearerAuth: []
