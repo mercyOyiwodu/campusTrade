@@ -1,4 +1,5 @@
 const Seller = require('../models/seller');
+const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
@@ -67,7 +68,7 @@ exports.register = async (req, res) => {
 
     } catch (error) {
         return res.status(500).json({
-            message: 'Something went wrong. Please try again later.'
+            message: 'Something went wrong. Please try again later.' + error.message
         });
     }
 };
@@ -259,6 +260,11 @@ exports.login = async (req, res) => {
                 message: 'Invalid password'
             });
         };
+        if (seller.isVerified === false) {
+            return res.status(400).json({
+                message: "seller not verified, Please check your email to verify"
+            });
+        }
         // generate  a token for the user
         const token = await JWT.sign({ sellerId: seller.id, isAdmin: seller.isAdmin }, process.env.JWT_SECRET, { expiresIn: '5mins' });
         const sellerData = seller.get({ plain: true });
@@ -387,8 +393,10 @@ exports.getAll = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error)
+
         return res.status(500).json({
-            message: 'Internal server error' + ' ' + error.message
+            message: 'Internal server error'+ error.message
         })
     }
 }

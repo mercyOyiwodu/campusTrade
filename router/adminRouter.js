@@ -6,43 +6,75 @@ const JWT = require('jsonwebtoken');
 
 /**
  * @swagger
- * /api/v1/createAdmin:
- *   post:
- *     summary: Register a new admin
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - fullName
- *               - email
- *               - password
- *               - confirmPassword
- *             properties:
- *               fullName:
- *                 type: string
- *                 example: Jane Doe
- *               email:
- *                 type: string
- *                 format: email
- *                 example: jane@example.com
- *               password:
- *                 type: string
- *                 example: secret123
- *               confirmPassword:
- *                 type: string
- *                 example: secret123
- *     responses:
- *       201:
- *         description: Admin created successfully
- *       400:
- *         description: Validation error or admin already exists
- *       500:
- *         description: Internal server error
+ * paths:
+ *   /api/v1/createAdmin:
+ *     post:
+ *       summary: Create a new admin
+ *       description: Registers a new admin and sends a verification email with a token link.
+ *       tags:
+ *         - Admin Authentication
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - email
+ *                 - password
+ *                 - confirmPassword
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   example: "admin@example.com"
+ *                 password:
+ *                   type: string
+ *                   example: "StrongPassword123"
+ *                 confirmPassword:
+ *                   type: string
+ *                   example: "StrongPassword123"
+ *       responses:
+ *         "201":
+ *           description: Admin account created successfully
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Admin account created successfully"
+ *                   data:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         example: "123"
+ *                       email:
+ *                         type: string
+ *                         example: "admin@example.com"
+ *         "400":
+ *           description: Bad Request - Email already exists or password mismatch
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Admin with this email already exists"
+ *         "500":
+ *           description: Internal Server Error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: "Internal Server Error: [error message]"
  */
+
 adminRouter.post('/createAdmin', registerValidation, createAdmin);
 
 /**

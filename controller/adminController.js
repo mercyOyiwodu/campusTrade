@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
 const JWT = require('jsonwebtoken');
-const { toPascalCase } = require('../utils/stringHelpers');
 
 // Admin registration (only accessible to super_admin)
 exports.createAdmin = async (req, res) => {
@@ -51,7 +50,7 @@ const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${token}`
 
 // Create the email details
 const mailDetails = {
-    to: newAdmin.email,
+    email: newAdmin.email,
     subject: 'Welcome to Campus Trade',
     html: signUpTemplate(link, 'Admin')
 };
@@ -65,7 +64,8 @@ const mailDetails = {
 
     res.status(201).json({
       message: 'Admin account created successfully',
-      data: adminData
+      data: adminData,
+      token
     });
   } catch (error) {
     res.status(500).json({
@@ -135,6 +135,7 @@ exports.verifyAdmin = async (req, res) => {
         }
         // verify the user account
         admin.isVerified = true;
+        admin.isAdmin = true;
         // save the changes to the database
         await admin.save();
         // send a success response

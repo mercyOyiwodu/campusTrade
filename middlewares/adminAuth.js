@@ -1,47 +1,47 @@
-// middlewares/authMiddleware.js
 const JWT = require('jsonwebtoken');
-
+const Admin = require('../models/admin'); 
 
 exports.authenticateAdmin = async (req, res, next) => {
     try {
-        // Get the token from the request header
+        // Get the token from Authorization header
         const auth = req.header('Authorization');
-        if (auth == undefined) {
+        if (!auth) {
             return res.status(401).json({
                 message: 'Authentication required'
             });
         }
-        
+
         const token = auth.split(' ')[1];
-        if (token == undefined) {
+        if (!token) {
             return res.status(401).json({
                 message: 'Invalid token'
             });
         }
-        
+
+        // Verify the token
         const decodedToken = await JWT.verify(token, process.env.JWT_SECRET);
-        
-        // Check if token is for admin
+        console.log('Decoded Token:', decodedToken); // For debugging
+
+        // Ensure it's an admin token
         if (decodedToken.type !== 'admin') {
             return res.status(403).json({
                 message: 'Admin privileges required'
             });
         }
-        
-        // Check for the admin and throw error if not found
-        const admin = await Admin.findByPk(decodedToken.adminId);
-        if (admin == null) {
+
+        // Find the admin by id
+        const admin = await Admin.findByPk(decodedToken.id); // <-- FIXED: using 'id'
+        if (!admin) {
             return res.status(404).json({
                 message: 'Authentication failed: admin not found'
             });
         }
-        
-        // Attach only necessary admin data to request
+
+        // Attach admin data to request
         req.admin = {
             id: admin.id,
             email: admin.email,
             isAdmin: admin.isAdmin,
-            
         };
 
         next();
@@ -51,19 +51,20 @@ exports.authenticateAdmin = async (req, res, next) => {
                 message: 'Session timed-out, please login'
             });
         }
-        
+
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({
                 message: 'Invalid token'
             });
         }
-        
-        console.log(error.message);
+
+        console.error('Auth Error:', error.message);
         return res.status(500).json({
             message: 'Internal server error'
         });
     }
 };
+
 
   exports.adminAuth = (req, res, next) => {
     try {
