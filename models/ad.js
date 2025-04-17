@@ -24,6 +24,14 @@ Ad.init(
       type: DataTypes.TEXT,
       allowNull: true
     },
+    date: {
+      type:DataTypes.DATE,
+      allowNull:false
+    },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE

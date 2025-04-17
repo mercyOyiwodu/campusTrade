@@ -29,7 +29,7 @@ module.exports = {
         allowNull: false,
       },
       media: {
-        type: Sequelize.JSON,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       sellerId: {
@@ -46,7 +46,7 @@ module.exports = {
         defaultValue: Sequelize.NOW,
       },
       status: {
-        type: Sequelize.ENUM('pending', 'approved'),
+        type: Sequelize.ENUM('pending', 'approved','not_approved'),
         defaultValue: 'pending',
       },
        createdAt: {

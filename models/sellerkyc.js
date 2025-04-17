@@ -27,23 +27,23 @@ SellerKYC.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    connectLink: {
+    whatsappLink: {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: true
     },
     school: {
-      type: DataTypes.ENUM('LASU', 'UNILAG', 'LAUTECH'),
-      defaultValue: 'UNILAG',
+      type: DataTypes.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology'),
+      defaultValue: 'Lagos State University',
     },
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    location: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+    gender: {
+      type:Sequelize.ENUM('Female', 'Male'),
+    defaultValue: 'Male'
+   },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE

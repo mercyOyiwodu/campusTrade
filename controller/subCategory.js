@@ -1,19 +1,28 @@
 const SubCategory = require('../models/subCategory');
+const Category = require('../models/category')
 
+// Create SubCategory
 exports.createSubCategory = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { categoryId } =req.params
+    const { name } = req.body;
 
-    const existing = await SubCategory.findOne({ where: { name } });
-    if (existing) {
-      return res.status(400).json({ message: 'Subcategory already exists' });
+    // Check if categoryId exists
+    const category = await Category.findByPk(categoryId);
+    if (!category) {
+      return res.status(400).json({ message: 'Category not found' });
     }
 
-    const subcategory = await SubCategory.create({ name, categoryId });
+    const existingSubCategory = await SubCategory.findOne({ where: { name, categoryId } });
+    if (existingSubCategory) {
+      return res.status(400).json({ message: 'Subcategory already exists in this category' });
+    }
+
+    const subCategory = await SubCategory.create({ name, categoryId });
 
     res.status(201).json({
       message: 'Subcategory created successfully',
-      data: subcategory,
+      data: subCategory,
     });
   } catch (error) {
     console.log(error);
@@ -21,9 +30,16 @@ exports.createSubCategory = async (req, res) => {
   }
 };
 
+// Get All SubCategories
 exports.getAllSubCategories = async (req, res) => {
   try {
-    const subCategories = await SubCategory.findAll();
+    const subCategories = await SubCategory.findAll({
+      include: {
+        model: Category,
+        as: 'category', 
+      },
+    });
+
     res.status(200).json({
       message: 'Subcategories fetched successfully',
       data: subCategories,
@@ -34,10 +50,16 @@ exports.getAllSubCategories = async (req, res) => {
   }
 };
 
+// Get SubCategory by ID
 exports.getSubCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const subCategory = await SubCategory.findByPk(id);
+    const subCategory = await SubCategory.findByPk(id, {
+      include: {
+        model: Category,
+        as: 'category', // Include category data for the subcategory
+      },
+    });
 
     if (!subCategory) {
       return res.status(404).json({ message: 'Subcategory not found' });
@@ -53,10 +75,11 @@ exports.getSubCategoryById = async (req, res) => {
   }
 };
 
+// Update SubCategory
 exports.updateSubCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, categoryId } = req.body;
+    const { name, categoryId } = req.body; 
 
     const subCategory = await SubCategory.findByPk(id);
 
@@ -64,8 +87,19 @@ exports.updateSubCategory = async (req, res) => {
       return res.status(404).json({ message: 'Subcategory not found' });
     }
 
-    subCategory.name = name || subCategory.name;
-    subCategory.categoryId = categoryId || subCategory.categoryId;
+    // If categoryId is provided, validate it
+    if (categoryId) {
+      const category = await Category.findByPk(categoryId);
+      if (!category) {
+        return res.status(400).json({ message: 'Category not found' });
+      }
+      subCategory.categoryId = categoryId;
+    }
+
+    // Update name if provided
+    if (name) {
+      subCategory.name = name;
+    }
 
     await subCategory.save();
 
@@ -79,6 +113,8 @@ exports.updateSubCategory = async (req, res) => {
   }
 };
 
+
+// Delete SubCategory
 exports.deleteSubCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -88,20 +124,13 @@ exports.deleteSubCategory = async (req, res) => {
       return res.status(404).json({ message: 'Subcategory not found' });
     }
 
-    // If subcategories exist (for nested categories), delete them
-    if (subCategory.getSubCategories) {
-      const subCats = await subCategory.getSubCategories();
-      for (const sub of subCats) {
-        await sub.destroy();
-      }
-    }
-
     await subCategory.destroy();
 
-    res.status(200).json({ message: 'Subcategory deleted successfully' });
+    res.status(200).json({
+      message: 'Subcategory deleted successfully',
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
-

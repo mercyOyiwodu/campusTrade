@@ -25,7 +25,7 @@ const router = require('express').Router();
  *           schema:
  *             type: string
  *           description: ID of the product category
- *           example: "1"
+ *           example: "60d0fe4f5311906168a10ob"
  *         - in: path
  *           name: sellerId
  *           required: true

@@ -36,6 +36,9 @@ Transaction.init(
     paymentDate: {
       type: DataTypes.STRING,
       allowNull: false,
+    },sellerId: {
+      type: DataTypes.UUID,
+      allowNull: false
     },
     createdAt: {
       allowNull: false,
@@ -49,8 +52,8 @@ Transaction.init(
   {
     // Other model options go here
     sequelize, // We need to pass the connection instance
-    modelName: 'Transaction', 
-    tableName: 'Transactions'
+    modelName: 'transaction', 
+    tableName: 'transactions'
   },
 );
 

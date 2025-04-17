@@ -8,51 +8,63 @@ const formatedDate = new Date().toLocaleString();
 
 exports.initializePayment = async(req, res) =>{
     try {
-        const {email, amount, name} = req.body;
-        if(!email || !name || !amount){
+        const { email, amount, name, sellerId } = req.body;
+
+        if (!email || !name || !amount || !sellerId) {
             return res.status(400).json({
-                message:'Please input all fields'
-            })
-        };
-         const paymentData = {
+                message: 'Please input all fields'
+            });
+        }
+
+        const otp = otpGenerator.generate(12, { specialChars: false });
+        const ref = `TCA-AF-${otp}`;
+        const paymentData = {
             amount,
-            customer:{
+            customer: {
                 name,
                 email
             },
             currency: "NGN",
             reference: ref
-         }
-         const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData,{
-            headers:{
-                Authorization: `Bearer ${Secret_key}`
+        };
+
+        const response = await axios.post(
+            'https://api.korapay.com/merchant/api/v1/charges/initialize',
+            paymentData,
+            {
+                headers: {
+                    Authorization: `Bearer ${Secret_key}`
+                }
             }
-         });
-         const {data} = response?.data;
-         const payment = new transactionModel({
-            name, 
+        );
+
+        const { data } = response?.data;
+        const payment = new transactionModel({
+            name,
             amount,
             email,
-            reference:paymentData.reference,
-            paymentDate: formatedDate
-         }) 
+            reference: paymentData.reference,
+            paymentDate: formatedDate,
+            sellerId 
+        });
 
-         await payment.save();
+        await payment.save();
 
-         res.status(200).json({
+        res.status(200).json({
             message: 'Payment initialized successfully',
-            data:{
+            data: {
                 reference: data?.reference,
-                checkout_url:data?.checkout_url
+                checkout_url: data?.checkout_url
             }
-         })
+        });
+
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
         res.status(500).json({
-            message: 'Error initializing payment' +error.message 
-        })
+            message: 'Error initializing payment: ' + error.message
+        });
     }
-}
+};
 
 exports.verifyPayment = async (req, res)=>{
     try {

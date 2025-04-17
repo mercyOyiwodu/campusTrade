@@ -5,19 +5,18 @@ const bcrypt = require('bcryptjs');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
 const JWT = require('jsonwebtoken');
-const { toPascalCase } = require('../utils/stringHelpers');
 
 // Admin registration (only accessible to super_admin)
 exports.createAdmin = async (req, res) => {
   try {
 
     // Check if request is from a super_admin
-    const { email, fullName, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword } = req.body;
 
     // Validate required fields
-    if (!email || !fullName || !password || !confirmPassword) {
+    if (!email  || !password || !confirmPassword) {
       return res.status(400).json({
-        message: 'Email, fullName and password are required'
+        message: 'Email and password are required'
       });
     }
 
@@ -38,7 +37,6 @@ exports.createAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newAdmin = await Admin.create({
-      fullName: toPascalCase(fullName),
       email: email.toLowerCase(),
       password: hashedPassword,
 
@@ -49,13 +47,12 @@ const token = JWT.sign({ id: newAdmin.id}, process.env.JWT_SECRET, { expiresIn: 
     
 // Create the verify link with the token generated
 const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${token}`;
-const firstName =  newAdmin.fullName.split(' ')[0] 
 
 // Create the email details
 const mailDetails = {
-    to: newAdmin.email,
+    email: newAdmin.email,
     subject: 'Welcome to Campus Trade',
-    html: signUpTemplate(link, firstName)
+    html: signUpTemplate(link, 'Admin')
 };
 
     // Send the verification email
@@ -67,7 +64,8 @@ const mailDetails = {
 
     res.status(201).json({
       message: 'Admin account created successfully',
-      data: adminData
+      data: adminData,
+      token
     });
   } catch (error) {
     res.status(500).json({
@@ -79,9 +77,6 @@ const mailDetails = {
 
 exports.verifyAdmin = async (req, res) => {
   try {
-    if (req.body.fullName) {
-      req.body.fullName = toPascalCase(req.body.fullName);
-    }
     const { token } = req.params;
     // verify the token
     await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
@@ -109,12 +104,11 @@ exports.verifyAdmin = async (req, res) => {
           // dynamically create the link
           const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${newToken}`;
           // get the user's first name
-          const firstName = admin.fullName.split(' ')[0];
           // create the email details
           const mailDetails = {
             email: admin.email,
             subject: 'Email verification',
-            html: signUpTemplate(link, firstName)
+            html: signUpTemplate(link, 'Admin')
           };
           // await nodemailer to send the email
           await sendEmail(mailDetails);
@@ -141,6 +135,7 @@ exports.verifyAdmin = async (req, res) => {
         }
         // verify the user account
         admin.isVerified = true;
+        admin.isAdmin = true;
         // save the changes to the database
         await admin.save();
         // send a success response
@@ -162,7 +157,7 @@ exports.verifyAdmin = async (req, res) => {
 // Admin login
 exports.loginAdmin = async (req, res) => {
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password } = req.body;
 
     const newAdmin = await Admin.findOne({
       where: { email: email.toLowerCase() }

@@ -1,21 +1,20 @@
 const Joi = require('joi');
 
 exports.registerValidation = (req, res, next) => {
-  console.log(req)
     const schema = Joi.object({
-      fullName: Joi.string()
-        .min(3)
-        .trim()
-        .pattern(/^[A-Za-z ]+$/)
-        .required()
-        .messages({
-          "any.required": 'Fullname is required here',
-          'string.empty': 'Fullname cannot be empty',
-          'string.pattern.base': "Fullname should only contain alphabets",
-          "string.min": "Fullname should not be less than 3 letters"
-        }),
+      // fullName: Joi.string()
+      //   .min(3)
+      //   .trim()
+      //   .pattern(/^[A-Za-z ]+$/)
+      //   .required()
+      //   .messages({
+      //     "any.required": 'Fullname is required here',
+      //     'string.empty': 'Fullname cannot be empty',
+      //     'string.pattern.base': "Fullname should only contain alphabets",
+      //     "string.min": "Fullname should not be less than 3 letters"
+      //   }),
         
-        email: Joi.string().email().pattern(/^[a-z0-9](\.?[a-z0-9]){5,}@g(oogle)?mail\.com$/).required().messages({
+        email: Joi.string().email().required().messages({
           "string.email": "Invalid email format",
           "string.empty": "Email cannot be empty",
           "any.required": "Email is required",
@@ -52,8 +51,8 @@ exports.registerValidation = (req, res, next) => {
                 "string.pattern.base":
                   "Invalid email. Use a valid Gmail address with at least 6 characters before '@gmail.com' (e.g., johndoe@gmail.com). Only lowercase letters, numbers, and optional dots are allowed."
               }),
-        
         })
+next()
     }  
 
 exports.resetPasswords = (req, res, next)=>{
@@ -66,5 +65,5 @@ const schema = Joi.object().keys({
       "Invalid email. Use a valid Gmail address with at least 6 characters before '@gmail.com' (e.g., johndoe@gmail.com). Only lowercase letters, numbers, and optional dots are allowed."
   }),
 })
-
+next()
 }
