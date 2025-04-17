@@ -37,9 +37,6 @@ const kycRouter = express.Router();
  *               jambRegNo:
  *                 type: string
  *                 example: "12345678AB"
- *               description:
- *                 type: string
- *                 example: "Student entrepreneur and product reseller."
  *               school:
  *                 type: string
  *                 example: "University of Lagos"
