@@ -16,9 +16,10 @@ exports.createProduct = async (req, res) => {
         return res.status(404).json({ message: "Seller not found" });
       }
   
-      const totalPaid = await Transaction.sum("amountPaid", {
-        where: { userId: sellerId, status: "Success" },
+      const totalPaid = await Transaction.sum('amount', {
+        where: { sellerId, status: "Success" },
       });
+      
   
       if (!totalPaid || totalPaid < postFee) {
         req.files.forEach(file => fs.unlinkSync(file.path));

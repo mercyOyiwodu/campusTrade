@@ -36,6 +36,9 @@ module.exports = {
         allowNull: false,
         defaultValue: 'Pending'
       },
+      sellerId: {
+        type: Sequelize.UUID,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

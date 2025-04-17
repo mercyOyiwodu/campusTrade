@@ -1,6 +1,7 @@
 const express = require('express');
 const { createSubCategory, getAllSubCategories, getSubCategoryById, deleteSubCategory, updateSubCategory } = require('../controller/subCategory');
-const router = express.Router()
+const router = express.Router();
+
 /**
  * @swagger
  * tags:
@@ -10,10 +11,18 @@ const router = express.Router()
 
 /**
  * @swagger
- * /api/v1/create-subcategory:
+ * /api/v1/create-subcategory/{categoryId}:
  *   post:
  *     summary: Create a new subcategory
  *     tags: [SubCategory]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The category ID to which the subcategory belongs
  *     requestBody:
  *       required: true
  *       content:
@@ -22,13 +31,9 @@ const router = express.Router()
  *             type: object
  *             required:
  *               - name
- *               - categoryId
  *             properties:
  *               name:
  *                 type: string
- *               categoryId:
- *                 type: string
- *                 format: uuid
  *     responses:
  *       201:
  *         description: Subcategory created successfully
@@ -37,7 +42,8 @@ const router = express.Router()
  *       500:
  *         description: Internal server error
  */
-router.get('create-subcategory',createSubCategory)
+router.post('/create-subcategory/:categoryId', createSubCategory);
+
 /**
  * @swagger
  * /api/v1/all-subcategory:
@@ -50,8 +56,8 @@ router.get('create-subcategory',createSubCategory)
  *       500:
  *         description: Internal server error
  */
-
 router.get('/all-subcategory', getAllSubCategories);
+
 /**
  * @swagger
  * /api/v1/one-subcategory/{id}:
@@ -74,8 +80,8 @@ router.get('/all-subcategory', getAllSubCategories);
  *       500:
  *         description: Internal server error
  */
-
 router.get('/one-subcategory/:id', getSubCategoryById);
+
 /**
  * @swagger
  * /api/v1/update-subcategory/{id}:
@@ -86,10 +92,10 @@ router.get('/one-subcategory/:id', getSubCategoryById);
  *       - in: path
  *         name: id
  *         required: true
+ *         description: ID of the subcategory to update
  *         schema:
  *           type: string
  *           format: uuid
- *         description: Subcategory ID
  *     requestBody:
  *       required: true
  *       content:
@@ -99,12 +105,19 @@ router.get('/one-subcategory/:id', getSubCategoryById);
  *             properties:
  *               name:
  *                 type: string
- *               categoryId:
- *                 type: string
- *                 format: uuid
+ *                 example: "Mobile Phones"
  *     responses:
  *       200:
  *         description: Subcategory updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/SubCategory'
  *       400:
  *         description: Category not found
  *       404:
@@ -114,6 +127,7 @@ router.get('/one-subcategory/:id', getSubCategoryById);
  */
 
 router.put('/update-subcategory/:id', updateSubCategory);
+
 /**
  * @swagger
  * /api/v1/delete-subcategory/{id}:
@@ -138,5 +152,4 @@ router.put('/update-subcategory/:id', updateSubCategory);
  */
 router.delete('/delete-subcategory/:id', deleteSubCategory);
 
-
-module.exports = router
+module.exports = router;

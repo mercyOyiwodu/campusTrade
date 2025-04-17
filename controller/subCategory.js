@@ -1,9 +1,11 @@
 const SubCategory = require('../models/subCategory');
+const Category = require('../models/category')
 
 // Create SubCategory
 exports.createSubCategory = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { categoryId } =req.params
+    const { name } = req.body;
 
     // Check if categoryId exists
     const category = await Category.findByPk(categoryId);
@@ -34,7 +36,7 @@ exports.getAllSubCategories = async (req, res) => {
     const subCategories = await SubCategory.findAll({
       include: {
         model: Category,
-        as: 'category', // Include the category for each subcategory
+        as: 'category', 
       },
     });
 
@@ -77,7 +79,7 @@ exports.getSubCategoryById = async (req, res) => {
 exports.updateSubCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, categoryId } = req.body;
+    const { name, categoryId } = req.body; 
 
     const subCategory = await SubCategory.findByPk(id);
 
@@ -85,15 +87,19 @@ exports.updateSubCategory = async (req, res) => {
       return res.status(404).json({ message: 'Subcategory not found' });
     }
 
+    // If categoryId is provided, validate it
     if (categoryId) {
       const category = await Category.findByPk(categoryId);
       if (!category) {
         return res.status(400).json({ message: 'Category not found' });
       }
+      subCategory.categoryId = categoryId;
     }
 
-    subCategory.name = name || subCategory.name;
-    subCategory.categoryId = categoryId || subCategory.categoryId;
+    // Update name if provided
+    if (name) {
+      subCategory.name = name;
+    }
 
     await subCategory.save();
 
@@ -106,6 +112,7 @@ exports.updateSubCategory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Delete SubCategory
 exports.deleteSubCategory = async (req, res) => {
