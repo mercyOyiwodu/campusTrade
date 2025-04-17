@@ -1,4 +1,5 @@
-const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword,getSellerDashboard, getAll, searchSellers} = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, 
+    getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, searchSellers} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
@@ -338,7 +339,12 @@ sellerRouter.delete('/remove', deleteSeller);                                   
  *             example:
  *               message: "Unauthorized access"
  */
-sellerRouter.get('/getSellerDashboard', getSellerDashboard);
+sellerRouter.get('/stats', authenticate, getDashboardStats);
+sellerRouter.get('/recent-posts', authenticate, getRecentPosts);
+sellerRouter.get('/pending-posts', authenticate, getPendingPosts);
+sellerRouter.get('/approved-posts', authenticate, getApprovedPosts);
+sellerRouter.get('/category-weekly-stats', authenticate, getWeeklyCategoryUploadStats);
+
 
 /**
  * @swagger

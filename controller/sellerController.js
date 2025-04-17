@@ -6,6 +6,9 @@ const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
 const forgotTemplate = require('../utils/signUp')
 const fs = require('fs');
+const Product = require('../models/product')
+const { Op } = require("sequelize");
+const verificationLink = process.env.FRONTEND_URL;
 
 exports.register = async (req, res) => {
     try {
@@ -46,14 +49,12 @@ exports.register = async (req, res) => {
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
         // Create verification link
-        const link = `${req.protocol}://${req.get('host')}/api/v1/seller/verify-user/${token}`;
+        const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${token}`;
 
-        // Email details
-        const mailDetails = {
-            email: seller.email,
-            subject: 'Welcome to Campus Trade',
-            html: signUpTemplate(link, 'User'),
-        };
+        await sendEmail(email, "Verify your CampusTrade account", `
+      <p>Please verify your email by clicking the link below:</p>
+      <a href="${verificationLink}">Verify Account</a>
+    `);
 
         await sendEmail(mailDetails);
 
@@ -63,7 +64,6 @@ exports.register = async (req, res) => {
         return res.status(201).json({
             message: 'Account created! Please check your email to verify it.',
             data: sellerData,
-            token
         });
 
     } catch (error) {
@@ -101,12 +101,12 @@ exports.verify = async (req, res) => {
                     const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '3mins' });
 
                     // dynamically create the link
-                    const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
+                    const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${newToken}`;
                     // create the email details
                     const mailDetails = {
                         email: seller.email,
                         subject: 'Email verification',
-                        html: signUpTemplate(link, 'seller')
+                        html: signUpTemplate(verificationLink, 'seller')
                     };
                     // await nodemailer to send the email
                     await sendEmail(mailDetails);
@@ -165,23 +165,23 @@ exports.forgotPassword = async (req, res) => {
                 message: 'User not found'
             })
         }
-       
+
         // Generate a token for the user
         const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
         // Create the reset link
         const link = `${req.protocol}://${req.get('host')}/api/v1/seller/forget/${token}`;
         // const firstName = seller.fullName.split(' ')[0];
         // configure the email details
-        
+
         const mailDetails = {
             subject: 'Password Reset',
             email: seller.email,
             html: forgotTemplate(link, 'User')
         }
-        
+
         // Await nodemailer to send the user an email
         await sendEmail(mailDetails);
-        
+
         // Send a success response
         res.status(200).json({
             message: 'Password reset initiated, Please check your email for the reset link',
@@ -237,53 +237,53 @@ exports.resetPassword = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-      const { email, password } = req.body;
-  
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Please enter email and password' });
-      }
-  
-      const seller = await Seller.findOne({ where: { email: email.toLowerCase() } });
-  
-      if (!seller) {
-        return res.status(400).json({ message: 'Seller not found' });
-      }
-  
-      const isPasswordCorrect = await bcrypt.compare(password, seller.password);
-      if (!isPasswordCorrect) {
-        return res.status(400).json({ message: 'Invalid password' });
-      }
-  
-      if (!seller.isVerified) {
-        return res.status(400).json({
-          message: 'Seller not verified, please check your email to verify'
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please enter email and password' });
+        }
+
+        const seller = await Seller.findOne({ where: { email: email.toLowerCase() } });
+
+        if (!seller) {
+            return res.status(400).json({ message: 'Seller not found' });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, seller.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: 'Invalid password' });
+        }
+
+        if (!seller.isVerified) {
+            return res.status(400).json({
+                message: 'Seller not verified, please check your email to verify'
+            });
+        }
+
+
+        const token = await JWT.sign(
+            { sellerId: seller.id, isAdmin: seller.isAdmin },
+            process.env.JWT_SECRET,
+            { expiresIn: '5mins' }
+        );
+
+        const sellerData = seller.get({ plain: true });
+        delete sellerData.password;
+
+        seller.isLoggedIn = true;
+        await seller.save();
+
+        res.status(200).json({
+            message: 'Login successful',
+            data: sellerData,
+            token
         });
-      }
-  
-  
-      const token = await JWT.sign(
-        { sellerId: seller.id, isAdmin: seller.isAdmin },
-        process.env.JWT_SECRET,
-        { expiresIn: '5mins' }
-      );
-  
-      const sellerData = seller.get({ plain: true });
-      delete sellerData.password;
-      
-      seller.isLoggedIn = true;
-      await seller.save();
-      
-      res.status(200).json({
-        message: 'Login successful',
-        data: sellerData,
-        token
-      });
     } catch (error) {
-      return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
-  };
-  
-  exports.logOut = async (req, res) => {
+};
+
+exports.logOut = async (req, res) => {
     try {
         const sellerId = req.seller?.id;
 
@@ -345,43 +345,110 @@ exports.changePassword = async (req, res) => {
         });
     }
 
-}                                                                                                                                                                                                     // // In sellerController.js
-exports.getSellerDashboard = async (req, res) => {
+}
+
+
+exports.getDashboardStats = async (req, res) => {
     try {
-        const sellerId = req.seller.id;
+        const { sellerId } = req.params;
+
+        // Basic validation example
+        if (!sellerId || typeof sellerId !== 'string') {
+            return res.status(400).json({ message: 'Invalid sellerId' });
+        }
 
         const totalProducts = await Product.count({ where: { sellerId } });
-        const pendingProducts = await Product.count({
-            where: {
-                sellerId,
-                approvalStatus: 'pending'
-            }
-        });
-        const approvedProducts = await Product.count({
-            where: {
-                sellerId,
-                approvalStatus: 'approved'
-            }
-        });
+        const pendingProducts = await Product.count({ where: { sellerId, approvalStatus: 'pending' } });
+        const approvedProducts = await Product.count({ where: { sellerId, approvalStatus: 'approved' } });
 
         res.status(200).json({
-            message: 'Dashboard data retrieved successfully',
+            message: 'Dashboard stats retrieved successfully',
             data: {
-                products: {
-                    total: totalProducts,
-                    pending: pendingProducts,
-                    approved: approvedProducts
-                },
-                verificationStatus: req.seller.isVerified
+                totalProducts,
+                pendingProducts,
+                approvedProducts
             }
         });
     } catch (error) {
-        res.status(500).json({
-            message: "Internal Server Error: " + error.message
+        console.error('Error fetching dashboard stats:', error); // Logging the error
+        res.status(500).json({ message: "Internal Server Error: " + error.message });
+    }
+};
+exports.getRecentPosts = async (req, res) => {
+    try {
+        const sellerId = req.seller.id;
+        const recentPosts = await Product.findAll({
+            where: { sellerId },
+            order: [['createdAt', 'DESC']],
+            limit: 5
         });
+
+        res.status(200).json({ message: 'Recent posts retrieved', data: recentPosts });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error: " + error.message });
     }
 };
 
+exports.getPendingPosts = async (req, res) => {
+    try {
+        const sellerId = req.seller.id;
+        const pendingPosts = await Product.findAll({
+            where: { sellerId, approvalStatus: 'pending' }
+        });
+
+        res.status(200).json({ message: 'Pending posts retrieved', data: pendingPosts });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error: " + error.message });
+    }
+};
+
+exports.getApprovedPosts = async (req, res) => {
+    try {
+        const sellerId = req.seller.id;
+        const approvedPosts = await Product.findAll({
+            where: { sellerId, approvalStatus: 'approved' }
+        });
+
+        res.status(200).json({ message: 'Approved posts retrieved', data: approvedPosts });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error: " + error.message });
+    }
+};
+
+exports.getWeeklyCategoryUploadStats = async (req, res) => {
+    try {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const categoryCounts = await Product.findAll({
+            where: {
+                approvalStatus: 'approved',
+                createdAt: { [Op.gte]: oneWeekAgo }
+            },
+            attributes: ['categoryId', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+            group: ['categoryId'],
+            raw: true
+        });
+
+        const total = categoryCounts.reduce((sum, item) => sum + parseInt(item.count), 0);
+        const categories = await Category.findAll({ attributes: ['id', 'categoryName'], raw: true });
+
+        const result = categoryCounts.map(cat => {
+            const category = categories.find(c => c.id === cat.categoryId);
+            return {
+                category: category ? category.categoryName : 'Unknown',
+                percentage: Math.round((cat.count / total) * 100)
+            };
+        });
+
+        res.status(200).json({
+            message: 'Weekly category upload stats retrieved successfully',
+            data: result
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error: " + error.message });
+    }
+};
 
 exports.getAll = async (req, res) => {
     try {
@@ -396,7 +463,7 @@ exports.getAll = async (req, res) => {
         console.log(error)
 
         return res.status(500).json({
-            message: 'Internal server error'+ error.message
+            message: 'Internal server error' + error.message
         })
     }
 }
