@@ -8,7 +8,8 @@ exports.createProduct = async (req, res) => {
     try {
       const { productName, price, condition, school, description } = req.body;
       const { categoryId, sellerId } = req.params;
-      const postFee = price * 0.1;
+      const postFee = price * 0.05; 
+
   
       const seller = await Seller.findByPk(sellerId);
       if (!seller) {

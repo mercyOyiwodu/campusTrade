@@ -2,6 +2,7 @@ const Seller = require('../models/seller');
 const SellerKYC = require('../models/sellerkyc');
 const cloudinary = require('../config/cloudinary');
 const { toPascalCase } = require('../utils/stringHelpers');
+const fs = require('fs')
 
 exports.profileDetails = async(req, res) =>{
     try {
