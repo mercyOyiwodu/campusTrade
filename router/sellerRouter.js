@@ -7,7 +7,7 @@ const sellerRouter = require('express').Router();
 const {authenticateAdmin} =require('../middlewares/adminAuth')
 
 
-/**
+/**  
  * @swagger
  * /api/v1/seller/register:
  *   post:
@@ -63,6 +63,7 @@ const {authenticateAdmin} =require('../middlewares/adminAuth')
  */
 
 sellerRouter.post('/register', registerValidation, register);
+
 
 /**
  * @openapi
@@ -292,7 +293,8 @@ sellerRouter.post('/signout', logOut);
  *             example:
  *               message: "Old password is incorrect"
  */
-sellerRouter.patch('/change/:id', changePassword);
+
+sellerRouter.patch('/change/:token', changePassword);
 
 /**
  * @swagger
@@ -308,8 +310,8 @@ sellerRouter.patch('/change/:id', changePassword);
  *           application/json:
  *             example:
  *               message: "Seller account deleted successfully"
- */                                                                                                                                                                                               
-sellerRouter.delete('/remove', deleteSeller);                                                                                                                                                                     sellerRouter.delete('/remove', deleteSeller);
+ */
+sellerRouter.delete('/remove/:id', deleteSeller);
 
 
 /**

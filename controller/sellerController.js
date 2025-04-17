@@ -5,7 +5,7 @@ const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
 const forgotTemplate = require('../utils/signUp')
-const fs = require('fs');
+//const fs = require('fs');
 
 exports.register = async (req, res) => {
     try {
@@ -53,6 +53,7 @@ exports.register = async (req, res) => {
             email: seller.email,
             subject: 'Welcome to Campus Trade',
             html: signUpTemplate(link, 'User'),
+
         };
 
         await sendEmail(mailDetails);
@@ -70,6 +71,7 @@ exports.register = async (req, res) => {
         return res.status(500).json({
             message: 'Something went wrong. Please try again later.' + error.message
         });
+
     }
 };
 
@@ -102,6 +104,7 @@ exports.verify = async (req, res) => {
 
                     // dynamically create the link
                     const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
+
                     // create the email details
                     const mailDetails = {
                         email: seller.email,
@@ -202,7 +205,7 @@ exports.resetPassword = async (req, res) => {
         // Extract the passwod and confirm password from the request body
         const { password } = req.body;
         // Verify if the token is still valid
-        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
+        const { sellerId } = await  JWT.verify(token, process.env.JWT_SECRET);
         // Check if the user is still existsing
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
@@ -305,45 +308,62 @@ exports.logOut = async (req, res) => {
     }
 };
 
+
 exports.changePassword = async (req, res) => {
     try {
         // Extract the token from the params
         const { token } = req.params;
-        // Extract the passwod and confirm password from the request body
+        // Extract the password and confirm password from the request body
         const { password, confirmPassword } = req.body;
+
         // Verify if the token is still valid
-        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
-        // Check if the user is still existsing
+        let sellerId;
+        try {
+            const decoded = await JWT.verify(token, process.env.JWT_SECRET);
+            sellerId = decoded.sellerId;
+        } catch (error) {
+            return res.status(400).json({
+                message: 'Invalid or expired token'
+            });
+        }
+
+        // Check if the user exists
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
             return res.status(404).json({
                 message: 'User not found'
-            })
+            });
         }
-        // Confirm that the password matches
+
+        // Confirm that the passwords match
         if (password !== confirmPassword) {
             return res.status(400).json({
-                message: 'Password does not match'
-            })
+                message: 'Passwords do not match'
+            });
         }
+
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        // Update the user's password to the new password
+
+        // Update the user's password
         seller.password = hashedPassword;
-        await seller.save()
+        await seller.save();
+
+        // Return success message
         res.status(200).json({
             message: 'Password updated successfully'
         });
 
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         res.status(500).json({
-            message: error.message
+            message: 'An error occurred while updating the password.'+ error.message
         });
     }
+};
 
-}                                                                                                                                                                                                     // // In sellerController.js
+
 exports.getSellerDashboard = async (req, res) => {
     try {
         const sellerId = req.seller.id;
