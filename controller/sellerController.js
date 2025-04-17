@@ -364,7 +364,6 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-}
 
 
 exports.getDashboardStats = async (req, res) => {

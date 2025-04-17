@@ -9,182 +9,323 @@ const router = require('express').Router();
  *   description: Endpoints related to product operations
  */
 
-/**
- * @swagger
- * paths:
- *   /api/v1/products/{categoryId}/{sellerId}:
- *     post:
- *       summary: Create a new product
- *       description: Creates a new product for the seller with product images uploaded to Cloudinary.
- *       tags:
- *         - Product
- *       parameters:
- *         - in: path
- *           name: categoryId
- *           required: true
- *           schema:
- *             type: string
- *           description: ID of the product category
- *           example: "60d0fe4f5311906168a10ob"
- *         - in: path
- *           name: sellerId
- *           required: true
- *           schema:
- *             type: string
- *           description: ID of the seller
- *           example: "60d0fe4f5311236168a109cb"
- *       requestBody:
- *         required: true
- *         content:
- *           multipart/form-data:
- *             schema:
- *               type: object
- *               required:
- *                 - productName
- *                 - price
- *                 - condition
- *                 - school
- *                 - description
- *               properties:
- *                 productName:
- *                   type: string
- *                   example: "Mathematics Textbook"
- *                 price:
- *                   type: number
- *                   example: 3000
- *                 condition:
- *                   type: string
- *                   example: "New"
- *                 school:
- *                   type: string
- *                   example: "University of Lagos"
- *                 description:
- *                   type: string
- *                   example: "This textbook covers fundamental mathematics topics."
- *                 media:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: binary
- *                   description: Images or media related to the product
- *       responses:
- *         "201":
- *           description: Product created successfully
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Product created successfully"
- *                   data:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "60d0fe4f5311236168a109ca"
- *                       productName:
- *                         type: string
- *                         example: "Mathematics Textbook"
- *                       price:
- *                         type: number
- *                         example: 3000
- *                       condition:
- *                         type: string
- *                         example: "New"
- *                       school:
- *                         type: string
- *                         example: "University of Lagos"
- *                       description:
- *                         type: string
- *                         example: "This textbook covers fundamental mathematics topics."
- *                       media:
- *                         type: array
- *                         items:
- *                           type: string
- *                           example: "https://res.cloudinary.com/yourcloud/image/upload/v123456/product.jpg"
- *         "400":
- *           description: Bad Request - Missing or invalid fields
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Product name, price, condition, school, and description are required"
- *         "500":
- *           description: Internal Server Error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error creating product: <error-message>"
- */
+// /**
+//  * @swagger
+//  * paths:
+//  *   /api/v1/products/{categoryId}/{sellerId}:
+//  *     post:
+//  *       summary: Create a new product
+//  *       description: Creates a new product for the seller with product images uploaded to Cloudinary.
+//  *       tags:
+//  *         - Product
+//  *       parameters:
+//  *         - in: path
+//  *           name: categoryId
+//  *           required: true
+//  *           schema:
+//  *             type: string
+//  *           description: ID of the product category
+//  *           example: "60d0fe4f5311906168a10ob"
+//  *         - in: path
+//  *           name: sellerId
+//  *           required: true
+//  *           schema:
+//  *             type: string
+//  *           description: ID of the seller
+//  *           example: "60d0fe4f5311236168a109cb"
+//  *       requestBody:
+//  *         required: true
+//  *         content:
+//  *           multipart/form-data:
+//  *             schema:
+//  *               type: object
+//  *               required:
+//  *                 - productName
+//  *                 - price
+//  *                 - condition
+//  *                 - school
+//  *                 - description
+//  *               properties:
+//  *                 productName:
+//  *                   type: string
+//  *                   example: "Mathematics Textbook"
+//  *                 price:
+//  *                   type: number
+//  *                   example: 3000
+//  *                 condition:
+//  *                   type: string
+//  *                   example: "New"
+//  *                 school:
+//  *                   type: string
+//  *                   example: "University of Lagos"
+//  *                 description:
+//  *                   type: string
+//  *                   example: "This textbook covers fundamental mathematics topics."
+//  *                 media:
+//  *                   type: array
+//  *                   items:
+//  *                     type: string
+//  *                     format: binary
+//  *                   description: Images or media related to the product
+//  *       responses:
+//  *         "201":
+//  *           description: Product created successfully
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   message:
+//  *                     type: string
+//  *                     example: "Product created successfully"
+//  *                   data:
+//  *                     type: object
+//  *                     properties:
+//  *                       id:
+//  *                         type: string
+//  *                         example: "60d0fe4f5311236168a109ca"
+//  *                       productName:
+//  *                         type: string
+//  *                         example: "Mathematics Textbook"
+//  *                       price:
+//  *                         type: number
+//  *                         example: 3000
+//  *                       condition:
+//  *                         type: string
+//  *                         example: "New"
+//  *                       school:
+//  *                         type: string
+//  *                         example: "University of Lagos"
+//  *                       description:
+//  *                         type: string
+//  *                         example: "This textbook covers fundamental mathematics topics."
+//  *                       media:
+//  *                         type: array
+//  *                         items:
+//  *                           type: string
+//  *                           example: "https://res.cloudinary.com/yourcloud/image/upload/v123456/product.jpg"
+//  *         "400":
+//  *           description: Bad Request - Missing or invalid fields
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   message:
+//  *                     type: string
+//  *                     example: "Product name, price, condition, school, and description are required"
+//  *         "500":
+//  *           description: Internal Server Error
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   message:
+//  *                     type: string
+//  *                     example: "Error creating product: <error-message>"
+//  */
 
 /**
  * @swagger
- * paths:
- *   /api/v1/products:
- *     get:
- *       summary: Get all products
- *       description: Retrieves a list of all products with their associated seller information.
- *       tags:
- *         - Product
- *       responses:
- *         "200":
- *           description: Products retrieved successfully
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Products retrieved successfully"
- *                   data:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: string
- *                           example: "60d0fe4f5311236168a109ca"
- *                         productName:
- *                           type: string
- *                           example: "Mathematics Textbook"
- *                         price:
- *                           type: number
- *                           example: 3000
- *                         condition:
- *                           type: string
- *                           example: "New"
- *                         school:
- *                           type: string
- *                           example: "University of Lagos"
- *                         description:
- *                           type: string
- *                           example: "This textbook covers fundamental mathematics topics."
- *                         media:
- *                           type: array
- *                           items:
- *                             type: string
- *                             example: "https://res.cloudinary.com/yourcloud/image/upload/v123456/product.jpg"
- *         "500":
- *           description: Internal Server Error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error retrieving products: <error-message>"
+ * /api/v1/create/{sellerId}/{categoryId}:
+ *   post:
+ *     summary: Create a new product
+ *     description: Allows a seller to create a new product listing with images or videos.
+ *     tags:
+ *       - Product
+ *     parameters:
+ *       - in: path
+ *         name: sellerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The seller's ID
+ *         example: "1"
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The category ID the product belongs to
+ *         example: "5"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productName
+ *               - price
+ *               - condition
+ *               - school
+ *               - description
+ *               - media
+ *             properties:
+ *               productName:
+ *                 type: string
+ *                 example: "HP Pavilion 15"
+ *               price:
+ *                 type: number
+ *                 example: 150000
+ *               condition:
+ *                 type: string
+ *                 example: "New"
+ *               school:
+ *                 type: string
+ *                 example: "University of Lagos"
+ *               description:
+ *                 type: string
+ *                 example: "A brand new HP laptop with 8GB RAM"
+ *               media:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       "201":
+ *         description: Product created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Post created successfully
+ *                 data:
+ *                   type: object
+ *       "404":
+ *         description: Seller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller not found"
+ *       "500":
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
  */
+
+
+// /**
+//  * @swagger
+//  * paths:
+//  *   /api/v1/products:
+//  *     get:
+//  *       summary: Get all products
+//  *       description: Retrieves a list of all products with their associated seller information.
+//  *       tags:
+//  *         - Product
+//  *       responses:
+//  *         "200":
+//  *           description: Products retrieved successfully
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   message:
+//  *                     type: string
+//  *                     example: "Products retrieved successfully"
+//  *                   data:
+//  *                     type: array
+//  *                     items:
+//  *                       type: object
+//  *                       properties:
+//  *                         id:
+//  *                           type: string
+//  *                           example: "60d0fe4f5311236168a109ca"
+//  *                         productName:
+//  *                           type: string
+//  *                           example: "Mathematics Textbook"
+//  *                         price:
+//  *                           type: number
+//  *                           example: 3000
+//  *                         condition:
+//  *                           type: string
+//  *                           example: "New"
+//  *                         school:
+//  *                           type: string
+//  *                           example: "University of Lagos"
+//  *                         description:
+//  *                           type: string
+//  *                           example: "This textbook covers fundamental mathematics topics."
+//  *                         media:
+//  *                           type: array
+//  *                           items:
+//  *                             type: string
+//  *                             example: "https://res.cloudinary.com/yourcloud/image/upload/v123456/product.jpg"
+//  *         "500":
+//  *           description: Internal Server Error
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *                 properties:
+//  *                   message:
+//  *                     type: string
+//  *                     example: "Error retrieving products: <error-message>"
+//  */
+
+/**
+ * @swagger
+ * /api/v1/product/getAll:
+ *   get:
+ *     summary: Get all products
+ *     description: Returns all product listings, requires seller to have paid the post fee.
+ *     tags:
+ *       - Product
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       "200":
+ *         description: Products retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Products retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       "403":
+ *         description: Post fee required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "You must pay the post fee before accessing all products."
+ *       "500":
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+
 
 /**
  * @swagger
@@ -417,7 +558,7 @@ const router = require('express').Router();
  */
 
 
-router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
+router.post('/create/:categoryId/:sellerId', upload.array('media', 5), createProduct);
 router.get('/products', getAllProducts);
 router.get('/oneproduct/:id', getProductById);
 router.put('/update-product/:id', upload.array('media', 5), updateProduct);
