@@ -1,10 +1,11 @@
-const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword,getSellerDashboard, getAll} = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword,getSellerDashboard, getAll, searchSellers} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
 const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
 const {authenticateAdmin} =require('../middlewares/adminAuth')
+const {authenticate} =require('../middlewares/authentication')
 
 
 /**  
@@ -251,7 +252,7 @@ sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
  *             example:
  *               message: "Logout successful"
  */
-sellerRouter.post('/signout', logOut);
+sellerRouter.post('/signout',authenticate ,logOut);
 
 /**
  * @swagger
@@ -408,6 +409,55 @@ sellerRouter.get('/getSellerDashboard', getSellerDashboard);
  */                                                                                                                                                                              
 sellerRouter.get('/getAll', authenticateAdmin, getAll);
 
+/**
+ * @swagger
+ * /api/v1/seller/searchSellers:
+ *   get:
+ *     summary: Search sellers by school
+ *     description: Retrieve a list of sellers filtered by school. If no query is provided, returns all sellers.
+ *     tags:
+ *       - Seller
+ *     parameters:
+ *       - in: query
+ *         name: school
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The school name to filter sellers
+ *         example: "University of Lagos"
+ *     responses:
+ *       "200":
+ *         description: List of sellers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                     example: "seller@example.com"
+ *                   fullName:
+ *                     type: string
+ *                     example: "Jane Doe"
+ *                   school:
+ *                     type: string
+ *                     example: "University of Lagos"
+ *       "500":
+ *         description: Error searching for sellers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error searching for sellers"
+ */
+sellerRouter.get('get-one-seller', searchSellers)
 
 /**
  * @openapi

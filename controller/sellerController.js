@@ -170,7 +170,7 @@ exports.forgotPassword = async (req, res) => {
         }
        
         // Generate a token for the user
-        const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '10mins' });
+        const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
         // Create the reset link
         const link = `${req.protocol}://${req.get('host')}/api/v1/seller/forget/${token}`;
         // const firstName = seller.fullName.split(' ')[0];
@@ -286,25 +286,26 @@ exports.login = async (req, res) => {
     }
   };
   
-exports.logOut = async (req, res) => {
+  exports.logOut = async (req, res) => {
     try {
-        const sellerExists = await Seller.findByPk(req.seller.sellerId);
-        if (!sellerExists) {
-            return res.status(404).json({
-                message: 'user not found'
-            })
-        }
-        sellerExists.isLoggedIn = false
-        await sellerExists.save()
-        res.status(200).json({
-            message: 'user logged out successfully'
-        })
-    } catch (error) {
-        console.log(error);
+        const sellerId = req.seller?.id;
 
-        res.status(500).json({
-            message: error.message
-        });
+        if (!sellerId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const seller = await Seller.findByPk(sellerId);
+        if (!seller) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        seller.isLoggedIn = false;
+        await seller.save();
+
+        res.status(200).json({ message: 'User logged out successfully' });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
