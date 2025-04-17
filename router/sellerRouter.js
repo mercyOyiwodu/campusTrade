@@ -155,7 +155,7 @@ sellerRouter.post('/forget', forgetPasswords, forgotPassword);
  *             example:
  *               message: "Invalid or expired token"
  */
-sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
+sellerRouter.post('/reset/:token', resetPassword);
 
 /**
  * @swagger
@@ -260,7 +260,7 @@ sellerRouter.post('/signout', logOut);
  *               message: "Old password is incorrect"
  */
 
-sellerRouter.patch('/change/:id', changePassword);
+sellerRouter.patch('/change/:token', changePassword);
 
 /**
  * @swagger
@@ -277,7 +277,7 @@ sellerRouter.patch('/change/:id', changePassword);
  *             example:
  *               message: "Seller account deleted successfully"
  */
-sellerRouter.delete('/remove', deleteSeller);
+sellerRouter.delete('/remove/:id', deleteSeller);
 
 /**
  * @swagger

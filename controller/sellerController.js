@@ -214,7 +214,7 @@ exports.resetPassword = async (req, res) => {
         // Extract the passwod and confirm password from the request body
         const { password, confirmPassword } = req.body;
         // Verify if the token is still valid
-        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
+        const { sellerId } = await  JWT.verify(token, process.env.JWT_SECRET);
         // Check if the user is still existsing
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
@@ -246,7 +246,7 @@ exports.resetPassword = async (req, res) => {
                 message: 'Link expired, Please initiate a link'
             })
         }
-        res.status(500).json({
+        return res.status(500).json({
             message: error.message 
         })
     }
@@ -268,6 +268,13 @@ exports.login = async (req, res)=>{
                 message: 'Seller not found'
             });
         };
+
+        //   // Check if email is verified
+        //   if (!seller.isVerified) {
+        //     return res.status(401).json({
+        //         message: 'Please verify your email before logging in'
+        //     });
+        // }
         // check the password if it is correct
         const isPasswordCorrect = await bcrypt.compare(password, seller.password);
         if (isPasswordCorrect === false){
@@ -317,45 +324,104 @@ exports.logOut = async (req, res) => {
     }
 };
 
+// exports.changePassword = async (req, res) => {
+//     try {
+//         // Extract the token from the params
+//         const { token } = req.params;
+//         // Extract the passwod and confirm password from the request body
+//         const { password, confirmPassword } = req.body;
+//         // Verify if the token is still valid
+//         const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
+//         // Check if the user is still existsing
+//         const seller = await Seller.findByPk(sellerId);
+//         if (!seller) {
+//             return res.status(404).json({
+//                 message: 'User not found'
+//             })
+//         }
+//         // Confirm that the password matches
+//         if (password !== confirmPassword) {
+//             return res.status(400).json({
+//                 message: 'Password does not match'
+//             })
+//         }
+//         // Generate a salt and hash the password
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
+//         // Update the user's password to the new password
+//         seller.password = hashedPassword;
+//         await seller.save()
+//         res.status(200).json({
+//             message: 'Password updated successfully'
+//         });
+
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).json({
+//             message: error.message 
+//         });
+//     }
+
+// }                               
+
+
+
+
 exports.changePassword = async (req, res) => {
     try {
         // Extract the token from the params
         const { token } = req.params;
-        // Extract the passwod and confirm password from the request body
+        // Extract the password and confirm password from the request body
         const { password, confirmPassword } = req.body;
+
         // Verify if the token is still valid
-        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
-        // Check if the user is still existsing
+        let sellerId;
+        try {
+            const decoded = await JWT.verify(token, process.env.JWT_SECRET);
+            sellerId = decoded.sellerId;
+        } catch (error) {
+            return res.status(400).json({
+                message: 'Invalid or expired token'
+            });
+        }
+
+        // Check if the user exists
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
             return res.status(404).json({
                 message: 'User not found'
-            })
+            });
         }
-        // Confirm that the password matches
+
+        // Confirm that the passwords match
         if (password !== confirmPassword) {
             return res.status(400).json({
-                message: 'Password does not match'
-            })
+                message: 'Passwords do not match'
+            });
         }
+
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        // Update the user's password to the new password
+
+        // Update the user's password
         seller.password = hashedPassword;
-        await seller.save()
+        await seller.save();
+
+        // Return success message
         res.status(200).json({
             message: 'Password updated successfully'
         });
 
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         res.status(500).json({
-            message: error.message 
+            message: 'An error occurred while updating the password.'
         });
     }
+};
 
-}                                                                                                                                                                                                     // // In sellerController.js
+
 exports.getSellerDashboard = async (req, res) => {
     try {
       const sellerId = req.seller.id;
@@ -442,17 +508,17 @@ exports.deleteSeller = async (req, res) => {
                 message: 'User not found'
             })
         }
-        const oldFilePaths = seller.profilePic.map((e) => { return `./uploads/${e}` })
-        const deleteuser =await Seller.destroy(id)
+        //const oldFilePaths = seller.profilePic.map((e) => { return `./uploads/${e}` })
+        const deleteuser =await Seller.destroy({where: {id}});
         
-        if (deleteuser) {
-            oldFilePaths.forEach((path) => {
-                if (fs.existsSync(path)) {
-                    fs.unlinkSync(path)  
-            }
-            })
-        }
-        res.status(201).json({
+        // if (deleteuser) {
+        //     oldFilePaths.forEach((path) => {
+        //         if (fs.existsSync(path)) {
+        //             fs.unlinkSync(path)  
+        //     }
+        //     })
+        // }
+        res.status(200).json({
             message: 'user deleted successfully'
             
         })
