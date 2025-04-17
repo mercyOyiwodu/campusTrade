@@ -9,38 +9,46 @@ Transaction.init(
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
-
-    },
-    status: {
-      type: DataTypes.ENUM('Pending', 'Success', 'Failed'),
-      allowNull: false,
-      defaultValue: 'Pending'
-    },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: true,
+      defaultValue: UUIDV4
   },
-    email: {
+  name: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    amount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    reference: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    paymentDate: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },sellerId: {
-      type: DataTypes.UUID,
       allowNull: false
-    },
-    createdAt: {
+  },
+  amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+  },
+  email: {
+      type: DataTypes.STRING,
+      allowNull: false
+  },
+  reference: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+  },
+  paymentDate: {
+      type: DataTypes.STRING,
+      allowNull: false
+  },
+  status: {
+      type: DataTypes.ENUM('Pending', 'Success', 'Failed'),
+      defaultValue: 'Pending',
+  },
+  purpose: {
+      type: DataTypes.STRING,
+      allowNull: false, // Identifying the purpose (post_fee, etc.)
+  },
+  used: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // Indicates if the transaction was used
+  },
+  sellerId: {
+      type: DataTypes.UUID,
+      allowNull: true, // Optional
+  },
+  createdAt: {
       allowNull: false,
       type: DataTypes.DATE
     },

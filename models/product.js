@@ -28,7 +28,7 @@ Product.init(
     },
     condition: {
       type: DataTypes.ENUM('Used', 'New'),
-      allowNull: false,
+      defaultValue: 'Used'
     },
     media: {
       type: DataTypes.STRING,
@@ -54,6 +54,10 @@ Product.init(
       type: DataTypes.ENUM('pending', 'approved','not_approved'),
       defaultValue: 'pending',
     },    
+    isVerified:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     timeCreated: {
       type: DataTypes.DATE,
       allowNull: false,

@@ -1,23 +1,23 @@
 const transactionModel = require('../models/transaction');
 const axios = require('axios')
+require('dotenv').config()
 const otpGenerator = require('otp-generator');
 const otp = otpGenerator.generate(12, {specialChars: false});
 const Secret_key = process.env.Korapay_Secret_Key;
-const ref = `TCA-AF-${otp}`
+const ref = `TCA-YU-${otp}`
 const formatedDate = new Date().toLocaleString();
 
-exports.initializePayment = async(req, res) =>{
+console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
+
+exports.initializePayment = async(req, res) => {
     try {
         const { email, amount, name, sellerId } = req.body;
-
-        if (!email || !name || !amount || !sellerId) {
+        if (!email || !name || !amount) {
             return res.status(400).json({
                 message: 'Please input all fields'
             });
         }
 
-        const otp = otpGenerator.generate(12, { specialChars: false });
-        const ref = `TCA-AF-${otp}`;
         const paymentData = {
             amount,
             customer: {
@@ -28,24 +28,25 @@ exports.initializePayment = async(req, res) =>{
             reference: ref
         };
 
-        const response = await axios.post(
-            'https://api.korapay.com/merchant/api/v1/charges/initialize',
-            paymentData,
-            {
-                headers: {
-                    Authorization: `Bearer ${Secret_key}`
-                }
+        const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
+            headers: {
+                Authorization: `Bearer ${Secret_key}`
             }
-        );
+        });
 
         const { data } = response?.data;
+
+        // Create a new transaction record
         const payment = new transactionModel({
             name,
             amount,
             email,
             reference: paymentData.reference,
             paymentDate: formatedDate,
-            sellerId 
+            status: 'Pending', // Status initialized as Pending
+            purpose: 'post_fee', // Identifying the purpose of the transaction
+            used: false, // This ensures the transaction is not yet used
+            sellerId: sellerId || null, // Optional sellerId for better reference
         });
 
         await payment.save();
@@ -57,53 +58,54 @@ exports.initializePayment = async(req, res) =>{
                 checkout_url: data?.checkout_url
             }
         });
-
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
         res.status(500).json({
-            message: 'Error initializing payment: ' + error.message
+            message: 'Error initializing payment: ' + error
         });
     }
 };
 
-exports.verifyPayment = async (req, res)=>{
+exports.verifyPayment = async (req, res) => {
     try {
-        //extract the reference from the qquery prams
-        const {reference} = req.query;
-        //get the payment data from kora by snding a get method to their api
+        const { reference } = req.query;
+
+        // Fetch payment data from KoraPay API
         const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
-            headers:{Authorization: `Bearer ${Secret_key}`}
+            headers: { Authorization: `Bearer ${Secret_key}` }
         });
-        console.log(response)
-        //extract the data from the response
-        const {data} = response?.data;
-        //update your database according to the status of te resonse from KORAPAY API
-        if (data?.status === 'success'){
-            //update to success if yes
-         await transactionModel.update( 
-                {status: 'Success'},{where: {reference}});
-                console.log("Data after pay",data)
-                const updatedPayment = await transactionModel.findOne({ where: { reference } });
+
+        const { data } = response?.data;
+
+        // If payment is successful, update the transaction status
+        if (data?.status === 'success') {
+            // Update status to 'Success' when payment is successful
+            await transactionModel.update(
+                { status: 'Success', used: true }, // mark as used
+                { where: { reference } }
+            );
+
+            // Fetch and return the updated transaction data
+            const updatedPayment = await transactionModel.findOne({ where: { reference } });
+
             return res.status(200).json({
-                message:'Payment verified successfully',
+                message: 'Payment verified successfully',
                 data: updatedPayment
-            }) 
-        }else  {
-        await transactionModel.update({where:{reference}}, 
-                {status: 'Failed'})
+            });
+        } else {
+            // If payment is unsuccessful, mark as failed
+            await transactionModel.update(
+                { status: 'Failed' },
+                { where: { reference } }
+            );
             return res.status(200).json({
-                message:'Payment verification failed'
-            }) 
+                message: 'Payment verification failed'
+            });
         }
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
         res.status(500).json({
-
-            message: "Error initializing payment" + error.message 
-
-        })
+            message: "Error verifying payment: " + error.message
+        });
     }
-}
-
-
-
+};

@@ -11,34 +11,41 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      amount: {
+        allowNull: false
+    },
+    amount: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-
-      },
-      reference: {
+        allowNull: false
+    },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    reference: {
         type: Sequelize.STRING,
         allowNull: false,
-
-      },
-      paymentDate: {
+        unique: true
+    },
+    paymentDate: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      status: {
+        allowNull: false
+    },
+    status: {
         type: Sequelize.ENUM('Pending', 'Success', 'Failed'),
-        allowNull: false,
-        defaultValue: 'Pending'
-      },
-      sellerId: {
+        defaultValue: 'Pending',
+    },
+    purpose: {
+        type: Sequelize.STRING,
+        allowNull: false, // Identifying the purpose (post_fee, etc.)
+    },
+    used: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false, // Indicates if the transaction was used
+    },
+    sellerId: {
         type: Sequelize.UUID,
-      },
+        allowNull: true, // Optional
+    },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -10,7 +10,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
       },
       productName: {
         type: Sequelize.STRING,
@@ -26,7 +25,7 @@ module.exports = {
       },
       condition: {
         type: Sequelize.ENUM('Used', 'New'),
-        allowNull: false,
+        defaultValue: 'Used',
       },
       media: {
         type: Sequelize.STRING,
@@ -38,6 +37,10 @@ module.exports = {
       },
       categoryId: {
         type: Sequelize.UUID,
+        allowNull: false,
+      },
+      isVerified:{
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
       timeCreated: {

@@ -5,60 +5,68 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 
 exports.createProduct = async (req, res) => {
-    try {
-      const { productName, price, condition, school, description } = req.body;
-      const { categoryId, sellerId } = req.params;
-      const postFee = price * 0.05; 
+  try {
+    const { productName, price, condition, school, description } = req.body;
+    const { categoryId, sellerId } = req.params;
+    const postFee = price * 0.05;
 
-  
-      const seller = await Seller.findByPk(sellerId);
-      if (!seller) {
-        req.files.forEach(file => fs.unlinkSync(file.path));
-        return res.status(404).json({ message: "Seller not found" });
-      }
-  
-      const totalPaid = await Transaction.sum('amount', {
-        where: { sellerId, status: "Success" },
-      });
-      
-  
-      if (!totalPaid || totalPaid < postFee) {
-        req.files.forEach(file => fs.unlinkSync(file.path));
-        return res.status(403).json({
-          message: `Sellers must pay at least ₦${postFee} before posting a product.`,
-        });
-      }
-  
-      const uploadedMedia = [];
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          resource_type: "auto",
-        });
-        uploadedMedia.push(result.secure_url);
-        fs.unlinkSync(file.path);
-      }
-  
-      const product = await Product.create({
-        productName,
-        price,
-        condition,
-        school,
-        description,
-        media: uploadedMedia, 
-        categoryId,
-        sellerId,
-        timeCreated: new Date(),
-        status: 'pending'
-      });
-  
-      res.status(201).json({ message: "Post created successfully", data: product });
-    } catch (error) {
-      console.error(error);
-      if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
-      res.status(500).json({ message: error.message  });
+    const seller = await Seller.findByPk(sellerId);
+    if (!seller) {
+      req.files.forEach(file => fs.unlinkSync(file.path));
+      return res.status(404).json({ message: "Seller not found" });
     }
-  };
-  
+
+    const recentFeeTxn = await Transaction.findOne({
+      where: {
+        sellerId,
+        status: "Success",
+        purpose: "post_fee",
+        amount: postFee,
+        used: false
+      },
+      order: [['createdAt', 'DESC']],
+    });
+
+    if (!recentFeeTxn) {
+      req.files.forEach(file => fs.unlinkSync(file.path));
+      return res.status(403).json({
+        message: `Seller must make a post fee payment of ₦${postFee} before posting.`,
+      });
+    }
+
+    const uploadedMedia = [];
+    for (const file of req.files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        resource_type: "auto",
+      });
+      uploadedMedia.push(result.secure_url);
+      fs.unlinkSync(file.path);
+    }
+
+    const product = await Product.create({
+      productName,
+      price,
+      condition,
+      school,
+      description,
+      media: uploadedMedia,
+      categoryId,
+      sellerId,
+      timeCreated: new Date(),
+      status: 'pending'
+    });
+
+    await recentFeeTxn.update({ used: true, linkedProductId: product.id });
+
+    res.status(201).json({ message: "Post created successfully", data: product });
+
+  } catch (error) {
+    console.error(error);
+    if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.findAll({
