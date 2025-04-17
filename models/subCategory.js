@@ -32,8 +32,21 @@ Subcategory.init(
   }
 );
 
+
+
 // Associations
-Subcategory.belongsTo(Category, { foreignKey: 'categoryId', as: 'parentCategory' });
-Category.hasMany(Subcategory, { foreignKey: 'categoryId', as: 'subCategories' });
+// SubCategory model
+// Category model
+ // Category model
+
+ Category.hasMany(Subcategory, { 
+  as: 'subCategories', 
+  foreignKey: 'categoryId' 
+});
+
+Subcategory.belongsTo(Category, { 
+  foreignKey: 'categoryId', 
+  as: 'category' 
+});
 
 module.exports = Subcategory;

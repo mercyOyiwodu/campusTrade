@@ -12,10 +12,12 @@ const router = express.Router();
 
 /**
  * @swagger
- * /create-categories:
+ * /api/v1/create-categories:
  *   post:
+ *     tags:
+ *       - Categories
  *     summary: Create a new category
- *     tags: [Categories]
+ *     description: Creates a new category if it does not already exist.
  *     requestBody:
  *       required: true
  *       content:
@@ -31,16 +33,58 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: Category created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Category created successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: Electronics
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: '2025-04-17T14:35:00.000Z'
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: '2025-04-17T14:35:00.000Z'
  *       400:
  *         description: Category already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Category already exists
  *       500:
- *         description: Internal server error
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: An unexpected error occurred
  */
+
 
 router.post('/create-categories', createCategory);
 /**
  * @swagger
- * /all-categories:
+ * /api/v1/all-categories:
  *   get:
  *     summary: Get all categories
  *     tags: [Categories]
@@ -53,7 +97,7 @@ router.post('/create-categories', createCategory);
 router.get('/all-categories', getAllCategories);
 /**
  * @swagger
- * /one-categories/{id}:
+ * /api/v1/one-categories/{id}:
  *   get:
  *     summary: Get category by ID
  *     tags: [Categories]
@@ -76,7 +120,7 @@ router.get('/all-categories', getAllCategories);
 router.get('/one-categories/:id', getCategoryById);
 /**
  * @swagger
- * /update-categories/{id}:
+ * /api/v1/update-categories/{id}:
  *   put:
  *     summary: Update a category by ID
  *     tags: [Categories]
@@ -110,9 +154,9 @@ router.get('/one-categories/:id', getCategoryById);
 router.put('/update-categories/:id', updateCategory);
 /**
  * @swagger
- * /update-categories/{id}:
- *   put:
- *     summary: Update a category by ID
+ * /api/v1/delete-categories/{id}:
+ *   delete:
+ *     summary: Delete a category by ID
  *     tags: [Categories]
  *     parameters:
  *       - in: path
@@ -122,25 +166,14 @@ router.put('/update-categories/:id', updateCategory);
  *           type: string
  *           format: uuid
  *         description: Category ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: Gadgets
  *     responses:
  *       200:
- *         description: Category updated successfully
+ *         description: Category deleted successfully
  *       404:
  *         description: Category not found
  *       500:
  *         description: Internal server error
  */
-
 router.delete('/delete-categories/:id', deleteCategory);
 
 module.exports = router;

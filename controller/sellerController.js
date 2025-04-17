@@ -102,13 +102,11 @@ exports.verify = async (req, res) => {
 
                     // dynamically create the link
                     const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
-                    // get the seller/user's first name
-                    const firstName = seller.fullName.split(' ')[0];
                     // create the email details
                     const mailDetails = {
                         email: seller.email,
                         subject: 'Email verification',
-                        html: signUpTemplate(link, firstName)
+                        html: signUpTemplate(link, 'seller')
                     };
                     // await nodemailer to send the email
                     await sendEmail(mailDetails);
@@ -239,52 +237,52 @@ exports.resetPassword = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        // extract the user email's and password from the request body
-        const { email, password } = req.body;
-        if (email == undefined || password == undefined) {
-            return res.status(400).json({
-                message: 'Please enter email and password'
-            });
-        };
-        //check for the user and throw an error if not found
-        const seller = await Seller.findOne({ where: { email: email.toLowerCase() } });
-        if (seller == null) {
-            return res.status(400).json({
-                message: 'Seller not found'
-            });
-        };
-        // check the password if it is correct
-        const isPasswordCorrect = await bcrypt.compare(password, seller.password);
-        if (isPasswordCorrect === false) {
-            return res.status(400).json({
-                message: 'Invalid password'
-            });
-        };
-        if (seller.isVerified === false) {
-            return res.status(400).json({
-                message: "seller not verified, Please check your email to verify"
-            });
-        }
-        // generate  a token for the user
-        const token = await JWT.sign({ sellerId: seller.id, isAdmin: seller.isAdmin }, process.env.JWT_SECRET, { expiresIn: '5mins' });
-        const sellerData = seller.get({ plain: true });
-
-        // Remove password from response
-        delete sellerData.password;
-        //send response
-        res.status(200).json({
-            message: 'Login successful',
-            data: sellerData,
-            token
-
-        })
+      const { email, password } = req.body;
+  
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Please enter email and password' });
+      }
+  
+      const seller = await Seller.findOne({ where: { email: email.toLowerCase() } });
+  
+      if (!seller) {
+        return res.status(400).json({ message: 'Seller not found' });
+      }
+  
+      const isPasswordCorrect = await bcrypt.compare(password, seller.password);
+      if (!isPasswordCorrect) {
+        return res.status(400).json({ message: 'Invalid password' });
+      }
+  
+      if (!seller.isVerified) {
+        return res.status(400).json({
+          message: 'Seller not verified, please check your email to verify'
+        });
+      }
+  
+  
+      const token = await JWT.sign(
+        { sellerId: seller.id, isAdmin: seller.isAdmin },
+        process.env.JWT_SECRET,
+        { expiresIn: '5mins' }
+      );
+  
+      const sellerData = seller.get({ plain: true });
+      delete sellerData.password;
+      
+      seller.isLoggedIn = true;
+      await seller.save();
+      
+      res.status(200).json({
+        message: 'Login successful',
+        data: sellerData,
+        token
+      });
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        })
+      return res.status(500).json({ message: error.message });
     }
-}
-
+  };
+  
 exports.logOut = async (req, res) => {
     try {
         const sellerExists = await Seller.findByPk(req.seller.sellerId);
