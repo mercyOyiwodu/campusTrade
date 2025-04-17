@@ -9,7 +9,7 @@ const {authenticateAdmin} =require('../middlewares/adminAuth')
 const {authenticate} =require('../middlewares/authentication')
 
 
-/**
+/**  
  * @swagger
  * /api/v1/seller/register:
  *   post:
@@ -65,6 +65,7 @@ const {authenticate} =require('../middlewares/authentication')
  */
 
 sellerRouter.post('/register', registerValidation, register);
+
 
 /**
  * @openapi
@@ -294,7 +295,8 @@ sellerRouter.post('/signout',authenticate ,logOut);
  *             example:
  *               message: "Old password is incorrect"
  */
-sellerRouter.patch('/change/:id', changePassword);
+
+sellerRouter.patch('/change/:token', changePassword);
 
 /**
  * @swagger
@@ -310,8 +312,8 @@ sellerRouter.patch('/change/:id', changePassword);
  *           application/json:
  *             example:
  *               message: "Seller account deleted successfully"
- */                                                                                                                                                                                               
-sellerRouter.delete('/remove', deleteSeller);                                                                                                                                                                     sellerRouter.delete('/remove', deleteSeller);
+ */
+sellerRouter.delete('/remove/:id', deleteSeller);
 
 
 /**
