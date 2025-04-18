@@ -44,7 +44,6 @@ exports.profileDetails = async(req, res) =>{
             school,
             jambRegNo,
             id:sellerId,
-            description,
             whatsappLink,
             gender,
             phoneNumber,
