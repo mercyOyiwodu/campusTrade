@@ -4,10 +4,96 @@ const Seller = require("../models/seller");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 
+// exports.createProduct = async (req, res) => {
+//   try {
+//     const { categoryId, sellerId } = req.params;
+//     const { productName, price, condition, school, description } = req.body;
+//     const postFee = price * 0.05;
+
+//     const seller = await Seller.findByPk(sellerId);
+//     if (!seller) {
+//       req.files.forEach(file => fs.unlinkSync(file.path));
+//       return res.status(404).json({ message: "Seller not found" });
+//     }
+
+//     const recentFeeTxn = await Transaction.findOne({
+//       where: {
+//         sellerId,
+//         status: "Success",
+//         purpose: "post_fee",
+//         amount: postFee,
+//         used: false
+//       },
+//       order: [['createdAt', 'DESC']],
+//     });
+
+//     if (!recentFeeTxn) {
+//       req.files.forEach(file => fs.unlinkSync(file.path));
+//       return res.status(403).json({
+//         message: `Seller must make a post fee payment of ₦${postFee} before posting.`,
+//       });
+//     }
+
+//     const uploadedMedia = [];
+//     for (const file of req.files) {
+//       const result = await cloudinary.uploader.upload(file.path, {
+//         resource_type: "auto",
+//       });
+//       uploadedMedia.push(result.secure_url);
+//       fs.unlinkSync(file.path);
+//     }
+
+//     const product = await Product.create({
+//       productName,
+//       price,
+//       condition,
+//       school,
+//       description,
+//       media: uploadedMedia,
+//       categoryId,
+//       sellerId,
+//       timeCreated: new Date(),
+//       status: 'pending'
+//     });
+
+//     await recentFeeTxn.update({ used: true, linkedProductId: product.id });
+
+//     res.status(201).json({ message: "Post created successfully", data: product });
+
+//   } catch (error) {
+//     console.error(error);
+//     if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// exports.getAllProducts = async (req, res) => {
+//     try {
+//         const products = await Product.findAll({
+//             include: [
+//                 {
+//                     model: Seller,
+//                     attributes: ["fullName", "email"],
+//                 },
+//             ],
+//         });
+
+//         res.status(200).json({
+//             message: "Products retrieved successfully",
+//             data: products,
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ message: error.message });
+//     }
+// }
+
+
 exports.createProduct = async (req, res) => {
   try {
-    const { productName, price, condition, school, description } = req.body;
     const { categoryId, sellerId } = req.params;
+
+    const { productName, price, condition, school, description } = req.body;
 
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
@@ -38,6 +124,7 @@ exports.createProduct = async (req, res) => {
       timeCreated: new Date(),
       status: 'pending'
     });
+
     if (req.files) {
       req.files.forEach(file => {
         try {
@@ -48,6 +135,7 @@ exports.createProduct = async (req, res) => {
       });
     }
     
+
     res.status(201).json({ message: "Post created successfully", data: product });
 
   } catch (error) {
@@ -68,16 +156,49 @@ exports.getAllProducts = async (req, res) => {
                 },
             ],
         });
+//   try {
+//     const sellerId = req.seller.id; // assuming seller is authenticated via middleware
 
-        res.status(200).json({
-            message: "Products retrieved successfully",
-            data: products,
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
-}
+
+//     const recentFeeTxn = await Transaction.findOne({
+//       where: {
+//         sellerId,
+//         status: "Success",
+//         purpose: "post_fee",
+//         used: false
+//       },
+//       order: [['createdAt', 'DESC']],
+//     });
+
+//     if (!recentFeeTxn) {
+//       return res.status(403).json({
+//         message: "You must pay the post fee before accessing all products.",
+//       });
+//     }
+
+//     const products = await Product.findAll({
+//       include: [
+//         {
+//           model: Seller,
+//           attributes: ["fullName", "email"],
+//         },
+//       ],
+//     });
+
+//     // Optionally mark the transaction as used after viewing
+//     await recentFeeTxn.update({ used: true });
+
+    res.status(200).json({
+      message: "Products retrieved successfully",
+      data: products,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 exports.getProductById = async (req, res) => {
     try {

@@ -79,7 +79,7 @@ const swaggerDefinition = {
           description: 'Production server',
       },
       {
-          url: 'http://localhost:4725',
+          url: 'http://localhost:1999',
           description: 'Development server',
       },
 
@@ -147,13 +147,7 @@ const server = async()=>{
   
 server();
 
-// console.log({
-//   host: sequelize.options.host,
-//   username: sequelize.options.username,
-//   password: sequelize.options.password,
-// });
-
-app.listen(PORT,()=>{
+app.listen(PORT, ()=>{
     console.log(`Server is listening to PORT: ${PORT}`);
 })
 

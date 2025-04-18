@@ -8,9 +8,10 @@ const router = require('express').Router();
  *   name: Product
  *   description: Endpoints related to product operations
  */
+
 /**
  * @swagger
- * /api/products/{categoryId}/{sellerId}:
+ * /api/v1/products/{categoryId}/{sellerId}:
  *   post:
  *     summary: Create a new product post
  *     tags:
@@ -80,14 +81,7 @@ const router = require('express').Router();
  *                   example: Seller not found
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Something went wrong
+ *                   example: "Internal Server Error"
  */
 
 router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);

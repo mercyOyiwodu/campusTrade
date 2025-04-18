@@ -16,7 +16,7 @@ const dialect = process.env.DATABASE_DIALECT
   "test": {
     "username": "root",
     "password": "root",
-    "database": "campust",
+    "database": "campus",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

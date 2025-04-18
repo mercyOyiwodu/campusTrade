@@ -23,10 +23,6 @@ SellerKYC.init(
           type: DataTypes.STRING,
           allowNull:false
         },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     whatsappLink: {
       type: DataTypes.STRING,
       allowNull: true,
