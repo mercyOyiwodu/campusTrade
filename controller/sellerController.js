@@ -252,11 +252,21 @@ exports.login = async (req, res) => {
         }
 
         if (!seller.isVerified) {
+            const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
+
+            // // Create verification link
+            const link = `${verificationLink}/${token}`;
+            const mailDetails = {
+                email: seller.email,
+                subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+                html: signUpTemplate(link, 'seller'),
+            };
+    
+            await sendEmail(mailDetails);
             return res.status(400).json({
-                message: 'Seller not verified, please check your email to verify'
+                message: 'Not verified, please check your email to verify'
             });
         }
-
 
         const token = await JWT.sign(
             { sellerId: seller.id, isAdmin: seller.isAdmin },
