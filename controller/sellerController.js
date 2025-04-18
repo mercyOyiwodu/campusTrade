@@ -71,48 +71,6 @@ exports.register = async (req, res) => {
             data: sellerData,
         });
 
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
-    }
-
-    // Check if seller already exists
-    const existingSeller = await Seller.findOne({ where: { email: email.toLowerCase() } });
-    if (existingSeller) {
-      return res.status(400).json({ message: `An account with ${email} already exists` });
-    }
-
-    // Encrypt password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create seller
-    const seller = await Seller.create({
-      email: email.toLowerCase(),
-      password: hashedPassword
-    });
-
-    // Generate JWT token
-    const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30m' });
- const link = `${process.env.FRONTEND_URL}/verify-email/${token}`;
-    // Create verification link
-    
-    // Create the email details
-    const mailDetails = {
-        email: seller.email,
-        subject: 'Welcome to Campus Trade',
-        html: signUpTemplate(link, "Seller")
-    };
-    await sendEmail(mailDetails);
-
-    // Remove password from seller data
-    const sellerData = seller.toJSON();
-    delete sellerData.password;
-
-    return res.status(201).json({
-      message: 'Account created! Please check your email to verify it.',
-      data: sellerData,
-    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
