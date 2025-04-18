@@ -11,7 +11,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /products/{categoryId}/{sellerId}:
+ * /api/v1/products/{categoryId}/{sellerId}:
  *   post:
  *     summary: Create a new product post
  *     tags:
