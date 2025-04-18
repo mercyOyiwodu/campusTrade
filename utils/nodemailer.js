@@ -24,7 +24,7 @@ async function main() {
     //send mail witbh defined transport object
 
     const info = await transporter.sendMail({
-        from: `"Campus Trade" <${process.env.APP_USERNAME}>`, // sender address
+        from: `"Campus Trade" <${process.env.user}>`, // sender address
         to: options.email, // list of receivers
         subject: options.subject, 
         html: options.html,
