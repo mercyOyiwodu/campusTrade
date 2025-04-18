@@ -5,7 +5,7 @@ const Seller = require('../models/seller');
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:1709/api/v1/auth/google/login"
+    callbackURL: "http://localhost:4725/api/v1/auth/google/login"
   },
   async (accessToken, refreshToken, profile, cb) => {
     console.log("Profile: ", profile)

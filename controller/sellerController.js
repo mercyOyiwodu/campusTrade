@@ -14,8 +14,6 @@ const bcrypt = require('bcryptjs');
 exports.register = async (req, res) => {
     try {
         const { email, password, confirmPassword } = req.body;
-        console.log('req body', req.body)
-
 
         // Validate required fields
         if (!email || !password || !confirmPassword) {
@@ -59,6 +57,7 @@ exports.register = async (req, res) => {
         return res.status(201).json({
             message: 'Account created! Please check your email to verify it.',
             data: sellerData,
+            token
         });
 
     } catch (error) {
@@ -126,6 +125,7 @@ exports.verify = async (req, res) => {
                 }
                 // verify the user account
                 seller.isVerified = true;
+                console.log(seller.isVerified)
                 // save the changes to the database
                 await seller.save();
                 // send a success response

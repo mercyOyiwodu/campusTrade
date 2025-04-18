@@ -63,3 +63,13 @@ exports.profileDetails = async(req, res) =>{
         })
     }
 }
+
+exports.getall = async(req, res) =>{
+    try {
+        
+    } catch (error) {
+        return res.status(500).json({
+            message: 'There was an issue get all the user detail' + " " 
+        })
+    }
+}

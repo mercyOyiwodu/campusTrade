@@ -25,7 +25,12 @@ exports.createCategory = async (req, res) => {
 // Get All Categories
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({ 
+      include: {
+        model: Category,
+        as: 'category', 
+      },}
+    );
     res.status(200).json({
       message: 'Categories fetched successfully',
       data: categories,
