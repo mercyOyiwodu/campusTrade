@@ -8,8 +8,6 @@ const forgotTemplate = require('../utils/signUp')
 const fs = require('fs');
 const Product = require('../models/product')
 const { Op } = require("sequelize");
-const verificationLink = process.env.FRONTEND_URL;
-
 
 exports.register = async (req, res) => {
     try {
@@ -49,15 +47,24 @@ exports.register = async (req, res) => {
         // Generate JWT token
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
-        // Create verification link
-        const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${token}`;
+        // // Create verification link
+        // const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${token}`;
+        // const mailDetails = {
+        //     email: seller.email,
+        //     subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+        //     html: signUpTemplate(verificationLink, 'seller'),
+        // };
 
-        await sendEmail(email, "Verify your CampusTrade account", `
-      <p>Please verify your email by clicking the link below:</p>
-      <a href="${verificationLink}">Verify Account</a>
-    `);
-
-
+         // Create the verify link with the token generated
+         const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
+         
+         // Create the email details
+         const mailDetails = {
+             email: seller.email,
+             subject: 'Welcome to Campus Trade',
+             html: signUpTemplate(link, 'seller')
+         };
+         
         await sendEmail(mailDetails);
 
         const sellerData = seller.toJSON();
@@ -104,12 +111,12 @@ exports.verify = async (req, res) => {
                     const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '3mins' });
 
                     // dynamically create the link
-                    const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${newToken}`;
+                    const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
                     // create the email details
                     const mailDetails = {
                         email: seller.email,
                         subject: 'Email verification',
-                        html: signUpTemplate(verificationLink, 'seller')
+                        html: signUpTemplate(link, 'seller')
                     };
                     // await nodemailer to send the email
                     await sendEmail(mailDetails);
