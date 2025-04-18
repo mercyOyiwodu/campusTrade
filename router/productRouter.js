@@ -11,7 +11,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /api/v1/products/{categoryId}/{sellerId}:
+ * /products/{categoryId}/{sellerId}:
  *   post:
  *     summary: Create a new product post
  *     tags:
@@ -59,29 +59,10 @@ const router = require('express').Router();
  *     responses:
  *       201:
  *         description: Product created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Post created successfully
- *                 data:
- *                   $ref: '#/components/schemas/Product'
  *       404:
  *         description: Seller not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Seller not found
  *       500:
  *         description: Server error
- *                   example: "Internal Server Error"
  */
 
 router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
