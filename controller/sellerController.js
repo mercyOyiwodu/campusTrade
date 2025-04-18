@@ -6,21 +6,21 @@ const fs = require('fs');
 const Product = require('../models/product');
 const { Op } = require("sequelize");
 
-// const verificationLink = process.env.FRONTEND_URL;
+const verificationLink = process.env.FRONTEND_URL;
 const Seller = require('../models/seller')
 const bcrypt = require('bcryptjs');
 
 
 exports.register = async (req, res) => {
-  try {
-    const { email, password, confirmPassword } = req.body;
-    console.log('req body',req.body)
+    try {
+        const { email, password, confirmPassword } = req.body;
+        console.log('req body', req.body)
 
 
-    // Validate required fields
-    if (!email || !password || !confirmPassword) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
+        // Validate required fields
+        if (!email || !password || !confirmPassword) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
 
         const sellerExists = await Seller.findOne({ where: { email: email.toLowerCase() } });
         if (sellerExists) {
@@ -44,23 +44,13 @@ exports.register = async (req, res) => {
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
         // // Create verification link
-        // const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${token}`;
-        // const mailDetails = {
-        //     email: seller.email,
-        //     subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
-        //     html: signUpTemplate(verificationLink, 'seller'),
-        // };
+        const link = `${verificationLink}/${token}`;
+        const mailDetails = {
+            email: seller.email,
+            subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+            html: signUpTemplate(link, 'seller'),
+        };
 
-         // Create the verify link with the token generated
-         const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${token}`;
-         
-         // Create the email details
-         const mailDetails = {
-             email: seller.email,
-             subject: 'Welcome to Campus Trade',
-             html: signUpTemplate(link, 'seller')
-         };
-         
         await sendEmail(mailDetails);
 
         const sellerData = seller.toJSON();
@@ -71,10 +61,10 @@ exports.register = async (req, res) => {
             data: sellerData,
         });
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
-  }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+    }
 };
 
 
@@ -105,12 +95,11 @@ exports.verify = async (req, res) => {
                     const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '3mins' });
 
                     // dynamically create the link
-                    const link = `${req.protocol}://${req.get('host')}/api/v1/verify-user/${newToken}`;
-                    // create the email details
+                    const link = `${verificationLink}/${newToken}`;
                     const mailDetails = {
                         email: seller.email,
-                        subject: 'Email verification',
-                        html: signUpTemplate(link, 'seller')
+                        subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+                        html: signUpTemplate(link, 'seller'),
                     };
                     // await nodemailer to send the email
                     await sendEmail(mailDetails);
@@ -204,9 +193,9 @@ exports.resetPassword = async (req, res) => {
         // Extract the token from the params
         const { token } = req.params;
         // Extract the passwod and confirm password from the request body
-        const { password , confirmPassword} = req.body;
+        const { password, confirmPassword } = req.body;
         // Verify if the token is still valid
-        const { sellerId } = await  JWT.verify(token, process.env.JWT_SECRET);
+        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
         // Check if the user is still existsing
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
@@ -214,10 +203,11 @@ exports.resetPassword = async (req, res) => {
                 message: 'User not found'
             })
         }
-        if (password !== confirmPassword){
+        if (password !== confirmPassword) {
             return res.status(400).json({
                 message: 'Passwords do not match'
-            })}
+            })
+        }
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -363,7 +353,7 @@ exports.changePassword = async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
-            message: 'An error occurred while updating the password.'+ error.message
+            message: 'An error occurred while updating the password.' + error.message
         });
     }
 };
