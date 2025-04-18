@@ -125,15 +125,15 @@ exports.createProduct = async (req, res) => {
       status: 'pending'
     });
 
-    if (req.files) {
-      req.files.forEach(file => {
-        try {
-          fs.unlinkSync(file.path);
-        } catch (err) {
-          console.warn(`Could not delete file: ${file.path}`);
-        }
-      });
-    }
+    // if (req.files) {
+    //   req.files.forEach(file => {
+    //     try {
+    //       fs.unlinkSync(file.path);
+    //     } catch (err) {
+    //       console.warn(`Could not delete file: ${file.path}`);
+    //     }
+    //   });
+    // }
     
 
     res.status(201).json({ message: "Post created successfully", data: product });

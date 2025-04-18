@@ -30,10 +30,10 @@ Product.init(
       type: DataTypes.ENUM('Used', 'New'),
       defaultValue: 'Used'
     },
-  //  media: {
-  //     type: DataTypes.STRING,
-  //     allowNull: false,
-  //   },
+    media: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+    },
     sellerId: {
       type: DataTypes.UUID,
       allowNull: false,
