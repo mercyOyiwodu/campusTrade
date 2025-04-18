@@ -6,22 +6,18 @@ const kycRouter = express.Router();
 
 /**
  * @swagger
- * /api/v1/kyc/profile/{id}:
+ * /api/kyc/profile/{id}:
  *   patch:
- *     summary: Update seller profile with KYC information
- *     description: Allows a seller to complete their profile by submitting KYC details including an image or video.
+ *     summary: Complete seller profile details (KYC)
  *     tags:
  *       - Seller KYC
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Seller ID
  *         schema:
  *           type: string
- *         description: The seller ID
- *         example: "f78c8e4f-bb1c-442e-93b9-3cce27681b3a"
  *     requestBody:
  *       required: true
  *       content:
@@ -31,31 +27,25 @@ const kycRouter = express.Router();
  *             required:
  *               - profilePic
  *             properties:
- *               fullName:
- *                 type: string
- *                 example: "Jane Doe"
- *               jambRegNo:
- *                 type: string
- *                 example: "12345678AB"
- *               school:
- *                 type: string
- *                 example: "University of Lagos"
- *               gender:
- *                 type: string
- *                 example: "Female"
- *               whatsappLink:
- *                 type: string
- *                 example: "https://wa.me/2348012345678"
- *               phoneNumber:
- *                 type: string
- *                 example: "+2348012345678"
  *               profilePic:
  *                 type: string
  *                 format: binary
- *                 description: "Image or video file"
+ *               fullName:
+ *                 type: string
+ *               jambRegNo:
+ *                 type: string
+ *               school:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *               whatsappLink:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
  *     responses:
- *       "201":
- *         description: Profile created successfully
+ *       201:
+ *         description: Successfully completed your profile update
  *         content:
  *           application/json:
  *             schema:
@@ -63,40 +53,33 @@ const kycRouter = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Successfully completed your profile update"
  *                 data:
- *                   $ref: "#/components/schemas/SellerKYC"
- *       "400":
- *         description: Validation or upload error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Profile image is required"
- *       "404":
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     school:
+ *                       type: string
+ *                     jambRegNo:
+ *                       type: string
+ *                     whatsappLink:
+ *                       type: string
+ *                     gender:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                     profilePic:
+ *                       type: string
+ *                     fullName:
+ *                       type: string
+ *       400:
+ *         description: Missing or invalid input
+ *       404:
  *         description: Seller not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Seller not found"
- *       "500":
+ *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "An unexpected error occurred"
  */
+
 kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
 
 
