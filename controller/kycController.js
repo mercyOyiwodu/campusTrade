@@ -64,12 +64,33 @@ exports.profileDetails = async(req, res) =>{
     }
 }
 
-exports.getall = async(req, res) =>{
+exports.getSeller = async (req, res) => {
     try {
-        
+        const { id: sellerId } = req.params;
+
+        const seller = await Seller.findByPk(sellerId, {
+            include: [
+                {
+                    model: SellerKYC,
+                    as: 'kycDetails' // make sure this matches your association
+                }
+            ]
+        });
+
+        if (!seller) {
+            return res.status(404).json({
+                message: 'Seller not found'
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Seller retrieved successfully',
+            data: seller
+        });
+
     } catch (error) {
         return res.status(500).json({
-            message: 'There was an issue get all the user detail' + " " 
-        })
+            message: 'There was an issue getting the user detail: ' + error.message 
+        });
     }
-}
+};

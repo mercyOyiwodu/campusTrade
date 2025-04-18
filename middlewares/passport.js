@@ -5,7 +5,8 @@ const Seller = require('../models/seller');
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:4725/api/v1/auth/google/login"
+    // callbackURL: "https://campustrade-kku1.onrender.com/api/v1/auth/google/login"
+    callbackURL: "https://localhost:4725/api/v1/seller/auth/google/login"
   },
   async (accessToken, refreshToken, profile, cb) => {
     console.log("Profile: ", profile)

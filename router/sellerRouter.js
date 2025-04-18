@@ -1,4 +1,4 @@
-const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, searchSellers} = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, searchSellers, getSellerById} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
@@ -394,55 +394,57 @@ sellerRouter.get('/category-weekly-stats', authenticate, getWeeklyCategoryUpload
  */                                                                                                                                                                              
 sellerRouter.get('/getAll', authenticateAdmin, getAll);
 
-/**
- * @swagger
- * /api/v1/seller/searchSellers:
- *   get:
- *     summary: Search sellers by school
- *     description: Retrieve a list of sellers filtered by school. If no query is provided, returns all sellers.
- *     tags:
- *       - Seller
- *     parameters:
- *       - in: query
- *         name: school
- *         schema:
- *           type: string
- *         required: false
- *         description: The school name to filter sellers
- *         example: "University of Lagos"
- *     responses:
- *       "200":
- *         description: List of sellers
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   email:
- *                     type: string
- *                     example: "seller@example.com"
- *                   fullName:
- *                     type: string
- *                     example: "Jane Doe"
- *                   school:
- *                     type: string
- *                     example: "University of Lagos"
- *       "500":
- *         description: Error searching for sellers
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error searching for sellers"
- */
-sellerRouter.get('get-one-seller', searchSellers)
+// /**
+//  * @swagger
+//  * /api/v1/seller/searchSellers:
+//  *   get:
+//  *     summary: Search sellers by school
+//  *     description: Retrieve a list of sellers filtered by school. If no query is provided, returns all sellers.
+//  *     tags:
+//  *       - Seller
+//  *     parameters:
+//  *       - in: query
+//  *         name: school
+//  *         schema:
+//  *           type: string
+//  *         required: false
+//  *         description: The school name to filter sellers
+//  *         example: "University of Lagos"
+//  *     responses:
+//  *       "200":
+//  *         description: List of sellers
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: array
+//  *               items:
+//  *                 type: object
+//  *                 properties:
+//  *                   id:
+//  *                     type: string
+//  *                   email:
+//  *                     type: string
+//  *                     example: "seller@example.com"
+//  *                   fullName:
+//  *                     type: string
+//  *                     example: "Jane Doe"
+//  *                   school:
+//  *                     type: string
+//  *                     example: "University of Lagos"
+//  *       "500":
+//  *         description: Error searching for sellers
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 message:
+//  *                   type: string
+//  *                   example: "Error searching for sellers"
+//  */
+// sellerRouter.get('get-one-seller', searchSellers)
+
+sellerRouter.get('/getOneSeller/:id',getSellerById)
 
 /**
  * @openapi
@@ -471,7 +473,7 @@ sellerRouter.get('get-one-seller', searchSellers)
 sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope: ['profile', 'email']}));
 
 /**
- * @openapi
+ * @Swagger
  * /api/v1/seller/auth/google/login:
  *   get:
  *     summary: Handle Google login redirect
@@ -496,14 +498,29 @@ sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope:
  */
 
 sellerRouter.get('/auth/google/login', passport.authenticate('google'), async (req, res)=>{
-    console.log('Req user:', req.seller);
+    try{
+        const token = await JWT.sign({sellerId: req.seller.id, isVerified: req.seller.isVerified},
+            process.env.JWT_SECRET, {expiresIn: '1day'});
+            const redirectUrl = `https://legacy-builder.vercel.app/callback/${token}/${req.seller.id}`;
+    return res.redirect(redirectUrl);
+
+    //    res.status(200).json({
+    //        message: 'Google Auth Login Successful',
+    //        data: req.seller,
+    //        token
+    //    });
+    }catch (error) {
+        console.error(error);
+        res.status(500).json({ 
+            message: "Internal Server Error" 
+        });
+
+    }
+
     
-    const token = await JWT.sign({sellerId: req.seller.id, isVerified: req.seller.isVerified},
-         process.env.JWT_SECRET, {expiresIn: '1day'});
-    res.status(200).json({
-        message: 'Google Auth Login Successful',
-        data: req.seller,
-        token
-    });
+   
 })
+
+
+
 module.exports = sellerRouter;
