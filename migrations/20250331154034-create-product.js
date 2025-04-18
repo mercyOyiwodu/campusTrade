@@ -28,7 +28,7 @@ module.exports = {
         defaultValue: 'Used',
       },
       media: {
-        type: Sequelize.STRING,
+        type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
       },
       sellerId: {
@@ -39,10 +39,10 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
       },
-      isVerified:{
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-      },
+      // isVerified:{
+      //   type: Sequelize.BOOLEAN,
+      //   allowNull: false,
+      // },
       timeCreated: {
         type: Sequelize.DATE,
         allowNull: false,

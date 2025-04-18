@@ -8,39 +8,22 @@ exports.createProduct = async (req, res) => {
   try {
     const { productName, price, condition, school, description } = req.body;
     const { categoryId, sellerId } = req.params;
-    const postFee = price * 0.05;
 
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
-      req.files.forEach(file => fs.unlinkSync(file.path));
+      if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
       return res.status(404).json({ message: "Seller not found" });
     }
 
-    const recentFeeTxn = await Transaction.findOne({
-      where: {
-        sellerId,
-        status: "Success",
-        purpose: "post_fee",
-        amount: postFee,
-        used: false
-      },
-      order: [['createdAt', 'DESC']],
-    });
-
-    if (!recentFeeTxn) {
-      req.files.forEach(file => fs.unlinkSync(file.path));
-      return res.status(403).json({
-        message: `Seller must make a post fee payment of ₦${postFee} before posting.`,
-      });
-    }
-
     const uploadedMedia = [];
-    for (const file of req.files) {
-      const result = await cloudinary.uploader.upload(file.path, {
-        resource_type: "auto",
-      });
-      uploadedMedia.push(result.secure_url);
-      fs.unlinkSync(file.path);
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          resource_type: "auto",
+        });
+        uploadedMedia.push(result.secure_url);
+        fs.unlinkSync(file.path);
+      }
     }
 
     const product = await Product.create({
@@ -55,9 +38,16 @@ exports.createProduct = async (req, res) => {
       timeCreated: new Date(),
       status: 'pending'
     });
-
-    await recentFeeTxn.update({ used: true, linkedProductId: product.id });
-
+    if (req.files) {
+      req.files.forEach(file => {
+        try {
+          fs.unlinkSync(file.path);
+        } catch (err) {
+          console.warn(`Could not delete file: ${file.path}`);
+        }
+      });
+    }
+    
     res.status(201).json({ message: "Post created successfully", data: product });
 
   } catch (error) {
@@ -67,13 +57,14 @@ exports.createProduct = async (req, res) => {
   }
 };
 
+
 exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.findAll({
             include: [
                 {
                     model: Seller,
-                    attributes: ["fullName", "email"],
+                    attributes: ["email"],
                 },
             ],
         });

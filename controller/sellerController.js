@@ -1,79 +1,69 @@
-const Seller = require('../models/seller');
-const Admin = require('../models/admin');
-const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/signUp');
-const forgotTemplate = require('../utils/signUp')
+const forgotTemplate = require('../utils/signUp');
 const fs = require('fs');
-const Product = require('../models/product')
+const Product = require('../models/product');
 const { Op } = require("sequelize");
-const verificationLink = process.env.FRONTEND_URL;
-
+// const verificationLink = process.env.FRONTEND_URL;
+const Seller = require('../models/seller')
+const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
-    try {
-        const { email, password, confirmPassword } = req.body;
+  try {
+    const { email, password, confirmPassword } = req.body;
+    console.log('req body',req.body)
 
-        // Validate required fields
-        if (!email || !password || !confirmPassword) {
-            return res.status(400).json({
-                message: 'All fields are required'
-            });
-        }
-
-        if (password !== confirmPassword) {
-            return res.status(400).json({
-                message: 'Passwords do not match'
-            });
-        }
-
-        const sellerExists = await Seller.findOne({ where: { email: email.toLowerCase() } });
-        if (sellerExists) {
-            return res.status(400).json({
-                message: `An account with ${email} already exists`
-            });
-        }
-
-        // Encrypt password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create seller
-        const seller = await Seller.create({
-            email: email.toLowerCase(),
-            password: hashedPassword,
-            isloggedIn: false,
-        });
-
-        // Generate JWT token
-        const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
-
-        // Create verification link
-        const verificationLink = `https://campus-trade-h7bq.vercel.app/verification?token=${token}`;
-
-        await sendEmail(email, "Verify your CampusTrade account", `
-      <p>Please verify your email by clicking the link below:</p>
-      <a href="${verificationLink}">Verify Account</a>
-    `);
-
-
-        await sendEmail(mailDetails);
-
-        const sellerData = seller.toJSON();
-        delete sellerData.password;
-
-        return res.status(201).json({
-            message: 'Account created! Please check your email to verify it.',
-            data: sellerData,
-        });
-
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Something went wrong. Please try again later.' + error.message
-        });
-
+    // Validate required fields
+    if (!email || !password || !confirmPassword) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    // Check if seller already exists
+    const existingSeller = await Seller.findOne({ where: { email: email.toLowerCase() } });
+    if (existingSeller) {
+      return res.status(400).json({ message: `An account with ${email} already exists` });
+    }
+
+    // Encrypt password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create seller
+    const seller = await Seller.create({
+      email: email.toLowerCase(),
+      password: hashedPassword
+    });
+
+    // Generate JWT token
+    const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30m' });
+ const link = `${process.env.FRONTEND_URL}/verify-email/${token}`;
+    // Create verification link
+    
+    // Create the email details
+    const mailDetails = {
+        email: seller.email,
+        subject: 'Welcome to Campus Trade',
+        html: signUpTemplate(link, "Seller")
+    };
+    await sendEmail(mailDetails);
+
+    // Remove password from seller data
+    const sellerData = seller.toJSON();
+    delete sellerData.password;
+
+    return res.status(201).json({
+      message: 'Account created! Please check your email to verify it.',
+      data: sellerData,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+  }
 };
 
 
@@ -203,7 +193,7 @@ exports.resetPassword = async (req, res) => {
         // Extract the token from the params
         const { token } = req.params;
         // Extract the passwod and confirm password from the request body
-        const { password } = req.body;
+        const { password , confirmPassword} = req.body;
         // Verify if the token is still valid
         const { sellerId } = await  JWT.verify(token, process.env.JWT_SECRET);
         // Check if the user is still existsing
@@ -213,7 +203,10 @@ exports.resetPassword = async (req, res) => {
                 message: 'User not found'
             })
         }
-
+        if (password !== confirmPassword){
+            return res.status(400).json({
+                message: 'Passwords do not match'
+            })}
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -364,7 +357,6 @@ exports.changePassword = async (req, res) => {
     }
 };
 
-}
 
 
 exports.getDashboardStats = async (req, res) => {

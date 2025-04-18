@@ -1,6 +1,6 @@
 const adminRouter = require('express').Router();
 const {loginAdmin, createAdmin, verifyAdmin, verifySeller}= require('../controller/adminController');
-const { authenticateAdmin, adminAuth } = require('../middlewares/adminAuth');
+const { authenticateAdmin } = require('../middlewares/adminAuth');
 const { registerValidation} = require('../middlewares/validator');
 
 /**
@@ -157,5 +157,7 @@ adminRouter.get('/verify-admin/:token', verifyAdmin);
  *         description: "Internal server error:<error-message>"
  */
 adminRouter.post('/login', loginAdmin);
+
+// adminRouter.post()
 
 module.exports = adminRouter ;

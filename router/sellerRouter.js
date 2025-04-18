@@ -1,5 +1,4 @@
-const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, 
-    getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, searchSellers} = require('../controller/sellerController');
+const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, searchSellers} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const passport = require('passport');
@@ -64,7 +63,7 @@ const {authenticate} =require('../middlewares/authentication')
  *               message: "Error creating Seller: [error message]"
  */
 
-sellerRouter.post('/register', registerValidation, register);
+sellerRouter.post('/register', register);
 
 
 /**

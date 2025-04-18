@@ -24,10 +24,6 @@ Seller.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    isloggedIn:{
-      type:DataTypes.BOOLEAN,
-      allowNull:false
-    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE

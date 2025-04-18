@@ -25,15 +25,15 @@ Product.init(
     price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-    },
+    }, 
     condition: {
       type: DataTypes.ENUM('Used', 'New'),
       defaultValue: 'Used'
     },
-    media: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+  //  media: {
+  //     type: DataTypes.STRING,
+  //     allowNull: false,
+  //   },
     sellerId: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -54,10 +54,10 @@ Product.init(
       type: DataTypes.ENUM('pending', 'approved','not_approved'),
       defaultValue: 'pending',
     },    
-    isVerified:{
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
+    // isVerified:{
+    //   type: DataTypes.BOOLEAN,
+    //   allowNull: false,
+    // },
     timeCreated: {
       type: DataTypes.DATE,
       allowNull: false,

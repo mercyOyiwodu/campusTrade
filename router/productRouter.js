@@ -8,123 +8,90 @@ const router = require('express').Router();
  *   name: Product
  *   description: Endpoints related to product operations
  */
-
 /**
  * @swagger
- * paths:
- *   /api/v1/products/{categoryId}/{sellerId}:
- *     post:
- *       summary: Create a new product
- *       description: Creates a new product for the seller with product images uploaded to Cloudinary.
- *       tags:
- *         - Product
- *       parameters:
- *         - in: path
- *           name: categoryId
- *           required: true
- *           schema:
- *             type: string
- *           description: ID of the product category
- *           example: "60d0fe4f5311906168a10ob"
- *         - in: path
- *           name: sellerId
- *           required: true
- *           schema:
- *             type: string
- *           description: ID of the seller
- *           example: "60d0fe4f5311236168a109cb"
- *       requestBody:
+ * /api/products/{categoryId}/{sellerId}:
+ *   post:
+ *     summary: Create a new product post
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
  *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the product category
+ *       - in: path
+ *         name: sellerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the seller
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productName:
+ *                 type: string
+ *                 example: "Nike Airforce 1"
+ *               price:
+ *                 type: number
+ *                 example: 25000
+ *               condition:
+ *                 type: string
+ *                 example: "new"
+ *               school:
+ *                 type: string
+ *                 example: "University of Ibadan"
+ *               description:
+ *                 type: string
+ *                 example: "Gently used Nike sneakers"
+ *               media:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Product created successfully
  *         content:
- *           multipart/form-data:
+ *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - productName
- *                 - price
- *                 - condition
- *                 - school
- *                 - description
  *               properties:
- *                 productName:
+ *                 message:
  *                   type: string
- *                   example: "Mathematics Textbook"
- *                 price:
- *                   type: number
- *                   example: 3000
- *                 condition:
+ *                   example: Post created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Seller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
  *                   type: string
- *                   example: "New"
- *                 school:
+ *                   example: Seller not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
  *                   type: string
- *                   example: "University of Lagos"
- *                 description:
- *                   type: string
- *                   example: "This textbook covers fundamental mathematics topics."
- *                 media:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: binary
- *                   description: Images or media related to the product
- *       responses:
- *         "201":
- *           description: Product created successfully
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Product created successfully"
- *                   data:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                         example: "60d0fe4f5311236168a109ca"
- *                       productName:
- *                         type: string
- *                         example: "Mathematics Textbook"
- *                       price:
- *                         type: number
- *                         example: 3000
- *                       condition:
- *                         type: string
- *                         example: "New"
- *                       school:
- *                         type: string
- *                         example: "University of Lagos"
- *                       description:
- *                         type: string
- *                         example: "This textbook covers fundamental mathematics topics."
- *                       media:
- *                         type: array
- *                         items:
- *                           type: string
- *                           example: "https://res.cloudinary.com/yourcloud/image/upload/v123456/product.jpg"
- *         "400":
- *           description: Bad Request - Missing or invalid fields
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Product name, price, condition, school, and description are required"
- *         "500":
- *           description: Internal Server Error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: "Error creating product: <error-message>"
+ *                   example: Something went wrong
  */
+
+router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
+
 
 /**
  * @swagger
@@ -417,7 +384,6 @@ const router = require('express').Router();
  */
 
 
-router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
 router.get('/products', getAllProducts);
 router.get('/oneproduct/:id', getProductById);
 router.put('/update-product/:id', upload.array('media', 5), updateProduct);
