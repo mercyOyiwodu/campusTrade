@@ -470,7 +470,7 @@ router.delete('/delete-product/:id', deleteProduct);
 
 /**
  * @swagger
- * /product/all-pending-product:
+ * /api/v1/all-pending-product:
  *   get:
  *     summary: Retrieve all pending products
  *     tags: [Product]
