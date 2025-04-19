@@ -10,7 +10,7 @@ const kycRouter = express.Router();
  *   patch:
  *     summary: Complete seller profile details (KYC)
  *     tags:
- *       - Seller KYC
+ *       - Seller 
  *     parameters:
  *       - in: path
  *         name: id
