@@ -446,7 +446,7 @@ router.delete('/delete-product/:id', deleteProduct);
 
 /**
  * @swagger
- * /product/all-approved-product:
+ * /all-approved-product:
  *   get:
  *     summary: Retrieve all approved products
  *     tags: [Product]
