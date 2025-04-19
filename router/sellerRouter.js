@@ -236,39 +236,74 @@ sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
  * @swagger
  * /api/v1/seller/login:
  *   post:
+ *     summary: Login a seller
+ *     description: Authenticates a seller and returns a token if the credentials are correct. If the account is not verified, it sends a verification email.
  *     tags:
- *       - Seller
- *     summary: Login seller
+ *       - Seller Auth
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email *
+ *               - password *
  *             properties:
  *               email:
  *                 type: string
  *                 example: johndoe@example.com
  *               password:
  *                 type: string
- *                 example: password123
+ *                 example: secret123
  *     responses:
  *       200:
  *         description: Login successful
  *         content:
  *           application/json:
- *             example:
- *               message: "Login successful"
- *               data:
- *                 token: JWT_TOKEN
- *       401:
- *         description: Invalid credentials
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Login successful"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *                     isVerified:
+ *                       type: boolean
+ *                       example: true
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Bad Request
  *         content:
  *           application/json:
- *             example:
- *               message: "Invalid email or password"
- */                                                                                                                                                                                               
- sellerRouter.post('/login', login)
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller not found"
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong"
+ */
+sellerRouter.post('/login', login)
 
 /**
  * @swagger
