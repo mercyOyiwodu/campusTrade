@@ -9,6 +9,7 @@ const verificationLink = process.env.FRONTEND_URL;
 const reset = process.env.RESET_PASSWORD
 const Seller = require('../models/seller')
 const bcrypt = require('bcryptjs');
+const passport = require('passport');
 
 
 exports.register = async (req, res) => {
@@ -90,8 +91,8 @@ exports.verify = async (req, res) => {
                             message: 'Seller not found'
                         })
                     };
-
-                    const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${token}`
+                    const newToken = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
+                    const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${newToken}`
                     const mailDetails = {
                         email: seller.email,
                         subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
@@ -327,7 +328,6 @@ exports.changePassword = async (req, res) => {
                 message: 'User not found'
             });
         }
-
 
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
