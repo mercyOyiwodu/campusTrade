@@ -42,7 +42,8 @@ exports.register = async (req, res) => {
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
         // // Create verification link
-        const link = `${verificationLink}/api/v1/seller/verify-user/${token}`;
+        // const link = `${verificationLink}/api/v1/seller/verify-user/${token}`;
+        const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${token}`
         const mailDetails = {
             email: seller.email,
             subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
