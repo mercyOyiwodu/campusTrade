@@ -9,91 +9,14 @@ const kycRouter = express.Router();
  * /api/v1/kyc/profile/{id}:
  *   patch:
  *     summary: Complete seller profile details (KYC)
+ *     description: Uploads profile information for a seller including profile image, school, contact details, and more.
  *     tags:
  *       - Seller KYC
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: Seller ID
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required:
- *               - profilePic
- *             properties:
- *               profilePic:
- *                 type: string
- *                 format: binary
- *               fullName:
- *                 type: string
- *               jambRegNo:
- *                 type: string
- *               school:
- *                 type: string
- *               gender:
- *                 type: string
- *                 enum: [male, female, other]
- *               whatsappLink:
- *                 type: string
- *               phoneNumber:
- *                 type: string
- *     responses:
- *       201:
- *         description: Successfully completed your profile update
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     school:
- *                       type: string
- *                     jambRegNo:
- *                       type: string
- *                     whatsappLink:
- *                       type: string
- *                     gender:
- *                       type: string
- *                     phoneNumber:
- *                       type: string
- *                     profilePic:
- *                       type: string
- *                     fullName:
- *                       type: string
- *       400:
- *         description: Missing or invalid input
- *       404:
- *         description: Seller not found
- *       500:
- *         description: Internal server error
- */
-
-kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
-
-/**
- * @swagger
- * /api/v1/kyc/profile/{id}:
- *   patch:
- *     summary: Complete seller profile details (KYC)
- *     tags:
- *       - Seller KYC
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Seller ID
+ *         description: The unique identifier of the seller
  *         schema:
  *           type: string
  *           example: "e8c3bfa4-49d2-4c1f-95e5-b39e34f09d10"
@@ -105,25 +28,30 @@ kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
  *             type: object
  *             required:
  *               - profilePic
+ *               - jambRegNo
+ *               - school
+ *               - gender
+ *               - fullName
+ *               - phoneNumber
  *             properties:
  *               profilePic:
  *                 type: string
  *                 format: binary
- *                 description: Profile picture of the seller (image file)
- *                 example: "profile_pic.jpg"  # This is just a placeholder for the file name
+ *                 description: Profile picture file (image)
  *               fullName:
  *                 type: string
  *                 example: "Jane Doe"
  *               jambRegNo:
- *                 type: string
- *                 example: "1234567890"
+ *                 type: integer
+ *                 example: 12345678
  *               school:
  *                 type: string
- *                 example: "University of Lagos"
+ *                 enum: ["Lagos State University", "University Of Lagos", "Yaba College Of Technology"]
+ *                 example: "University Of Lagos"
  *               gender:
  *                 type: string
- *                 enum: [male, female]
- *                 example: "female"
+ *                 enum: [Male, Female]
+ *                 example: "Female"
  *               whatsappLink:
  *                 type: string
  *                 example: "https://wa.me/2348098765432"
@@ -140,7 +68,7 @@ kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Profile updated successfully"
+ *                   example: Successfully completed your profile update
  *                 data:
  *                   type: object
  *                   properties:
@@ -151,14 +79,14 @@ kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
  *                       type: string
  *                       example: "Jane Doe"
  *                     jambRegNo:
- *                       type: string
- *                       example: "1234567890"
+ *                       type: integer
+ *                       example: 12345678
  *                     school:
  *                       type: string
- *                       example: "University of Lagos"
+ *                       example: "University Of Lagos"
  *                     gender:
  *                       type: string
- *                       example: "female"
+ *                       example: "Female"
  *                     whatsappLink:
  *                       type: string
  *                       example: "https://wa.me/2348098765432"
@@ -167,14 +95,109 @@ kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
  *                       example: "+2348098765432"
  *                     profilePic:
  *                       type: string
- *                       format: binary
- *                       example: "profile_pic.jpg"
+ *                       example: "https://res.cloudinary.com/appname/image/upload/v12345/profile.jpg"
  *       400:
- *         description: Missing or invalid input
+ *         description: Missing or invalid input (e.g. no image uploaded)
  *       404:
  *         description: Seller not found
  *       500:
  *         description: Internal server error
+ */
+
+kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
+
+/**
+ * @swagger
+ * /api/v1/kyc/get-kyc-details/{id}:
+ *   get:
+ *     summary: Get Seller KYC Details
+ *     description: Fetch a seller and their complete KYC profile by seller ID.
+ *     tags:
+ *       - Seller KYC
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Unique seller ID
+ *         schema:
+ *           type: string
+ *           example: "e8c3bfa4-49d2-4c1f-95e5-b39e34f09d10"
+ *     responses:
+ *       200:
+ *         description: Seller and KYC data fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller retrieved successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "e8c3bfa4-49d2-4c1f-95e5-b39e34f09d10"
+ *                     email:
+ *                       type: string
+ *                       example: "janedoe@example.com"
+ *                     isVerified:
+ *                       type: boolean
+ *                       example: true
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-04-19T12:30:00.000Z"  
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-04-19T12:30:00.000Z" 
+ *                     SellerKYCs:
+ *                       type: object
+ *                       properties:
+ *                         fullName:
+ *                           type: string
+ *                           example: "Jane Doe"
+ *                         jambRegNo:
+ *                           type: integer
+ *                           example: 12345678
+ *                         school:
+ *                           type: string
+ *                           example: "University Of Lagos"
+ *                         gender:
+ *                           type: string
+ *                           enum: [Male, Female]
+ *                           example: "Female"
+ *                         whatsappLink:
+ *                           type: string
+ *                           example: "https://wa.me/2348098765432"
+ *                         phoneNumber:
+ *                           type: string
+ *                           example: "+2348098765432"
+ *                         profilePic:
+ *                           type: string
+ *                           example: "https://res.cloudinary.com/app/image/upload/v123456/profile.jpg"
+ *       404:
+ *         description: Seller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller not found"
+ *       500:
+ *         description: Error retrieving seller data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "There was an issue getting the user detail: Internal Server Error"
  */
 
 kycRouter.get('/get-kyc-details/:id', getSellerKyc);
