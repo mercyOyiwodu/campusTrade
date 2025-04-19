@@ -178,7 +178,7 @@ sellerRouter.post('/forget', forgetPasswords, forgotPassword);
  *   post:
  *     summary: Reset seller's password using a token
  *     tags:
- *       - Seller Authentication
+ *       - Seller 
  *     parameters:
  *       - in: path
  *         name: token
@@ -239,7 +239,7 @@ sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
  *     summary: Login a seller
  *     description: Authenticates a seller and returns a token if the credentials are correct. If the account is not verified, it sends a verification email.
  *     tags:
- *       - Seller Auth
+ *       - Seller
  *     requestBody:
  *       required: true
  *       content:
@@ -420,7 +420,7 @@ sellerRouter.get('/category-weekly-stats', authenticate, getWeeklyCategoryUpload
  * /api/v1/seller/getAll:
  *   get:
  *     tags:
- *       - Seller (Admin)
+ *       - Admin
  *     summary: Get all sellers (Admin only)
  *     description: This endpoint retrieves all registered sellers. Only accessible by authenticated admins using a Bearer token.
  *     security:

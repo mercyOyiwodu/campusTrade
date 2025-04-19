@@ -11,7 +11,7 @@ const { registerValidation} = require('../middlewares/validator');
  *       summary: Create a new admin
  *       description: Registers a new admin and sends a verification email with a token link.
  *       tags:
- *         - Admin Authentication
+ *         - Admin 
  *       requestBody:
  *         required: true
  *         content:
