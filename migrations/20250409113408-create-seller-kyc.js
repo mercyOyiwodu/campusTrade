@@ -10,7 +10,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue:UUIDV4
+        defaultValue: UUIDV4
       },
       phoneNumber: {
         type: Sequelize.STRING,
@@ -20,9 +20,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      profilePic:{
-        type:Sequelize.STRING,
-        allowNull:false
+      profilePic: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       whatsappLink: {
         type: Sequelize.STRING,
@@ -30,13 +30,12 @@ module.exports = {
         defaultValue: true
       },
       school: {
-            type: Sequelize.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology'),
-            defaultValue: 'Lagos State University',
-          },
+        type: Sequelize.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology')
+      },
       gender: {
-        type:Sequelize.ENUM('Female', 'Male'),
-      defaultValue: 'Male'
-    },
+        type: Sequelize.ENUM('Female', 'Male'),
+        defaultValue: 'Male'
+      },
       location: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -45,7 +44,6 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

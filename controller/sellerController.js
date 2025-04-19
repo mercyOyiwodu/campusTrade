@@ -9,7 +9,6 @@ const verificationLink = process.env.FRONTEND_URL;
 const reset = process.env.RESET_PASSWORD
 const Seller = require('../models/seller')
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
 
 
 exports.register = async (req, res) => {
@@ -67,7 +66,6 @@ exports.register = async (req, res) => {
         return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
 };
-
 
 
 exports.verify = async (req, res) => {
@@ -260,7 +258,7 @@ exports.login = async (req, res) => {
         const token = await JWT.sign(
             { sellerId: seller.id, isAdmin: seller.isAdmin },
             process.env.JWT_SECRET,
-            { expiresIn: '5mins' }
+            { expiresIn: '1d' }
         );
 
         const sellerData = seller.get({ plain: true });

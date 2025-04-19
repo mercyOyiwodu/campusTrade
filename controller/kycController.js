@@ -64,7 +64,7 @@ exports.profileDetails = async(req, res) =>{
     }
 }
 
-exports.getSeller = async (req, res) => {
+exports.getSellerKyc = async (req, res) => {
     try {
         const { id: sellerId } = req.params;
 
@@ -72,7 +72,7 @@ exports.getSeller = async (req, res) => {
             include: [
                 {
                     model: SellerKYC,
-                    as: 'kycDetails' // make sure this matches your association
+                    as: 'SellerKYCs' 
                 }
             ]
         });

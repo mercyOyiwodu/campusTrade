@@ -91,8 +91,10 @@ const fs = require("fs");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { categoryId, sellerId } = req.params;
-
+    const { categoryId, subCategoryId} = req.params;
+    const auth = req.headers.authorization;
+    const token = auth.split(' ')[1]
+    const { sellerId } = jwt.verify(token, process.env.SECRET_KEY);
     const { productName, price, condition, school, description } = req.body;
 
     const seller = await Seller.findByPk(sellerId);
@@ -121,6 +123,7 @@ exports.createProduct = async (req, res) => {
       media: uploadedMedia,
       categoryId,
       sellerId,
+      subCategoryId,
       timeCreated: new Date(),
       status: 'pending'
     });
