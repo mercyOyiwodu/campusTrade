@@ -254,9 +254,10 @@ exports.login = async (req, res) => {
                 token
             });
         }
+        seller.isLoggedIn = true;
 
         const token = await JWT.sign(
-            { sellerId: seller.id, isAdmin: seller.isAdmin },
+            { sellerId: seller.id, isAdmin: seller.isAdmin, isLoggedIn: seller.isLoggedIn },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
@@ -264,7 +265,6 @@ exports.login = async (req, res) => {
         const sellerData = seller.get({ plain: true });
         delete sellerData.password;
 
-        seller.isLoggedIn = true;
         await seller.save();
 
         res.status(200).json({

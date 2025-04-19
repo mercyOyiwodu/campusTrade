@@ -1,4 +1,5 @@
 const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct } = require('../controller/product');
+const { authenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
 const router = require('express').Router();
 
@@ -11,61 +12,116 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /api/v1/products/{categoryId}/{sellerId}:
+ * /products/{categoryId}/{subCategoryId}:
  *   post:
- *     summary: Create a new product post
+ *     summary: Create a product
+ *     description: This endpoint allows a seller to create a new product post in a specific category and subcategory. It also handles media file uploads to Cloudinary and validates the seller's KYC and existence.
  *     tags:
  *       - Product
  *     parameters:
- *       - in: path
- *         name: categoryId
+ *       - name: categoryId
+ *         in: path
+ *         description: The category ID where the product will be posted.
  *         required: true
- *         schema:
- *           type: string
- *         description: ID of the product category
- *       - in: path
- *         name: sellerId
+ *         type: string
+ *         format: uuid
+ *       - name: subCategoryId
+ *         in: path
+ *         description: The subcategory ID where the product will be posted.
  *         required: true
- *         schema:
- *           type: string
- *         description: ID of the seller
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               productName:
- *                 type: string
- *                 example: "Nike Airforce 1"
- *               price:
- *                 type: number
- *                 example: 25000
- *               condition:
- *                 type: string
- *                 example: "new"
- *               school:
- *                 type: string
- *                 example: "University of Ibadan"
- *               description:
- *                 type: string
- *                 example: "Gently used Nike sneakers"
- *               media:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *         type: string
+ *         format: uuid
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for seller authentication.
+ *         required: true
+ *         type: string
+ *       - name: media
+ *         in: formData
+ *         description: Media files to be uploaded with the product.
+ *         required: false
+ *         type: file
+ *         collectionFormat: multi
+ *         maxItems: 5
  *     responses:
  *       201:
- *         description: Product created successfully
+ *         description: Product created successfully.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Post created successfully"
+ *             data:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "d4e5f6b7-8a9c-4d3e-bbc9-201b3c10d20f"
+ *                 productName:
+ *                   type: string
+ *                   example: "Product A"
+ *                 price:
+ *                   type: number
+ *                   format: float
+ *                   example: 100.50
+ *                 condition:
+ *                   type: string
+ *                   example: "New"
+ *                 school:
+ *                   type: string
+ *                   example: "University A"
+ *                 description:
+ *                   type: string
+ *                   example: "This is a description of the product."
+ *                 media:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     format: uri
+ *                     example: "https://res.cloudinary.com/.../image.jpg"
+ *                 sellerId:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "e7f6b9d1-3c9f-4d01-9b8e-9a4b1a70b507"
+ *                 subCategoryId:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "12c8b9b1-3a92-4cd7-9d65-f9a83970d472"
+ *                 timeCreated:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-04-19T12:00:00Z"
+ *                 status:
+ *                   type: string
+ *                   example: "pending"
+ *       400:
+ *         description: Bad request, missing required fields.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Please complete your profile before proceeding"
  *       404:
- *         description: Seller not found
+ *         description: Seller or Seller KYC not found.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Seller not found"
  *       500:
- *         description: Server error
+ *         description: Server error.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Internal server error"
  */
-
-router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createProduct);
+router.post('/products/:categoryId/:subCategoryId', authenticate,upload.array('media', 5), createProduct);
 
 
 /**
@@ -127,6 +183,7 @@ router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createP
  *                     type: string
  *                     example: "Error retrieving products: <error-message>"
  */
+router.get('/products', getAllProducts);
 
 /**
  * @swagger
@@ -203,6 +260,7 @@ router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createP
  *                     type: string
  *                     example: "Error retrieving product: <error-message>"
  */
+router.get('/oneproduct/:id', getProductById);
 
 /**
  * @swagger
@@ -307,6 +365,7 @@ router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createP
  *                     type: string
  *                     example: "Error updating product: <error-message>"
  */
+router.put('/update-product/:id', upload.array('media', 5), updateProduct);
 
 /**
  * @swagger
@@ -359,9 +418,6 @@ router.post('/products/:categoryId/:sellerId', upload.array('media', 5), createP
  */
 
 
-router.get('/products', getAllProducts);
-router.get('/oneproduct/:id', getProductById);
-router.put('/update-product/:id', upload.array('media', 5), updateProduct);
 router.delete('/delete-product/:id', deleteProduct);
 /**
  * @swagger
@@ -393,6 +449,7 @@ router.delete('/delete-product/:id', deleteProduct);
  *       500:
  *         description: "Server error:<error-message>"
  */
+router.post('/approve-product/:id', approveProduct);
 
 /**
  * @swagger
@@ -443,6 +500,7 @@ router.delete('/delete-product/:id', deleteProduct);
  *                   type: string
  *                   example: Internal server error
  */
+router.post('/not-approve/:id',rejectProduct)
 
 /**
  * @swagger
@@ -467,6 +525,7 @@ router.delete('/delete-product/:id', deleteProduct);
  *       500:
  *         description: "Server error:<error-message>"
  */
+router.get('/all-approved-product', getApprovedProducts);
 
 /**
  * @swagger
@@ -492,9 +551,9 @@ router.delete('/delete-product/:id', deleteProduct);
  *         description: "Server error:<error-message>"
  */
 
-router.post('/approve-product/:id', approveProduct);
-router.post('/not-approve/:id',rejectProduct)
-router.get('/all-approved-product', getApprovedProducts);
 router.get('/all-pending-product', getPendingProducts);
 
+
+
 module.exports = router;
+

@@ -34,7 +34,19 @@ Product.init(
     media: {
       type: DataTypes.STRING,
       allowNull: false,
+      get() {
+        const rawValue = this.getDataValue('media');
+        return rawValue ? rawValue.split(',') : [];
+      },
+      set(value) {
+        if (Array.isArray(value)) {
+          this.setDataValue('media', value.join(','));
+        } else {
+          throw new Error('Media must be an array of strings');
+        }
+      },
     },
+    
     sellerId: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -77,9 +89,9 @@ Product.init(
 );
 
 Product.belongsTo(Subcategory, { foreignKey: 'subCategoryId' });
-Subcategory.hasMany(Product, { foreignKey: 'productId' });
+Subcategory.hasMany(Product, { foreignKey: 'id' });
 
 Product.belongsTo(Seller, { foreignKey: 'sellerId' }); 
-Seller.hasMany(Product, { foreignKey: 'productId' }); 
+Seller.hasMany(Product, { foreignKey: 'id' }); 
 
 module.exports = Product;
