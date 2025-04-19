@@ -5,8 +5,8 @@ const forgotTemplate = require('../utils/signUp');
 const fs = require('fs');
 const Product = require('../models/product');
 const { Op } = require("sequelize");
-
 const verificationLink = process.env.FRONTEND_URL;
+const reset = process.env.RESET_PASSWORD
 const Seller = require('../models/seller')
 const bcrypt = require('bcryptjs');
 
@@ -42,7 +42,7 @@ exports.register = async (req, res) => {
         const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
         // // Create verification link
-        const link = `${verificationLink}/${token}`;
+        const link = `${verificationLink}/api/v1/seller/verify-user/${token}`;
         const mailDetails = {
             email: seller.email,
             subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
@@ -67,79 +67,149 @@ exports.register = async (req, res) => {
 };
 
 
+// exports.verify = async (req, res) => {
+//     try {
+//         const { token } = req.params;
+//         // verify the token
+//         await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
+//             if (error) {
+//                 // check if error is jwt expires error
+//                 if (error instanceof JWT.TokenExpiredError) {
+//                     const decodedToken = await JWT.decode(token);
+//                     // check for the seller/user
+//                     const seller = await Seller.findByPk(decodedToken.sellerId);
+//                     if (seller == null) {
+//                         return res.status(400).json({
+//                             message: 'Seller not found'
+//                         });
+//                     }
+//                     // check if the seller/user has already been verified
+//                     if (seller.isVerified === true) {
+//                         return res.status(400).json({
+//                             message: 'Seller already verified, please login'
+//                         });
+//                     }
+
+//                     // generate a new token
+//                     const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '3mins' });
+
+//                     // dynamically create the link
+//                     const link = `${verificationLink}/${newToken}`;
+//                     const mailDetails = {
+//                         email: seller.email,
+//                         subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+//                         html: signUpTemplate(link, 'seller'),
+//                     };
+//                     // await nodemailer to send the email
+//                     await sendEmail(mailDetails);
+//                     // send a success response
+//                     res.status(200).json({
+//                         message: "Link expired: A new verification link was sent, please check your email"
+//                     });
+//                 }
+//             } else {
+//                 console.log(payload);
+//                 // find the seller/user in the database
+//                 const seller = await Seller.findByPk(payload.sellerId);
+//                 // check if user exists
+//                 if (seller === null) {
+//                     return res.status(404).json({
+//                         message: 'Seller not found'
+//                     });
+//                 }
+//                 // check if the user has already been verified
+//                 if (seller.isVerified === true) {
+//                     return res.status(400).json({
+//                         message: 'Seller has already been verified, please login'
+//                     });
+//                 }
+//                 // verify the user account
+//                 seller.isVerified = true;
+//                 console.log(seller.isVerified)
+//                 // save the changes to the database
+//                 await seller.save();
+//                 // send a success response
+//                 res.status(200).json({
+//                     message: "Account verified successfully"
+//                 });
+//             }
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// };
+
 exports.verify = async (req, res) => {
     try {
-        const { token } = req.params;
-        // verify the token
-        await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
-            if (error) {
-                // check if error is jwt expires error
-                if (error instanceof JWT.TokenExpiredError) {
-                    const decodedToken = await JWT.decode(token);
-                    // check for the seller/user
-                    const seller = await Seller.findByPk(decodedToken.sellerId);
-                    if (seller == null) {
-                        return res.status(400).json({
-                            message: 'Seller not found'
-                        });
-                    }
-                    // check if the seller/user has already been verified
-                    if (seller.isVerified === true) {
-                        return res.status(400).json({
-                            message: 'Seller already verified, please login'
-                        });
-                    }
+      const { token } = req.params;
+  
+      let payload;
+      try {
+        payload = JWT.verify(token, process.env.JWT_SECRET);
+      } catch (error) {
+        if (error instanceof JWT.TokenExpiredError) {
+          const decodedToken = JWT.decode(token);
+          const seller = await Seller.findByPk(decodedToken.sellerId);
+  
+          if (!seller) {
+            return res.status(400).json({ message: 'Seller not found' });
+          }
+  
+          if (seller.isVerified) {
+            return res.status(400).json({ message: 'Seller already verified, please login' });
+          }
+  
+          const newToken = JWT.sign(
+            { sellerId: seller.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '3m' }
+          );
+  
+          const link = `${verificationLink}/${newToken}`;
+          const mailDetails = {
+            email: seller.email,
+            subject: "Verify your CampusTrade account",
+            html: signUpTemplate(link, 'seller'),
+          };
+  
+          await sendEmail(mailDetails);
+          return res.status(200).json({
+            message: 'Link expired: A new verification link has been sent to your email.',
+          });
+        }
+  
+        // Other JWT errors
+        return res.status(400).json({ message: 'Invalid or malformed token.' });
+      }
+  
+      // If token is valid
+      const seller = await Seller.findByPk(payload.sellerId);
+  
+      if (!seller) {
+        return res.status(404).json({ message: 'Seller not found' });
+      }
+  
+      if (seller.isVerified) {
+        return res.status(400).json({ message: 'Seller has already been verified, please login' });
+      }
+      
+      seller.isVerified = true;
+      console.log("seller_verified" + seller.isVerified); // should be false
+      await seller.save();
 
-                    // generate a new token
-                    const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '3mins' });
-
-                    // dynamically create the link
-                    const link = `${verificationLink}/${newToken}`;
-                    const mailDetails = {
-                        email: seller.email,
-                        subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
-                        html: signUpTemplate(link, 'seller'),
-                    };
-                    // await nodemailer to send the email
-                    await sendEmail(mailDetails);
-                    // send a success response
-                    res.status(200).json({
-                        message: "Link expired: A new verification link was sent, please check your email"
-                    });
-                }
-            } else {
-                console.log(payload);
-                // find the seller/user in the database
-                const seller = await Seller.findByPk(payload.sellerId);
-                // check if user exists
-                if (seller === null) {
-                    return res.status(404).json({
-                        message: 'Seller not found'
-                    });
-                }
-                // check if the user has already been verified
-                if (seller.isVerified === true) {
-                    return res.status(400).json({
-                        message: 'Seller has already been verified, please login'
-                    });
-                }
-                // verify the user account
-                seller.isVerified = true;
-                console.log(seller.isVerified)
-                // save the changes to the database
-                await seller.save();
-                // send a success response
-                res.status(200).json({
-                    message: "Account verified successfully"
-                });
-            }
-        });
+      const updatedSeller = await Seller.findByPk(seller.id);
+        console.log("updateSeller" + updatedSeller.isVerified); // should be true
+  
+      res.status(200).json({ message: 'Account verified successfully' });
+  
     } catch (error) {
-        return res.status(500).json({
-            message: error.message
-        });
+      return res.status(500).json({ message: 'Server error: ' + error.message });
     }
-};
+  };
+  
+
 
 exports.forgotPassword = async (req, res) => {
     try {
@@ -162,7 +232,7 @@ exports.forgotPassword = async (req, res) => {
         // Generate a token for the user
         const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
         // Create the reset link
-        const link = `${req.protocol}://${req.get('host')}/api/v1/seller/forget/${token}`;
+        const link = `${reset}/${token}`;
         // const firstName = seller.fullName.split(' ')[0];
         // configure the email details
 
@@ -251,7 +321,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid password' });
         }
 
-        if (!seller.isVerified) {
+        if (seller.isVerified === false) {
             const token = JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
 
             // // Create verification link
@@ -264,7 +334,8 @@ exports.login = async (req, res) => {
     
             await sendEmail(mailDetails);
             return res.status(400).json({
-                message: 'Not verified, please check your email to verify'
+                message: 'Not verified, please check your email to verify',
+                token
             });
         }
 
@@ -490,47 +561,29 @@ exports.getAll = async (req, res) => {
         })
     }
 }
-// exports.searchSellers = async (req, res) => {
-//     try {
-//         const { school } = req.query;
-
-//         let query = {};
-
-//         if (school) {
-//             query.school = school;
-//         }
-
-//         const sellers = await Seller.findAll({ where: query });
-
-//         return res.status(200).json(sellers);
-//     } catch (error) {
-//         return res.status(500).json({
-//             message: 'Error serching for sellers' + ' ' + error.message
-//         })
-//     }
-// }
 
 
 
 exports.getSellerById = async (req, res) => {
     try {
-        const { id :sellerId } = req.params;
+        const { id  } = req.params;
+        const seller = await Seller.findByPk(id);
 
-        if (!sellerId) {
+        if (!seller) {
             return res.status(400).json({
                 message: 'Seller id is required'
                 });
         }
 
-        const seller = await Seller.findOne({ where: {sellerId}});
+        const allSeller = await Seller.findOne({ where: {id}});
 
         return res.status(200).json({
             message: 'Seller found',
-            data: seller
+            data: allSeller
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'Error serching for sellers' + ' ' + error.message
+            message: 'Error getting seller ' + ' ' + error.message
         })
     }
 }

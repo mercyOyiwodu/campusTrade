@@ -7,7 +7,7 @@ const Secret_key = process.env.Korapay_Secret_Key;
 const ref = `TCA-YU-${otp}`
 const formatedDate = new Date().toLocaleString();
 
-console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
+// console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
 
 exports.initializePayment = async(req, res) => {
     try {
