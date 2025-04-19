@@ -58,7 +58,7 @@ exports.register = async (req, res) => {
         return res.status(201).json({
             message: 'Account created! Please check your email to verify it.',
             data: sellerData,
-            
+
         });
 
     } catch (error) {
@@ -142,75 +142,134 @@ exports.register = async (req, res) => {
 //     }
 // };
 
+// exports.verify = async (req, res) => {
+//     try {
+//       const { token } = req.params;
+
+//       let payload;
+//       try {
+//         payload = JWT.verify(token, process.env.JWT_SECRET);
+//       } catch (error) {
+//         if (error instanceof JWT.TokenExpiredError) {
+//           const decodedToken = JWT.decode(token);
+//           const seller = await Seller.findByPk(decodedToken.sellerId);
+
+//           if (!seller) {
+//             return res.status(400).json({ message: 'Seller not found' });
+//           }
+
+//           if (seller.isVerified) {
+//             return res.status(400).json({ message: 'Seller already verified, please login' });
+//           }
+
+//           const newToken = JWT.sign(
+//             { sellerId: seller.id },
+//             process.env.JWT_SECRET,
+//             { expiresIn: '3m' }
+//           );
+
+//           const link = `${verificationLink}/${newToken}`;
+//           const mailDetails = {
+//             email: seller.email,
+//             subject: "Verify your CampusTrade account",
+//             html: signUpTemplate(link, 'seller'),
+//           };
+
+//           await sendEmail(mailDetails);
+//           return res.status(200).json({
+//             message: 'Link expired: A new verification link has been sent to your email.',
+//           });
+//         }
+
+//         // Other JWT errors
+//         return res.status(400).json({ message: 'Invalid or malformed token.' });
+//       }
+
+//       // If token is valid
+//       const seller = await Seller.findByPk(payload.sellerId);
+
+//       if (!seller) {
+//         return res.status(404).json({ message: 'Seller not found' });
+//       }
+
+//       if (seller.isVerified) {
+//         return res.status(400).json({ message: 'Seller has already been verified, please login' });
+//       }
+
+//       seller.isVerified = true;
+//       console.log("seller_verified" + seller.isVerified); // should be false
+//       await seller.save();
+
+//       const updatedSeller = await Seller.findByPk(seller.id);
+//         console.log("updateSeller" + updatedSeller.isVerified); // should be true
+
+//       res.status(200).json({ message: 'Account verified successfully' });
+
+//     } catch (error) {
+//       return res.status(500).json({ message: 'Server error: ' + error.message });
+//     }
+//   };
+
+
+
 exports.verify = async (req, res) => {
     try {
-      const { token } = req.params;
-  
-      let payload;
-      try {
-        payload = JWT.verify(token, process.env.JWT_SECRET);
-      } catch (error) {
-        if (error instanceof JWT.TokenExpiredError) {
-          const decodedToken = JWT.decode(token);
-          const seller = await Seller.findByPk(decodedToken.sellerId);
-  
-          if (!seller) {
-            return res.status(400).json({ message: 'Seller not found' });
-          }
-  
-          if (seller.isVerified) {
-            return res.status(400).json({ message: 'Seller already verified, please login' });
-          }
-  
-          const newToken = JWT.sign(
-            { sellerId: seller.id },
-            process.env.JWT_SECRET,
-            { expiresIn: '3m' }
-          );
-  
-          const link = `${verificationLink}/${newToken}`;
-          const mailDetails = {
-            email: seller.email,
-            subject: "Verify your CampusTrade account",
-            html: signUpTemplate(link, 'seller'),
-          };
-  
-          await sendEmail(mailDetails);
-          return res.status(200).json({
-            message: 'Link expired: A new verification link has been sent to your email.',
-          });
-        }
-  
-        // Other JWT errors
-        return res.status(400).json({ message: 'Invalid or malformed token.' });
-      }
-  
-      // If token is valid
-      const seller = await Seller.findByPk(payload.sellerId);
-  
-      if (!seller) {
-        return res.status(404).json({ message: 'Seller not found' });
-      }
-  
-      if (seller.isVerified) {
-        return res.status(400).json({ message: 'Seller has already been verified, please login' });
-      }
-      
-      seller.isVerified = true;
-      console.log("seller_verified" + seller.isVerified); // should be false
-      await seller.save();
+        const { token } = req.params;
 
-      const updatedSeller = await Seller.findByPk(seller.id);
-        console.log("updateSeller" + updatedSeller.isVerified); // should be true
-  
-      res.status(200).json({ message: 'Account verified successfully' });
-  
+        if (!token) {
+            return res.status(404).json({
+                message: 'Token not found'
+            })
+        };
+
+        JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
+            if (error) {
+                if (error instanceof JWT.JsonWebTokenError) {
+                    const { sellerId } = JWT.decode(token);
+                    const seller = await Seller.findByPk(sellerId);
+
+                    if (!seller) {
+                        return res.status(404).json({
+                            message: 'Seller not found'
+                        })
+                    };
+
+                    const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${token}`
+                    const mailDetails = {
+                        email: seller.email,
+                        subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+                        html: signUpTemplate(link, 'seller'),
+                    };
+                    await sendEmail(mailDetails);
+                    res.status(200).json({
+                        message: 'Verification sent to email'
+                    })
+                }
+            } else {
+                const seller = await Seller.findByPk(payload.sellerId);
+                console.log(seller);
+                console.log(seller.isVerified);
+                
+                
+                if (!seller) {
+                    return res.status(404).json({
+                        message: 'Seller not found'
+                    })
+                };
+                
+                seller.isVerified = true;
+                console.log(seller.isVerified);
+                await seller.save();
+                res.status(200).json({
+                    message: 'Email verified successfully'
+                })
+            }
+        })
     } catch (error) {
-      return res.status(500).json({ message: 'Server error: ' + error.message });
+        console.error(error);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
-  };
-  
-
+};
 
 exports.forgotPassword = async (req, res) => {
     try {
@@ -332,7 +391,7 @@ exports.login = async (req, res) => {
                 subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
                 html: signUpTemplate(link, 'seller'),
             };
-    
+
             await sendEmail(mailDetails);
             return res.status(400).json({
                 message: 'Not verified, please check your email to verify',
@@ -567,16 +626,16 @@ exports.getAll = async (req, res) => {
 
 exports.getSellerById = async (req, res) => {
     try {
-        const { id  } = req.params;
+        const { id } = req.params;
         const seller = await Seller.findByPk(id);
 
         if (!seller) {
             return res.status(400).json({
                 message: 'Seller id is required'
-                });
+            });
         }
 
-        const allSeller = await Seller.findOne({ where: {id}});
+        const allSeller = await Seller.findOne({ where: { id } });
 
         return res.status(200).json({
             message: 'Seller found',
