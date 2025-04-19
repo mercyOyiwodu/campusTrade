@@ -15,7 +15,7 @@ const router = require('express').Router();
  *   post:
  *     summary: Create a new product post
  *     tags:
- *       - Products
+ *       - Product
  *     parameters:
  *       - in: path
  *         name: categoryId
@@ -365,7 +365,7 @@ router.put('/update-product/:id', upload.array('media', 5), updateProduct);
 router.delete('/delete-product/:id', deleteProduct);
 /**
  * @swagger
- * /product/approve-product/{id}:
+ * /api/v1/approve-product/{id}:
  *   patch:
  *     summary: Approve a product post
  *     tags: [Product]
@@ -396,11 +396,11 @@ router.delete('/delete-product/:id', deleteProduct);
 
 /**
  * @swagger
- * /not-approve/{id}:
+ * /api/v1/not-approve/{id}:
  *   post:
  *     summary: Reject a product post
  *     tags:
- *       - Products
+ *       - Product
  *     description: Sets the product status to `not_approved` for a specific product by ID.
  *     parameters:
  *       - in: path
@@ -446,7 +446,7 @@ router.delete('/delete-product/:id', deleteProduct);
 
 /**
  * @swagger
- * /all-approved-product:
+ * /api/v1/all-approved-product:
  *   get:
  *     summary: Retrieve all approved products
  *     tags: [Product]
