@@ -28,7 +28,7 @@ module.exports = {
         defaultValue: 'Used',
       },
       media: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: Sequelize.STRING,
         allowNull: false,
       },
       sellerId: {

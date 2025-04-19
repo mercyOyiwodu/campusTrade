@@ -7,11 +7,11 @@ const Secret_key = process.env.Korapay_Secret_Key;
 const ref = `TCA-YU-${otp}`
 const formatedDate = new Date().toLocaleString();
 
-console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
+// console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
 
 exports.initializePayment = async(req, res) => {
     try {
-        const { email, amount, name, sellerId } = req.body;
+        const { email, amount, name } = req.body;
         if (!email || !name || !amount) {
             return res.status(400).json({
                 message: 'Please input all fields'
@@ -25,7 +25,8 @@ exports.initializePayment = async(req, res) => {
                 email
             },
             currency: "NGN",
-            reference: ref
+            reference: ref,
+            redirect_url: `https://legacy-builder.vercel.app/verifyingPayment`,
         };
 
         const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentData, {
@@ -46,7 +47,6 @@ exports.initializePayment = async(req, res) => {
             status: 'Pending', // Status initialized as Pending
             purpose: 'post_fee', // Identifying the purpose of the transaction
             used: false, // This ensures the transaction is not yet used
-            sellerId: sellerId || null, // Optional sellerId for better reference
         });
 
         await payment.save();
@@ -55,7 +55,8 @@ exports.initializePayment = async(req, res) => {
             message: 'Payment initialized successfully',
             data: {
                 reference: data?.reference,
-                checkout_url: data?.checkout_url
+            checkout_url: data?.checkout_url,
+            redirect_url: paymentData.redirect_url,
             }
         });
     } catch (error) {
