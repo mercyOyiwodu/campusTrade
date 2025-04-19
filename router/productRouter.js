@@ -12,114 +12,67 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /products/{categoryId}/{subCategoryId}:
+ * /api/v1/products/{categoryId}/{subCategoryId}:
  *   post:
  *     summary: Create a product
- *     description: This endpoint allows a seller to create a new product post in a specific category and subcategory. It also handles media file uploads to Cloudinary and validates the seller's KYC and existence.
+ *     description: Allows a seller to create a product and upload images (max 5).
  *     tags:
  *       - Product
+ *     consumes:
+ *       - multipart/form-data
  *     parameters:
  *       - name: categoryId
  *         in: path
- *         description: The category ID where the product will be posted.
+ *         description: UUID of the category.
  *         required: true
  *         type: string
  *         format: uuid
  *       - name: subCategoryId
  *         in: path
- *         description: The subcategory ID where the product will be posted.
+ *         description: UUID of the subcategory.
  *         required: true
  *         type: string
  *         format: uuid
  *       - name: Authorization
  *         in: header
- *         description: JWT token for seller authentication.
+ *         description: Bearer token for seller authentication.
+ *         required: true
+ *         type: string
+ *       - name: productName
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: price
+ *         in: formData
+ *         required: true
+ *         type: number
+ *         format: float
+ *       - name: condition
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: school
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: description
+ *         in: formData
  *         required: true
  *         type: string
  *       - name: media
  *         in: formData
- *         description: Media files to be uploaded with the product.
+ *         description: Upload an image file (JPG/PNG). Can upload multiple in UI, but Swagger 2.0 only allows one declared.
  *         required: false
  *         type: file
- *         collectionFormat: multi
- *         maxItems: 5
  *     responses:
  *       201:
- *         description: Product created successfully.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Post created successfully"
- *             data:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   format: uuid
- *                   example: "d4e5f6b7-8a9c-4d3e-bbc9-201b3c10d20f"
- *                 productName:
- *                   type: string
- *                   example: "Product A"
- *                 price:
- *                   type: number
- *                   format: float
- *                   example: 100.50
- *                 condition:
- *                   type: string
- *                   example: "New"
- *                 school:
- *                   type: string
- *                   example: "University A"
- *                 description:
- *                   type: string
- *                   example: "This is a description of the product."
- *                 media:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: uri
- *                     example: "https://res.cloudinary.com/.../image.jpg"
- *                 sellerId:
- *                   type: string
- *                   format: uuid
- *                   example: "e7f6b9d1-3c9f-4d01-9b8e-9a4b1a70b507"
- *                 subCategoryId:
- *                   type: string
- *                   format: uuid
- *                   example: "12c8b9b1-3a92-4cd7-9d65-f9a83970d472"
- *                 timeCreated:
- *                   type: string
- *                   format: date-time
- *                   example: "2025-04-19T12:00:00Z"
- *                 status:
- *                   type: string
- *                   example: "pending"
+ *         description: Product created successfully
  *       400:
- *         description: Bad request, missing required fields.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Please complete your profile before proceeding"
+ *         description: Missing or invalid input
  *       404:
- *         description: Seller or Seller KYC not found.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Seller not found"
+ *         description: Seller not found
  *       500:
- *         description: Server error.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Internal server error"
+ *         description: Internal server error
  */
 router.post('/products/:categoryId/:subCategoryId', authenticate,upload.array('media', 5), createProduct);
 

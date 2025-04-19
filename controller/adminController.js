@@ -3,7 +3,7 @@ const Admin = require('../models/admin')
 //is the model routing correcting since i am importing seller and product models
 const bcrypt = require('bcryptjs');
 const { sendEmail } = require('../utils/nodemailer');
-const signUpTemplate = require('../utils/signUp');
+const signUpTemplate = require('../utils/mailtemplates');
 const JWT = require('jsonwebtoken');
 
 // Admin registration (only accessible to super_admin)
