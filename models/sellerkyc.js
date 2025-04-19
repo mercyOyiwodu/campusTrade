@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
-
+const Seller = require('../models/seller')
 class SellerKYC extends Model {}
 
 SellerKYC.init(
@@ -29,8 +29,7 @@ SellerKYC.init(
       defaultValue: true
     },
     school: {
-      type: DataTypes.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology'),
-      defaultValue: 'Lagos State University',
+      type: DataTypes.ENUM('Lagos State University', 'University Of Lagos', 'Yaba College Of Technology')
     },
     phoneNumber: {
       type: DataTypes.STRING,
@@ -56,5 +55,10 @@ SellerKYC.init(
     tableName: 'SellerKYCs'
   },
 );
+
+
+SellerKYC.belongsTo(Seller, {foreignKey: 'id', as: 'sellers'});
+Seller.hasOne(SellerKYC, { foreignKey: 'id', as: 'SellerKYCs' });
+
 
 module.exports= SellerKYC

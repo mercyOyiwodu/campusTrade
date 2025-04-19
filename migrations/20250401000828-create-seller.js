@@ -21,6 +21,10 @@ module.exports = {
             type: Sequelize.UUID,
             allowNull: true,
           },
+          isLoggedIn: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+          },
           verifiedAt: {
             type: Sequelize.DATE,
             allowNull: true

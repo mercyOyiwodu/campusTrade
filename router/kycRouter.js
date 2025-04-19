@@ -1,16 +1,16 @@
 const express = require('express');
-const { profileDetails } = require('../controller/kycController');
+const { profileDetails, getSellerKyc } = require('../controller/kycController');
 const { registerValidation } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const kycRouter = express.Router();
 
 /**
  * @swagger
- * /api/kyc/profile/{id}:
+ * /api/v1/kyc/profile/{id}:
  *   patch:
  *     summary: Complete seller profile details (KYC)
  *     tags:
- *       - Seller 
+ *       - Seller KYC
  *     parameters:
  *       - in: path
  *         name: id
@@ -82,6 +82,85 @@ const kycRouter = express.Router();
 
 kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
 
+/**
+ * @swagger
+ * /api/v1/kyc/get-kyc-details/{id}:
+ *   get:
+ *     summary: Retrieve a seller's KYC details
+ *     description: Fetches the seller information along with their KYC (Know Your Customer) details using the seller's unique ID.
+ *     tags:
+ *       - Seller KYC
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Unique ID of the seller
+ *         schema:
+ *           type: string
+ *           example: "e8c3bfa4-49d2-4c1f-95e5-b39e34f09d10"
+ *     responses:
+ *       200:
+ *         description: Seller and KYC details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Seller retrieved successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: e8c3bfa4-49d2-4c1f-95e5-b39e34f09d10
+ *                     fullName:
+ *                       type: string
+ *                       example: Jane Doe
+ *                     email:
+ *                       type: string
+ *                       example: janedoe@example.com
+ *                     kycDetails:
+ *                       type: object
+ *                       properties:
+ *                         bvn:
+ *                           type: string
+ *                           example: "2233445566"
+ *                         nin:
+ *                           type: string
+ *                           example: "12345678901"
+ *                         address:
+ *                           type: string
+ *                           example: "45 Banana Island Road, Ikoyi, Lagos"
+ *                         documentType:
+ *                           type: string
+ *                           example: "National ID"
+ *                         documentUrl:
+ *                           type: string
+ *                           example: "https://example.com/uploads/nin-card.jpg"
+ *       404:
+ *         description: Seller not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Seller not found
+ *       500:
+ *         description: Server error while fetching seller data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "There was an issue getting the user detail: Internal Server Error"
+ */
 
+kycRouter.get('/get-kyc-details/:id', getSellerKyc);
 
 module.exports = kycRouter;
