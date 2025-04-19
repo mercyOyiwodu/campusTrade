@@ -1,7 +1,7 @@
 const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
-const signUpTemplate = require('../utils/signUp');
-const forgotTemplate = require('../utils/signUp');
+const signUpTemplate = require('../utils/mailtemplates');
+const forgotTemplate = require('../utils/mailtemplates');
 const fs = require('fs');
 const Product = require('../models/product');
 const { Op } = require("sequelize");
