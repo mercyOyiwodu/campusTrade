@@ -156,70 +156,76 @@ router.get('/products', getAllProducts);
  *     responses:
  *       200:
  *         description: Successful retrieval of recent products.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Recent posts fetched successfully"
- *             data:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     format: uuid
- *                     example: "d4e5f6b7-8a9c-4d3e-bbc9-201b3c10d20f"
- *                   productName:
- *                     type: string
- *                     example: "Product A"
- *                   price:
- *                     type: number
- *                     format: float
- *                     example: 100.50
- *                   condition:
- *                     type: string
- *                     example: "New"
- *                   school:
- *                     type: string
- *                     example: "University A"
- *                   description:
- *                     type: string
- *                     example: "This is a description of the product."
- *                   media:
- *                     type: array
- *                     items:
- *                       type: string
- *                       format: uri
- *                       example: "https://res.cloudinary.com/.../image.jpg"
- *                   sellerId:
- *                     type: string
- *                     format: uuid
- *                     example: "e7f6b9d1-3c9f-4d01-9b8e-9a4b1a70b507"
- *                   timeCreated:
- *                     type: string
- *                     format: date-time
- *                     example: "2025-04-19T12:00:00Z"
- *                   status:
- *                     type: string
- *                     example: "pending"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Recent posts fetched successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                         example: "d4e5f6b7-8a9c-4d3e-bbc9-201b3c10d20f"
+ *                       productName:
+ *                         type: string
+ *                         example: "Product A"
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                         example: 100.50
+ *                       condition:
+ *                         type: string
+ *                         example: "New"
+ *                       school:
+ *                         type: string
+ *                         example: "University A"
+ *                       description:
+ *                         type: string
+ *                         example: "This is a description of the product."
+ *                       media:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                           format: uri
+ *                           example: "https://res.cloudinary.com/.../image.jpg"
+ *                       sellerId:
+ *                         type: string
+ *                         format: uuid
+ *                         example: "e7f6b9d1-3c9f-4d01-9b8e-9a4b1a70b507"
+ *                       timeCreated:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-04-19T12:00:00Z"
+ *                       status:
+ *                         type: string
+ *                         example: "pending"
  *       400:
  *         description: Seller ID is required or invalid.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Seller ID is required"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller ID is required"
  *       500:
  *         description: Internal server error.
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Internal server error"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 router.get('/recent-products/:id', getRecentProductsBySeller)
 /**
@@ -537,6 +543,7 @@ router.post('/approve-product/:id', approveProduct);
  *                   type: string
  *                   example: Internal server error
  */
+
 router.post('/not-approve/:id',rejectProduct)
 
 /**
