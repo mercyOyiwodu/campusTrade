@@ -1,4 +1,5 @@
 const Category = require('../models/category');
+const Subcategory = require('../models/subCategory');
 
 // Create Category
 exports.createCategory = async (req, res) => {
@@ -27,8 +28,8 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({ 
       include: {
-        model: Category,
-        as: 'category', 
+        model: Subcategory,
+        as: 'subCategories', 
       },}
     );
     res.status(200).json({

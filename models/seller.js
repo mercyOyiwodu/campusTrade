@@ -28,6 +28,10 @@ Seller.init(
       allowNull: false,
       type: DataTypes.DATE
     },
+    isLoggedIn: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     verifiedBy: {
       type: DataTypes.UUID,
       allowNull: true,

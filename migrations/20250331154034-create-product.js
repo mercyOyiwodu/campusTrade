@@ -33,10 +33,16 @@ module.exports = {
       },
       sellerId: {
         type: Sequelize.UUID,
-        allowNull: false,
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-      categoryId: {
+      
+      subCategoryId: {
         type: Sequelize.UUID,
+        allowNull: false
+      },
+      school : {
+        type: Sequelize.STRING,
         allowNull: false,
       },
       // isVerified:{

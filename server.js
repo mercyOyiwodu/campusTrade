@@ -31,7 +31,8 @@ const app = express();
 
 
 // Middlewares
-app.use(cors({origin: "*"}));
+// app.use(cors({origin: "*"}));
+app.use(cors({ origin: "*", methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));

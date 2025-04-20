@@ -7,8 +7,6 @@ const Secret_key = process.env.Korapay_Secret_Key;
 const ref = `TCA-YU-${otp}`
 const formatedDate = new Date().toLocaleString();
 
-// console.log("KoraPay Key:", process.env.KORAPAY_SECRET_KEY); // just for debugging
-
 exports.initializePayment = async(req, res) => {
     try {
         const { email, amount, name } = req.body;
@@ -44,9 +42,9 @@ exports.initializePayment = async(req, res) => {
             email,
             reference: paymentData.reference,
             paymentDate: formatedDate,
-            status: 'Pending', // Status initialized as Pending
-            purpose: 'post_fee', // Identifying the purpose of the transaction
-            used: false, // This ensures the transaction is not yet used
+            status: 'Pending', 
+            purpose: 'post_fee',
+            used: false, 
         });
 
         await payment.save();
@@ -71,18 +69,16 @@ exports.verifyPayment = async (req, res) => {
     try {
         const { reference } = req.query;
 
-        // Fetch payment data from KoraPay API
         const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
             headers: { Authorization: `Bearer ${Secret_key}` }
         });
 
         const { data } = response?.data;
 
-        // If payment is successful, update the transaction status
         if (data?.status === 'success') {
-            // Update status to 'Success' when payment is successful
+
             await transactionModel.update(
-                { status: 'Success', used: true }, // mark as used
+                { status: 'Success', used: true },
                 { where: { reference } }
             );
 

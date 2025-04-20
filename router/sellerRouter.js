@@ -10,80 +10,133 @@ const {authenticate} =require('../middlewares/authentication')
 
 /**
  * @swagger
- * /verify-user/{token}:
- *   get:
- *     summary: Verify a seller's email using a verification token
+ * /api/v1/seller/register:
+ *   post:
+ *     summary: Register a new seller
+ *     description: Registers a new seller account and sends a verification email to the provided address.*
  *     tags:
- *       - Seller Authentication
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: JWT token sent to the seller's email
+ *       - Seller
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "johndoe@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "strongPassword123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "strongPassword123"
  *     responses:
- *       200:
- *         description: Account verified successfully or new verification link sent
+ *       "201":
+ *         description: Account created and verification email sent
  *         content:
  *           application/json:
- *             example:
- *               message: Account verified successfully
- *       400:
- *         description: Bad request (e.g., seller not found or already verified)
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account created! Please check your email to verify it."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     isloggedIn:
+ *                       type: boolean
+ *       "400":
+ *         description: Bad request - validation or duplicate email
  *         content:
  *           application/json:
- *             example:
- *               message: Seller already verified, please login
- *       404:
- *         description: Seller not found
- *         content:
- *           application/json:
- *             example:
- *               message: Seller not found
- *       500:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An account with johndoe@example.com already exists"
+ *       "500":
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong. Please try again later."
  */
-
 sellerRouter.post('/register', register);
 
 /**
  * @swagger
- * /api/v1/verify-user/{token}:
+ * /api/v1/seller/verify-user/{token}:
  *   get:
- *     summary: Verify a seller's email using a verification token
+ *     summary: Verify seller's email
+ *     description: Verifies the seller's account using a token sent to their email. If the token is invalid, a new verification email is sent.*
  *     tags:
- *       - Seller Authentication
+ *       - Seller
  *     parameters:
- *       - in: path
- *         name: token
+ *       - name: token
+ *         in: path
  *         required: true
+ *         description: JWT token sent in the verification email*
  *         schema:
  *           type: string
- *         description: JWT token sent to the seller's email
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *     responses:
- *       200:
- *         description: Account verified successfully or new verification link sent
+ *       "200":
+ *         description: Email verified successfully or new verification email sent
  *         content:
  *           application/json:
- *             example:
- *               message: Account verified successfully
- *       400:
- *         description: Bad request (e.g., seller not found or already verified)
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email verified successfully"
+ *       "400":
+ *         description: Invalid token
  *         content:
  *           application/json:
- *             example:
- *               message: Seller already verified, please login
- *       404:
- *         description: Seller not found
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid token"
+ *       "404":
+ *         description: Token or seller not found
  *         content:
  *           application/json:
- *             example:
- *               message: Seller not found
- *       500:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller not found"
+ *       "500":
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong. Please try again later."
  */
-
 sellerRouter.get('/verify-user/:token', verify);
 
 /**
@@ -125,7 +178,7 @@ sellerRouter.post('/forget', forgetPasswords, forgotPassword);
  *   post:
  *     summary: Reset seller's password using a token
  *     tags:
- *       - Seller Authentication
+ *       - Seller 
  *     parameters:
  *       - in: path
  *         name: token
@@ -183,39 +236,74 @@ sellerRouter.post('/reset/:token', resetPasswords, resetPassword);
  * @swagger
  * /api/v1/seller/login:
  *   post:
+ *     summary: Login a seller
+ *     description: Authenticates a seller and returns a token if the credentials are correct. If the account is not verified, it sends a verification email.
  *     tags:
  *       - Seller
- *     summary: Login seller
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email *
+ *               - password *
  *             properties:
  *               email:
  *                 type: string
  *                 example: johndoe@example.com
  *               password:
  *                 type: string
- *                 example: password123
+ *                 example: secret123
  *     responses:
  *       200:
  *         description: Login successful
  *         content:
  *           application/json:
- *             example:
- *               message: "Login successful"
- *               data:
- *                 token: JWT_TOKEN
- *       401:
- *         description: Invalid credentials
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Login successful"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *                     isVerified:
+ *                       type: boolean
+ *                       example: true
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Bad Request
  *         content:
  *           application/json:
- *             example:
- *               message: "Invalid email or password"
- */                                                                                                                                                                                               
- sellerRouter.post('/login', login)
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Seller not found"
+ *       500:
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Something went wrong"
+ */
+sellerRouter.post('/login', login)
 
 /**
  * @swagger
@@ -332,7 +420,7 @@ sellerRouter.get('/category-weekly-stats', authenticate, getWeeklyCategoryUpload
  * /api/v1/seller/getAll:
  *   get:
  *     tags:
- *       - Seller (Admin)
+ *       - Admin
  *     summary: Get all sellers (Admin only)
  *     description: This endpoint retrieves all registered sellers. Only accessible by authenticated admins using a Bearer token.
  *     security:

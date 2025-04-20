@@ -2,6 +2,7 @@ const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Category = require('../models/category');
 const Seller = require('../models/seller'); // Assuming you have a Seller model
+const Subcategory = require('./subCategory');
 
 class Product extends Model {}
 
@@ -31,9 +32,21 @@ Product.init(
       defaultValue: 'Used'
     },
     media: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.STRING,
       allowNull: false,
+      get() {
+        const rawValue = this.getDataValue('media');
+        return rawValue ? rawValue.split(',') : [];
+      },
+      set(value) {
+        if (Array.isArray(value)) {
+          this.setDataValue('media', value.join(','));
+        } else {
+          throw new Error('Media must be an array of strings');
+        }
+      },
     },
+    
     sellerId: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -42,13 +55,17 @@ Product.init(
         key: 'id',
       },
     },
-    categoryId: {
+    subCategoryId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'Categories',
+        model: 'subcategories',
         key: 'id',
       },
+    },
+    school : {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     status: {
       type: DataTypes.ENUM('pending', 'approved','not_approved'),
@@ -71,10 +88,10 @@ Product.init(
   }
 );
 
-Product.belongsTo(Category, { foreignKey: 'categoryId' });
-Category.hasMany(Product, { foreignKey: 'categoryId' });
+Product.belongsTo(Subcategory, { foreignKey: 'subCategoryId' });
+Subcategory.hasMany(Product, { foreignKey: 'id' });
 
 Product.belongsTo(Seller, { foreignKey: 'sellerId' }); 
-Seller.hasMany(Product, { foreignKey: 'sellerId' }); 
+Seller.hasMany(Product, { foreignKey: 'id' }); 
 
 module.exports = Product;

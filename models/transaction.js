@@ -38,15 +38,15 @@ Transaction.init(
   },
   purpose: {
       type: DataTypes.STRING,
-      allowNull: false, // Identifying the purpose (post_fee, etc.)
+      allowNull: false, 
   },
   used: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false, // Indicates if the transaction was used
+      defaultValue: false, 
   },
   sellerId: {
       type: DataTypes.UUID,
-      allowNull: true, // Optional
+      allowNull: true,
   },
   createdAt: {
       allowNull: false,
