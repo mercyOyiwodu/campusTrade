@@ -140,7 +140,7 @@ router.get('/products', getAllProducts);
 
 /**
  * @swagger
- * /recent-products/{id}:
+ * /api/v1/recent-products/{id}:
  *   get:
  *     summary: Get all recent products from a seller
  *     description: This endpoint retrieves all the products posted by a specific seller and sorts them by the most recent post.
