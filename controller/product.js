@@ -47,8 +47,6 @@ exports.createProduct = async (req, res) => {
       status: 'pending'
     });
     console.log(product);
-    
-
     res.status(201).json({ message: "Post created successfully", data: product });
 
   } catch (error) {
