@@ -128,6 +128,7 @@ app.use((error, req, res, next) => {
 })
 
 app.use('/api/v1/seller', sellerRouter);
+// app.use(sellerRouter);
 app.use('/api/v1', adminRouter);
 app.use('/api/v1', productRouter);
 app.use('/api/v1', categoryRouter);
