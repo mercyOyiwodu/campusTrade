@@ -1,7 +1,6 @@
 const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
-const signUpTemplate = require('../utils/mailtemplates');
-const forgotTemplate = require('../utils/mailtemplates');
+const { signUpTemplate, passwordResetTemplate }= require('../utils/mailtemplates');
 const fs = require('fs');
 const Product = require('../models/product');
 const { Op } = require("sequelize");
@@ -46,7 +45,7 @@ exports.register = async (req, res) => {
         const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${token}`
         const mailDetails = {
             email: seller.email,
-            subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+            subject: "Verify your CampusTrade account",
             html: signUpTemplate(link, 'seller'),
         };
 
@@ -62,8 +61,8 @@ exports.register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+        console.error(error.message);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.'+ error.message });
     }
 };
 
@@ -93,7 +92,7 @@ exports.verify = async (req, res) => {
                     const link = `${req.protocol}://campus-trade-h7bq.vercel.app/verification/${newToken}`
                     const mailDetails = {
                         email: seller.email,
-                        subject: "Verify your CampusTrade account" + "Please verify your email by clicking the link below",
+                        subject: "Verify your CampusTrade account" ,
                         html: signUpTemplate(link, 'seller'),
                     };
                     await sendEmail(mailDetails);
@@ -155,7 +154,7 @@ exports.forgotPassword = async (req, res) => {
         const mailDetails = {
             subject: 'Password Reset',
             email: seller.email,
-            html: forgotTemplate(link, 'User')
+            html: passwordResetTemplate(link, 'User')
         }
 
         // Await nodemailer to send the user an email
