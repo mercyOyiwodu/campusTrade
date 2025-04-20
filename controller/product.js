@@ -42,9 +42,12 @@ exports.createProduct = async (req, res) => {
       media: uploadedMedia,
       sellerId,
       subCategoryId,
+      categoryId,
       timeCreated: new Date(),
       status: 'pending'
     });
+    console.log(product);
+    
 
     res.status(201).json({ message: "Post created successfully", data: product });
 
@@ -54,7 +57,28 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.getRecentProductsBySeller = async (req, res) => {
+  try {
+    const { id: sellerId } = req.params;
 
+    const products = await Product.findAll({
+      where: { sellerId }
+    });
+
+    const sortedProducts = products.sort((a, b) => {
+      return new Date(b.timeCreated) - new Date(a.timeCreated);  // Sort in descending order
+    });
+
+    res.status(200).json({
+      message: "Recent posts fetched successfully",
+      data: sortedProducts,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.getAllProducts = async (req, res) => {
     try {
@@ -69,6 +93,8 @@ exports.getAllProducts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 
 exports.getProductById = async (req, res) => {
@@ -90,9 +116,7 @@ exports.getProductById = async (req, res) => {
     }
 }
 
-exports.getRecentProduct = async(req,res) =>{
-  
-}
+
 exports.updateProduct = async (req, res) => {
     try {
       const { id } = req.params;
