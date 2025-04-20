@@ -334,7 +334,6 @@ exports.changePassword = async (req, res) => {
             });
         }
 
-<<<<<<< HEAD
         // Confirm that the passwords match
         // if (password !== confirmPassword) {
         //     return res.status(400).json({
@@ -362,8 +361,6 @@ exports.changePassword = async (req, res) => {
           }
 
 
-=======
->>>>>>> c4737d6bda59d76ef369cc9edf7808c6d2598fa8
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);

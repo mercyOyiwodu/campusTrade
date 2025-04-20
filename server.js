@@ -9,6 +9,7 @@ const productRouter = require('./router/productRouter');
 const categoryRouter = require('./router/category');
 const transactionRouter = require('./router/transactionRouter');
 const adRouter = require('./router/adRouter')
+const checkRouter = require('./router/jambRouter');
 const session = require('express-session');
 const subCategoryRouter = require('./router/subCategory')
 
@@ -137,6 +138,7 @@ app.use('/api/v1/kyc', kycRouter);
 app.use('/api/v1', transactionRouter);
 app.use('/api/v1', adRouter);
 app.use('/api/v1', subCategoryRouter)
+app.use('/api/v1', checkRouter);
 
 const server = async()=>{
     try {
