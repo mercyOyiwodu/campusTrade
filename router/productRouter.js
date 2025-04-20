@@ -1,4 +1,4 @@
-const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct } = require('../controller/product');
+const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct, getRecentProductsBySeller } = require('../controller/product');
 const { authenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
 const router = require('express').Router();
@@ -138,6 +138,90 @@ router.post('/products/:categoryId/:subCategoryId', authenticate,upload.array('m
  */
 router.get('/products', getAllProducts);
 
+/**
+ * @swagger
+ * /recent-products/{id}:
+ *   get:
+ *     summary: Get all recent products from a seller
+ *     description: This endpoint retrieves all the products posted by a specific seller and sorts them by the most recent post.
+ *     tags:
+ *       - Product
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The unique ID of the seller whose recent products are being fetched.
+ *         required: true
+ *         type: string
+ *         format: uuid
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of recent products.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Recent posts fetched successfully"
+ *             data:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                     example: "d4e5f6b7-8a9c-4d3e-bbc9-201b3c10d20f"
+ *                   productName:
+ *                     type: string
+ *                     example: "Product A"
+ *                   price:
+ *                     type: number
+ *                     format: float
+ *                     example: 100.50
+ *                   condition:
+ *                     type: string
+ *                     example: "New"
+ *                   school:
+ *                     type: string
+ *                     example: "University A"
+ *                   description:
+ *                     type: string
+ *                     example: "This is a description of the product."
+ *                   media:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                       format: uri
+ *                       example: "https://res.cloudinary.com/.../image.jpg"
+ *                   sellerId:
+ *                     type: string
+ *                     format: uuid
+ *                     example: "e7f6b9d1-3c9f-4d01-9b8e-9a4b1a70b507"
+ *                   timeCreated:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2025-04-19T12:00:00Z"
+ *                   status:
+ *                     type: string
+ *                     example: "pending"
+ *       400:
+ *         description: Seller ID is required or invalid.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Seller ID is required"
+ *       500:
+ *         description: Internal server error.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *               example: "Internal server error"
+ */
+router.get('/recent-products/:id', getRecentProductsBySeller)
 /**
  * @swagger
  * paths:
