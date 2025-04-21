@@ -64,7 +64,7 @@ exports.createProduct = async (req, res) => {
       categoryId,
       timeCreated: new Date(),
       status: 'pending',
-      Subcategory
+      subCategoryName: subCategoryExists.name
     });
     console.log(product);
     res.status(201).json({ message: "Post created successfully", data: product });
