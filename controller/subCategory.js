@@ -1,5 +1,6 @@
 const SubCategory = require('../models/subCategory');
-const Category = require('../models/category')
+const Category = require('../models/category');
+const Product = require('../models/product');
 
 // Create SubCategory
 exports.createSubCategory = async (req, res) => {
@@ -34,10 +35,10 @@ exports.createSubCategory = async (req, res) => {
 exports.getAllSubCategories = async (req, res) => {
   try {
     const subCategories = await SubCategory.findAll({
-      include: {
-        model: Category,
-        as: 'category', 
-      },
+        include: {
+          model: Product,
+          as: 'Products', 
+        },
     });
 
     res.status(200).json({
@@ -56,8 +57,8 @@ exports.getSubCategoryById = async (req, res) => {
     const { id } = req.params;
     const subCategory = await SubCategory.findByPk(id, {
       include: {
-        model: Category,
-        as: 'category', // Include category data for the subcategory
+        model: Product,
+        as: 'Products', 
       },
     });
 

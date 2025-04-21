@@ -1,8 +1,5 @@
 const { verify, forgotPassword, resetPassword, login, register, deleteSeller, logOut, changePassword, getDashboardStats, getApprovedPosts, getPendingPosts, getRecentPosts, getWeeklyCategoryUploadStats, getAll, getSellerById} = require('../controller/sellerController');
 const { registerValidation, forgetPasswords, resetPasswords } = require('../middlewares/validator');
-const upload = require('../utils/multer');
-const passport = require('passport');
-const JWT = require('jsonwebtoken');
 const sellerRouter = require('express').Router();
 const {authenticateAdmin} =require('../middlewares/adminAuth')
 const {authenticate} =require('../middlewares/authentication')
@@ -412,7 +409,7 @@ sellerRouter.get('/stats', authenticate, getDashboardStats);
 sellerRouter.get('/recent-posts', authenticate, getRecentPosts);
 sellerRouter.get('/pending-posts', authenticate, getPendingPosts);
 sellerRouter.get('/approved-posts', authenticate, getApprovedPosts);
-sellerRouter.get('/category-weekly-stats', authenticate, getWeeklyCategoryUploadStats);
+// sellerRouter.get('/category-weekly-stats', getWeeklyCategoryUploadStats);
 
 
 /**
@@ -485,80 +482,6 @@ sellerRouter.get('/getAll', authenticateAdmin, getAll);
 
 sellerRouter.get('/getOneSeller/:id',getSellerById)
 
-/**
- * @openapi
- * /api/v1/seller/google-authenticate:
- *   get:
- *     summary: Authenticate seller with Google
- *     tags:
- *       - Seller
- *     responses:
- *       '200':
- *         description: Google authentication successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                 token:
- *                   type: string
- *       '500':
- *         description: Internal server error
- */
-sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope: ['profile', 'email']}));
-
-/**
- * @Swagger
- * /api/v1/seller/auth/google/login:
- *   get:
- *     summary: Handle Google login redirect
- *     tags:
- *       - Seller
- *     responses:
- *       '200':
- *         description: Google login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                 token:
- *                   type: string
- *       '500':
- *         description: Internal server error
- */
-
-sellerRouter.get('/auth/google/login', passport.authenticate('google'), async (req, res)=>{
-    try{
-        const token = await JWT.sign({sellerId: req.seller.id, isVerified: req.seller.isVerified},
-            process.env.JWT_SECRET, {expiresIn: '1day'});
-            const redirectUrl = `https://legacy-builder.vercel.app/callback/${token}/${req.seller.id}`;
-    return res.redirect(redirectUrl);
-
-    //    res.status(200).json({
-    //        message: 'Google Auth Login Successful',
-    //        data: req.seller,
-    //        token
-    //    });
-    }catch (error) {
-        console.error(error);
-        res.status(500).json({ 
-            message: "Internal Server Error" 
-        });
-
-    }
-
-    
-   
-})
 
 
 

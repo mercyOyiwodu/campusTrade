@@ -2,8 +2,9 @@ const JWT = require('jsonwebtoken');
 const { sendEmail } = require('../utils/nodemailer');
 const { signUpTemplate, passwordResetTemplate }= require('../utils/mailtemplates');
 const fs = require('fs');
-const Product = require('../models/product');
-const { Op } = require("sequelize");
+const Product  = require('../models/product');
+const Category  = require('../models/category');
+const { Op, fn, col } = require('sequelize');
 const verificationLink = process.env.FRONTEND_URL;
 const reset = process.env.RESET_PASSWORD
 const Seller = require('../models/seller')
@@ -268,8 +269,7 @@ exports.login = async (req, res) => {
 
         res.status(200).json({
             message: 'Login successful',
-            data: sellerData,
-            token
+            data: sellerData
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -417,40 +417,52 @@ exports.getApprovedPosts = async (req, res) => {
     }
 };
 
-exports.getWeeklyCategoryUploadStats = async (req, res) => {
-    try {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-        const categoryCounts = await Product.findAll({
-            where: {
-                approvalStatus: 'approved',
-                createdAt: { [Op.gte]: oneWeekAgo }
-            },
-            attributes: ['categoryId', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
-            group: ['categoryId'],
-            raw: true
-        });
-
-        const total = categoryCounts.reduce((sum, item) => sum + parseInt(item.count), 0);
-        const categories = await Category.findAll({ attributes: ['id', 'categoryName'], raw: true });
-
-        const result = categoryCounts.map(cat => {
-            const category = categories.find(c => c.id === cat.categoryId);
-            return {
-                category: category ? category.categoryName : 'Unknown',
-                percentage: Math.round((cat.count / total) * 100)
-            };
-        });
-
-        res.status(200).json({
-            message: 'Weekly category upload stats retrieved successfully',
-            data: result
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error: " + error.message });
-    }
-};
+// exports.getWeeklyCategoryUploadStats = async (req, res) => {
+//     try {
+//       const oneWeekAgo = new Date();
+//       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+//       // Get count of approved products by category within the last 7 days
+//       const recentUploads = await Product.findAll({
+//         where: {
+//           approvalStatus: 'approved',
+//           createdAt: { [Op.gte]: oneWeekAgo },
+//         },
+//         attributes: ['categoryId', [fn('COUNT', col('id')), 'count']],
+//         group: ['categoryId'],
+//         raw: true,
+//       });
+  
+//       // total number of uploads for percentage computation
+//       const totalUploads = recentUploads.reduce((sum, item) => sum + parseInt(item.count), 0);
+  
+//       //Fetch all categories to map categoryId to categoryName
+//       const allCategories = await Category.findAll({
+//         attributes: ['id', 'categoryName'],
+//         raw: true,
+//       });
+  
+//       // Format response with percentages
+//       const stats = recentUploads.map(({ categoryId, count }) => {
+//         const category = allCategories.find(c => c.id === categoryId);
+//         return {
+//           category: category ? category.categoryName : 'Unknown',
+//           percentage: Math.round((count / totalUploads) * 100),
+//         };
+//       });
+  
+//       res.status(200).json({
+//         message: 'Weekly category upload stats retrieved successfully',
+//         data: stats,
+//       });
+//     } catch (error) {
+//       console.error('Error fetching weekly category upload stats:', error);
+//       res.status(500).json({
+//         message: 'Internal server error',
+//         error: error.message,
+//       });
+//     }
+//   };
 
 exports.getAll = async (req, res) => {
     try {

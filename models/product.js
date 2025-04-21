@@ -59,10 +59,15 @@ Product.init(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'subcategories',
+        model: 'Subcategory',
         key: 'id',
       },
     },
+    subCategoryName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
     school : {
       type: DataTypes.STRING,
       allowNull: false,
@@ -93,5 +98,7 @@ Subcategory.hasMany(Product, { foreignKey: 'id' });
 
 Product.belongsTo(Seller, { foreignKey: 'sellerId' }); 
 Seller.hasMany(Product, { foreignKey: 'id' }); 
+
+// Product.belongsTo(Category, { foreignKey: 'categoryId' }); 
 
 module.exports = Product;

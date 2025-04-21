@@ -36,15 +36,11 @@ module.exports = {
     },
     purpose: {
         type: Sequelize.STRING,
-        allowNull: false, // Identifying the purpose (post_fee, etc.)
+        allowNull: false,
     },
     used: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false, // Indicates if the transaction was used
-    },
-    sellerId: {
-        type: Sequelize.UUID,
-        allowNull: true, // Optional
+        defaultValue: false, 
     },
       createdAt: {
         allowNull: false,

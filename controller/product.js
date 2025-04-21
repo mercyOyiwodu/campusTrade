@@ -31,8 +31,7 @@ exports.createProduct = async (req, res) => {
     if (!subCategoryExists) {
       return res.status(404).json({ message: "Sub category not found" });
     }
-    console.log('Sub: ',subCategoryExists.Subcategory);
-    console.log('Values: ',subCategoryExists.Subcategory.dataValues);
+
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
@@ -64,7 +63,6 @@ exports.createProduct = async (req, res) => {
       media: uploadedMedia,
       sellerId,
       subCategoryId,
-      categoryId,
       timeCreated: new Date(),
       status: 'pending',
       subCategoryName: subCategoryExists.name
@@ -146,13 +144,18 @@ exports.getProductById = async (req, res) => {
       ],
     });
 
+  
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    const seller = await SellerKYC.findByPk(product.seller.id)
+   
     res.status(200).json({
       message: "Product retrieved successfully",
       data: product,
+      sellerName: seller.fullName
     });
   } catch (error) {
     console.log(error);

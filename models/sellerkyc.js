@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model, UUIDV4 } = require('sequelize');
+const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../database/sequelize');
 const Seller = require('../models/seller')
 class SellerKYC extends Model {}
@@ -36,7 +36,7 @@ SellerKYC.init(
       allowNull: false
     },
     gender: {
-      type:Sequelize.ENUM('Female', 'Male'),
+      type:DataTypes.ENUM('Female', 'Male'),
     defaultValue: 'Male'
    },
     createdAt: {
