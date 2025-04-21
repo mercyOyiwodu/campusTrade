@@ -21,12 +21,12 @@ exports.createProduct = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
     const subCategoryExists = await Subcategory.findByPk(subCategoryId,
-      {
-        include: {
-          model: Subcategory,
-          as: "name",
-        }
-      }
+      // {
+      //   include: {
+      //     model: Subcategory,
+      //     as: "name",
+      //   }
+      // }
     );
     if (!subCategoryExists) {
       return res.status(404).json({ message: "Sub category not found" });
