@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /api/v1/payment/initialize/{id}:
+ * /api/v1/initialize/{id}:
  *   post:
  *     summary: Initialize payment for product posting
  *     tags:
@@ -94,7 +94,7 @@ router.post('/initialize/:id', initializePayment);
 
 /**
  * @swagger
- * /api/v1/payment/verify:
+ * /api/v1/verify:
  *   get:
  *     summary: Verify a payment by reference
  *     tags:
