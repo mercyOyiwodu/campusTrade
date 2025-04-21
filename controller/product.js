@@ -31,7 +31,8 @@ exports.createProduct = async (req, res) => {
     if (!subCategoryExists) {
       return res.status(404).json({ message: "Sub category not found" });
     }
-    console.log('Sub: ',subCategoryExists);
+    console.log('Sub: ',subCategoryExists.Subcategory);
+    console.log('Values: ',subCategoryExists.Subcategory.dataValues);
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
