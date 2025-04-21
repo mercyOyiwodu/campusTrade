@@ -484,5 +484,4 @@ sellerRouter.get('/getOneSeller/:id',getSellerById)
 
 
 
-
 module.exports = sellerRouter;

@@ -9,6 +9,7 @@ const productRouter = require('./router/productRouter');
 const categoryRouter = require('./router/category');
 const transactionRouter = require('./router/transactionRouter');
 const adRouter = require('./router/adRouter')
+const checkRouter = require('./router/jambRouter');
 const session = require('express-session');
 const subCategoryRouter = require('./router/subCategory')
 
@@ -32,7 +33,8 @@ const app = express();
 
 
 // Middlewares
-app.use(cors({origin: "*"}));
+// app.use(cors({origin: "*"}));
+app.use(cors({ origin: "*", methods: "GET,HEAD,PUT,PATCH,POST,DELETE" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -129,6 +131,7 @@ app.use((error, req, res, next) => {
 })
 
 app.use('/api/v1/seller', sellerRouter);
+// app.use(sellerRouter);
 app.use('/api/v1', adminRouter);
 app.use('/api/v1', productRouter);
 app.use('/api/v1', categoryRouter);
@@ -137,6 +140,7 @@ app.use('/api/v1', transactionRouter);
 app.use('/api/v1', adRouter);
 app.use('/api/v1', subCategoryRouter);
 app.use(googleRouter)
+
 
 const server = async()=>{
     try {
