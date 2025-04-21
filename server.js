@@ -25,7 +25,8 @@ const kycRouter = require('./router/kycRouter');
 
 
 
-const swaggerUi = require('swagger-ui-express')
+const swaggerUi = require('swagger-ui-express');
+const googleRouter = require('./router/googleAuth');
 
 
 const app = express();
@@ -137,8 +138,9 @@ app.use('/api/v1', categoryRouter);
 app.use('/api/v1/kyc', kycRouter);
 app.use('/api/v1', transactionRouter);
 app.use('/api/v1', adRouter);
-app.use('/api/v1', subCategoryRouter)
-app.use('/api/v1', checkRouter);
+app.use('/api/v1', subCategoryRouter);
+app.use(googleRouter)
+
 
 const server = async()=>{
     try {

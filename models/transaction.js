@@ -44,10 +44,22 @@ Transaction.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false, 
   },
-  sellerId: {
+  productId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
+      references: {
+        model: 'Product',
+        key: 'id',
+      },
   },
+  // sellerId: {
+  //   type: DataTypes.UUID,
+  //   allowNull: false,
+  //   references: {
+  //     model: 'Seller',
+  //     key: 'id',
+  //   },
+  // },
   createdAt: {
       allowNull: false,
       type: DataTypes.DATE

@@ -59,8 +59,8 @@ Seller.init(
   },
 );
 
-  Seller.belongsTo(Admin, {foreignKey: 'id', as: 'admins'});
-  Admin.hasMany(Seller, { foreignKey: 'id', as: 'seller' });
+  // Seller.belongsTo(Admin, {foreignKey: 'id', as: 'admins'});
+  // Admin.hasMany(Seller, { foreignKey: 'id', as: 'seller' });
 
 
 
