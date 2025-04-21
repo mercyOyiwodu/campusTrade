@@ -271,3 +271,17 @@ exports.getPendingProducts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAllProductsBySubcategory = async (req, res) => {
+  try {
+    const {id: subCategoryId} = req.params;
+    const subCategoryExists = await Subcategory.findByPk(subCategoryId);
+    if (!subCategoryExists) {
+      return res.status(404).json({ message: "Sub category not found" });
+    } 
+    const products = await Product.findAll({ where: { subCategoryId } });
+    res.status(200).json({ message: `All products by sub category ${subCategoryId}`, data: products });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
