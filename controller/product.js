@@ -1,9 +1,11 @@
 const Product = require('../models/product');
 const Transaction = require("../models/transaction");
 const Seller = require("../models/seller");
+const Subcategory = require("../models/subCategory");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 const SellerKYC = require('../models/sellerkyc');
+const Category = require('../models/category');
 
 
 exports.createProduct = async (req, res) => {
@@ -11,7 +13,17 @@ exports.createProduct = async (req, res) => {
     const { categoryId, subCategoryId} = req.params;
     const { id: sellerId } = req.seller
     const { productName, price, condition, school, description } = req.body;
-
+    if (!productName || !price || !condition || !school || !description) {
+      return res.status(400).json({ message: "Please enter all required fields" });
+    }
+    const category = await Category.findByPk(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    const subCategoryExists = await Subcategory.findByPk(subCategoryId);
+    if (!subCategoryExists) {
+      return res.status(404).json({ message: "Sub category not found" });
+    }
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
@@ -19,7 +31,7 @@ exports.createProduct = async (req, res) => {
     }
     const sellerKYC = await SellerKYC.findByPk(sellerId);
     if (!sellerKYC) {
-      return res.status(404).json({ message: "Please complete your profile before proceeding" });
+      return res.status(400).json({ message: "Please complete your kyc before proceeding" });
     }
 
     const uploadedMedia = [];
@@ -78,14 +90,26 @@ exports.getRecentProductsBySeller = async (req, res) => {
   }
 };
 
+// Get All Products with their Subcategory and Seller
 exports.getAllProducts = async (req, res) => {
-    try {
-        const products = await Product.findAll();
-    res.status(200).json({
-      message: "Products retrieved successfully",
-      data: products,
+  try {
+    const products = await Product.findAll({
+      include: [
+        {
+          model: Subcategory,
+          // as: 'subCategory',
+        },
+        {
+          model: Seller,
+          as: 'seller',
+        },
+      ],
     });
 
+    res.status(200).json({
+      message: 'Products fetched successfully',
+      data: products,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
@@ -94,26 +118,38 @@ exports.getAllProducts = async (req, res) => {
 
 
 
-
 exports.getProductById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const product = await Product.findByPk(id);
+  try {
+    const { id } = req.params;
 
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
+    const product = await Product.findByPk(id, {
+      include: [
+        {
+          model: Subcategory,
+          as: 'subcategory',
+          include: [
+            {
+              model: Category,
+              as: 'category',
+            },
+          ],
+        },
+      ],
+    });
 
-        res.status(200).json({
-            message: "Product retrieved successfully",
-            data: product,
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message  });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
-}
 
+    res.status(200).json({
+      message: "Product retrieved successfully",
+      data: product,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.updateProduct = async (req, res) => {
     try {
