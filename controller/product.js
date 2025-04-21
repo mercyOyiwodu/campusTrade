@@ -51,7 +51,8 @@ exports.createProduct = async (req, res) => {
         fs.unlinkSync(file.path);
       }
     }
-
+    console.log(subCategoryExists.name);
+    
     const product = await Product.create({
       productName,
       price,
