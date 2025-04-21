@@ -20,7 +20,14 @@ exports.createProduct = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
-    const subCategoryExists = await Subcategory.findByPk(subCategoryId);
+    const subCategoryExists = await Subcategory.findByPk(subCategoryId,
+      {
+        include: {
+          model: Subcategory,
+          as: "name",
+        }
+      }
+    );
     if (!subCategoryExists) {
       return res.status(404).json({ message: "Sub category not found" });
     }
@@ -56,7 +63,8 @@ exports.createProduct = async (req, res) => {
       subCategoryId,
       categoryId,
       timeCreated: new Date(),
-      status: 'pending'
+      status: 'pending',
+      Subcategory
     });
     console.log(product);
     res.status(201).json({ message: "Post created successfully", data: product });
@@ -126,13 +134,11 @@ exports.getProductById = async (req, res) => {
       include: [
         {
           model: Subcategory,
-          as: 'subcategory',
-          include: [
-            {
-              model: Category,
-              as: 'category',
-            },
-          ],
+          // as: 'subCategory',
+        },
+        {
+          model: Seller,
+          as: 'seller',
         },
       ],
     });
