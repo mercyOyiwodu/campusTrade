@@ -6,7 +6,7 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     // callbackURL: "https://campustrade-kku1.onrender.com/api/v1/auth/google/login"
-    callbackURL: "https://localhost:4725/api/v1/seller/auth/google/login"
+    callbackURL: "https://localhost:4725/auth/google/login"
   },
   async (accessToken, refreshToken, profile, cb) => {
     console.log("Profile: ", profile)
@@ -15,14 +15,15 @@ passport.use(new GoogleStrategy({
       let seller = await Seller.findOne({
         where: { email: profile.emails[0].value }
       });
-      
+      const randomPassword = await bcrypt.hash(profile.id, 10);
       if (!seller) {
         // Create new user with Sequelize create method instead of Mongoose's new model
         seller = await Seller.create({
           email: profile.emails[0].value,
           fullName: profile.displayName,
-          isVerified: profile.emails[0].verified || false,
-          password: ''
+          // isVerified: profile.emails[0].verified || false,
+          isVerified: true,
+          password: randomPassword
         });
         // No need for separate save() call with Sequelize create()
       }

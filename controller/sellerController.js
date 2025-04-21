@@ -177,15 +177,22 @@ exports.resetPassword = async (req, res) => {
     try {
         // Extract the token from the params
         const { token } = req.params;
+
+        if (!token) {
+            return res.status(400).json({
+                message: 'Token not found'
+            })
+        }
         // Extract the passwod and confirm password from the request body
         const { password, confirmPassword } = req.body;
         // Verify if the token is still valid
-        const { sellerId } = await JWT.verify(token, process.env.JWT_SECRET);
+        const decoded = await JWT.verify(token, process.env.JWT_SECRET);
+        const sellerId = decoded.sellerId;
         // Check if the user is still existsing
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
             return res.status(404).json({
-                message: 'User not found'
+                message: 'Seller not found'
             })
         }
         if (password !== confirmPassword) {
@@ -208,7 +215,7 @@ exports.resetPassword = async (req, res) => {
         console.log(error.message)
         if (error instanceof JWT.JsonWebTokenError) {
             res.status(400).json({
-                message: 'Link expired, Please initiate a link'
+                message: 'Link expired, Please initiate a new link'
             })
         }
         res.status(500).json({
@@ -303,32 +310,60 @@ exports.logOut = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         // Extract the token from the params
-        const { token } = req.params;
+        // const { token } = req.params;
+        const { sellerId } = req.params;
         // Extract the password and confirm password from the request body
-        const { password, confirmPassword } = req.body;
+        const { currentPassword, newPassword } = req.body;
 
         // Verify if the token is still valid
-        let sellerId;
-        try {
-            const decoded = await JWT.verify(token, process.env.JWT_SECRET);
-            sellerId = decoded.sellerId;
-        } catch (error) {
-            return res.status(400).json({
-                message: 'Invalid or expired token'
-            });
-        }
+        // let sellerId;
+        // try {
+        //     const decoded = await JWT.verify(token, process.env.JWT_SECRET);
+        //     sellerId = decoded.sellerId;
+        // } catch (error) {
+        //     return res.status(400).json({
+        //         message: 'Invalid or expired token'
+        //     });
+        // }
 
         // Check if the user exists
         const seller = await Seller.findByPk(sellerId);
         if (!seller) {
             return res.status(404).json({
-                message: 'User not found'
+                message: 'Seller not found'
             });
         }
 
+        // Confirm that the passwords match
+        // if (password !== confirmPassword) {
+        //     return res.status(400).json({
+        //         message: 'Passwords do not match'
+        //     });
+        // }
+
+        const isPasswordCorrect = await bcrypt.compare(
+            currentPassword,
+            Seller.password
+          );
+      
+          if (!isPasswordCorrect) {
+            return res.status(400).json({
+              message: "Incorrect password",
+            });
+          }
+      
+          const isSamePassword = await bcrypt.compare(newPassword, Seller.password);
+      
+          if (isSamePassword) {
+            return res.status(400).json({
+              message: "New password cannot be the same as the current password",
+            });
+          }
+
+
         // Generate a salt and hash the password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         // Update the user's password
         seller.password = hashedPassword;

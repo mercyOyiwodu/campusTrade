@@ -536,18 +536,18 @@ sellerRouter.get('/google-authenticate', passport.authenticate('google', {scope:
  *         description: Internal server error
  */
 
-sellerRouter.get('/auth/google/login', passport.authenticate('google'), async (req, res)=>{
+sellerRouter.get('/auth/google/login', passport.authenticate('google',  { failureRedirect: "/login" }), async (req, res)=>{
     try{
         const token = await JWT.sign({sellerId: req.seller.id, isVerified: req.seller.isVerified},
             process.env.JWT_SECRET, {expiresIn: '1day'});
-            const redirectUrl = `https://legacy-builder.vercel.app/callback/${token}/${req.seller.id}`;
-    return res.redirect(redirectUrl);
+            // const redirectUrl = `https://legacy-builder.vercel.app/callback/${token}/${req.seller.id}`;
+    // return res.redirect(redirectUrl);
 
-    //    res.status(200).json({
-    //        message: 'Google Auth Login Successful',
-    //        data: req.seller,
-    //        token
-    //    });
+       res.status(200).json({
+           message: 'Google Auth Login Successful',
+           data: req.seller,
+           token
+       });
     }catch (error) {
         console.error(error);
         res.status(500).json({ 
