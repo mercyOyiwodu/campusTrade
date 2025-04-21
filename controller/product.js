@@ -31,6 +31,7 @@ exports.createProduct = async (req, res) => {
     if (!subCategoryExists) {
       return res.status(404).json({ message: "Sub category not found" });
     }
+    console.log('Sub: ',subCategoryExists);
     const seller = await Seller.findByPk(sellerId);
     if (!seller) {
       if (req.files) req.files.forEach(file => fs.unlinkSync(file.path));
@@ -51,8 +52,8 @@ exports.createProduct = async (req, res) => {
         fs.unlinkSync(file.path);
       }
     }
-    console.log(subCategoryExists.name);
     
+
     const product = await Product.create({
       productName,
       price,
@@ -67,7 +68,7 @@ exports.createProduct = async (req, res) => {
       status: 'pending',
       subCategoryName: subCategoryExists.name
     });
-    console.log(product);
+
     res.status(201).json({ message: "Post created successfully", data: product });
 
   } catch (error) {
