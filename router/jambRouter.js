@@ -1,6 +1,6 @@
-const checkRouter = require("express").Router();
-const {checkJamb} = require('../controller/jambCheckerController');
+// const checkRouter = require("express").Router();
+// const {checkJamb} = require('../controller/jambCheckerController');
 
-checkRouter.post('/checkJamb', checkJamb);
+// checkRouter.post('/checkJamb', checkJamb);
 
-module.exports = checkRouter;
+// module.exports = checkRouter;
