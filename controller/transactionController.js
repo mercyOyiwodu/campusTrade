@@ -36,8 +36,8 @@ exports.initializePayment = async (req, res) => {
             },
             currency: "NGN",
             reference:reference,
-            // redirect_url: `https://campus-trade-h7bq.vercel.app/dashboard/paymentstatus?${reference}`,
-            redirect_url: `http://localhost:5173/dashboard/paymentstatus/${reference}`,
+            redirect_url: `https://campus-trade-h7bq.vercel.app/dashboard/paymentstatus/${reference}`,
+            // redirect_url: `http://localhost:5173/dashboard/paymentstatus/${reference}`,
 
         };
 
