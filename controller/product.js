@@ -281,7 +281,8 @@ exports.getApprovedProducts = async (req, res) => {
 
 exports.getPendingProducts = async (req, res) => {
   try {
-    const products = await Product.findAll({ where: { status: 'pending' } });
+    const {id : sellerId} = req.params
+    const products = await Product.findAll({ where: { sellerId, status: 'pending' } });
     res.status(200).json({ message: "Pending products", data: products });
   } catch (error) {
     res.status(500).json({ message: error.message });
