@@ -76,21 +76,25 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.getRecentProductsBySeller = async (req, res) => {
   try {
     const { id: sellerId } = req.params;
 
     const products = await Product.findAll({
-      where: { sellerId }
+      where: { sellerId, status: 'approved' },
+      order: [['createdAt', 'DESC']] // Sort by most recent
     });
 
-    const sortedProducts = products.sort((a, b) => {
-      return new Date(b.timeCreated) - new Date(a.timeCreated);  // Sort in descending order
-    });
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        message: 'No recent posts'
+      });
+    }
 
     res.status(200).json({
-      message: "Recent posts fetched successfully",
-      data: sortedProducts,
+      message: 'Recent posts fetched successfully',
+      data: products
     });
 
   } catch (error) {
