@@ -81,8 +81,10 @@ exports.getRecentProductsBySeller = async (req, res) => {
   try {
     const { id: sellerId } = req.params;
 
-    const products = await Product.findAll({ where: { sellerId, status: 'approved' } });
-    res.status(200).json({ message: "Approved products", data: products });
+    const products = await Product.findAll({
+      where: { sellerId, status: 'approved' },
+      order: [['createdAt', 'DESC']] // Sort by most recent
+    });
 
     if (!products || products.length === 0) {
       return res.status(404).json({
