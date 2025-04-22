@@ -595,7 +595,7 @@ router.get('/all-approved-product', getApprovedProducts);
  *         description: "Server error:<error-message>"
  */
 
-router.get('/all-pending-product', getPendingProducts);
+router.get('/all-pending-product/:id', getPendingProducts);
 
 
 router.get('/all-products-by-subcategory/:id', getAllProductsBySubcategory);
