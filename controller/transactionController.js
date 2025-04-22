@@ -36,7 +36,7 @@ exports.initializePayment = async (req, res) => {
             },
             currency: "NGN",
             reference:reference,
-            redirect_url: `https://legacy-builder.vercel.app/verifyingPayment`,
+            redirect_url: `https://campus-trade-h7bq.vercel.app/dashboard/paymentstatus`,
         };
 
         const response = await axios.post(
