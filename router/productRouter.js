@@ -461,7 +461,7 @@ router.put('/update-product/:id', upload.array('media', 5), updateProduct);
  */
 
 
-router.delete('/delete-product/:id', deleteProduct);
+router.delete('/delete-product/:id',  deleteProduct);
 /**
  * @swagger
  * /api/v1/approve-product/{id}:
