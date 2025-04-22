@@ -36,7 +36,7 @@ exports.initializePayment = async (req, res) => {
             },
             currency: "NGN",
             reference:reference,
-            redirect_url: `https://campus-trade-h7bq.vercel.app/dashboard/paymentstatus`,
+            redirect_url: `https://campus-trade-h7bq.vercel.app/dashboard/paymentstatus?${reference}`,
         };
 
         const response = await axios.post(
@@ -86,7 +86,6 @@ exports.verifyPayment = async (req, res) => {
 
         const { data } = response?.data;
 
-        // Find transaction
         const transaction = await transactionModel.findOne({ where: { reference } });
 
         if (!transaction) {
@@ -94,13 +93,11 @@ exports.verifyPayment = async (req, res) => {
         }
 
         if (data?.status === 'success') {
-            // Update transaction
             await transactionModel.update(
                 { status: 'Success', used: true },
                 { where: { reference } }
             );
 
-            // Update product status to approved
             if (transaction.productId) {
                 await Product.update(
                     { status: 'approved' },
@@ -116,7 +113,6 @@ exports.verifyPayment = async (req, res) => {
             });
 
         } else {
-            // Mark transaction as failed
             await transactionModel.update(
                 { status: 'Failed' },
                 { where: { reference } }
