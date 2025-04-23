@@ -38,23 +38,18 @@ exports.createAdmin = async (req, res) => {
 
     });
     
-// Generate a token
 const token = JWT.sign({ id: newAdmin.id}, process.env.JWT_SECRET, { expiresIn: '30mins' });
     
-// Create the verify link with the token generated
 const link = `${req.protocol}://${req.get('host')}/api/v1/verify-admin/${token}`;
 
-// Create the email details
 const mailDetails = {
     email: newAdmin.email,
     subject: 'Welcome to Campus Trade',
     html: signUpTemplate(link, 'Admin')
 };
 
-    // Send the verification email
     await sendEmail(mailDetails);
 
-    // Remove password from response
     const adminData = newAdmin.toJSON();
     delete adminData.password;
 
@@ -74,13 +69,12 @@ const mailDetails = {
 exports.verifyAdmin = async (req, res) => {
   try {
     const { token } = req.params;
-    // verify the token
     await JWT.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
         // check if error is jwt expires error
         if (error instanceof JWT.TokenExpiredError) {
           const decodedToken = await JWT.decode(token);
-          // check for the seller/user
+          
           const admin = await Admin.findByPk(decodedToken.id);
           if (admin == null) {
             return res.status(400).json({

@@ -69,37 +69,37 @@ next()
 }
 
 
-exports.kycValidator = (req, res, next) => {
-  const schema = Joi.object({
-    jambRegNo: Joi.string()
-      .pattern(/^[0-9]{8}[A-Z]{2}$/)        // 12345678AB
-      .required()
-      .messages({ /* … */ }),
+// exports.kycValidator = (req, res, next) => {
+//   const schema = Joi.object({
+//     jambRegNo: Joi.string()
+//       .pattern(/^[0-9]{8}[A-Z]{2}$/)        // 12345678AB
+//       .required()
+//       .messages({ /* … */ }),
   
-    whatsappLink: Joi.string()
-      .pattern(/^https:\/\/(?:wa\.me\/\+?|api\.whatsapp\.com\/send\?phone=)\d{10,15}$/i)
-      .required()
-      .messages({ /* … */ }),
+//     whatsappLink: Joi.string()
+//       .pattern(/^https:\/\/(?:wa\.me\/\+?|api\.whatsapp\.com\/send\?phone=)\d{10,15}$/i)
+//       .required()
+//       .messages({ /* … */ }),
   
-    phoneNumber: Joi.string()
-      .pattern(/^\+234\d{10}$/)
-      .required()
-      .messages({ /* … */ }),
+//     phoneNumber: Joi.string()
+//       .pattern(/^\+234\d{10}$/)
+//       .required()
+//       .messages({ /* … */ }),
   
-    //  👇 OPTIONAL — won’t complain if missing or empty
-    gender: Joi.string()
-      .valid("Male", "Female")
-      .optional(),      // ← or simply remove the rule
+//     //  👇 OPTIONAL — won’t complain if missing or empty
+//     gender: Joi.string()
+//       .valid("Male", "Female")
+//       .optional(),      // ← or simply remove the rule
   
-    profilePic: Joi.string()
-      .uri({ scheme: ["http", "https"] })
-      .optional(),
+//     profilePic: Joi.string()
+//       .uri({ scheme: ["http", "https"] })
+//       .optional(),
   
-    fullName: Joi.string()
-      .min(3)
-      .max(100)
-      .pattern(/^[a-zA-Z\s.'-]+$/)
-      .optional(),
-  }).unknown(true);       
+//     fullName: Joi.string()
+//       .min(3)
+//       .max(100)
+//       .pattern(/^[a-zA-Z\s.'-]+$/)
+//       .optional(),
+//   }).unknown(true);       
   
-};
+// };
