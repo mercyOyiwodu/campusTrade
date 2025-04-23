@@ -6,6 +6,7 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 const SellerKYC = require('../models/sellerkyc');
 const Category = require('../models/category');
+const { Op } = require('sequelize');
 
 
 exports.createProduct = async (req, res) => {
@@ -302,3 +303,40 @@ exports.getAllProductsBySubcategory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 }
+
+
+exports.searchProducts = async (req, res) => {
+  try {
+    const { q = '' } = req.query; // q = search text
+
+    // Using Op.like explicitly for case-insensitive search in MySQL
+    const products = await Product.findAll({
+      where: {
+        status: 'approved',
+        [Op.or]: [
+          { productName: { [Op.like]: `%${q}%` } },  // Correct operator for MySQL
+          { description: { [Op.like]: `%${q}%` } }   // Correct operator for MySQL
+        ]
+      },
+      order: [['createdAt', 'DESC']],
+      include: [
+        { model: Subcategory },
+        {
+          model: Seller, 
+          as: 'seller',  // Ensure the alias 'seller' is correctly linked in the Seller model associations
+          attributes: ['id']  // Only retrieving the seller id to avoid errors
+        }
+      ]
+    });
+
+    res.status(200).json({
+      message: 'Search successful',
+      count: products.length,
+      data: products
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};

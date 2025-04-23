@@ -1,4 +1,4 @@
-const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct, getRecentProductsBySeller, getAllProductsBySubcategory } = require('../controller/product');
+const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, approveProduct, getApprovedProducts, getPendingProducts, rejectProduct, getRecentProductsBySeller, getAllProductsBySubcategory,searchProducts } = require('../controller/product');
 const { authenticate } = require('../middlewares/authentication');
 const upload = require('../utils/multer');
 const router = require('express').Router();
@@ -599,6 +599,8 @@ router.get('/all-pending-product/:id', getPendingProducts);
 
 
 router.get('/all-products-by-subcategory/:id', getAllProductsBySubcategory);
+
+router.get('/search', searchProducts);
 
 
 
