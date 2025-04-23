@@ -94,3 +94,51 @@ exports.getSellerKyc = async (req, res) => {
         });
     }
 };
+
+
+exports.updateSellerKyc = async (req, res) => {
+  try {
+    const { id: sellerId } = req.params;      
+    const { jambRegNo, school, gender, whatsappLink, phoneNumber, fullName } = req.body;
+
+    const seller = await Seller.findByPk(sellerId);
+    if (!seller) {
+      return res.status(404).json({ message: 'Seller not found' });
+    }
+
+    // Grab the existing KYC row (must exist to edit)
+    const kyc = await SellerKYC.findByPk(sellerId);
+    if (!kyc) {
+      return res.status(404).json({ message: 'KYC record not found' });
+    }
+
+    let newProfilePicUrl = kyc.profilePic;      
+    if (req.file) {
+      const upload = await cloudinary.uploader.upload(
+        req.file.path,
+        { resource_type: 'auto' }
+      );
+      fs.unlinkSync(req.file.path);            
+      newProfilePicUrl = upload.secure_url;
+    }
+
+    await kyc.update({
+      jambRegNo:     jambRegNo   ?? kyc.jambRegNo,
+      school:        school      ?? kyc.school,
+      gender:        gender      ?? kyc.gender,
+      whatsappLink:  whatsappLink?? kyc.whatsappLink,
+      phoneNumber:   phoneNumber ?? kyc.phoneNumber,
+      fullName:      fullName ? toPascalCase(fullName) : kyc.fullName,
+      profilePic:    newProfilePicUrl
+    });
+
+    return res.status(200).json({
+      message: 'KYC updated successfully',
+      data: kyc
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
