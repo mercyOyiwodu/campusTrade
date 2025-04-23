@@ -1,9 +1,7 @@
 const express = require('express');
 const { profileDetails, getSellerKyc,updateSellerKyc } = require('../controller/kycController');
-const { registerValidation } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const kycRouter = express.Router();
-const  {kycValidator} = require('../middlewares/validator')
 
 /**
  * @swagger
@@ -105,7 +103,7 @@ const  {kycValidator} = require('../middlewares/validator')
  *         description: Internal server error
  */
 
-kycRouter.patch('/profile/:id', upload.single('profilePic'), kycValidator, profileDetails);
+kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
 
 /**
  * @swagger
