@@ -160,7 +160,7 @@ exports.getProductById = async (req, res) => {
     res.status(200).json({
       message: "Product retrieved successfully",
       data: product,
-      sellerName: seller.fullName
+      // sellerName: seller.fullName
     });
   } catch (error) {
     console.log(error);
