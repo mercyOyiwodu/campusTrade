@@ -1,57 +1,51 @@
-const  GoogleStrategy = require('passport-google-oauth20').Strategy;
-const passport = require('passport');
-const Seller = require('../models/seller');
+require('dotenv').config()
+const passport       = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const bcrypt         = require("bcryptjs");
+const Seller         = require("../models/seller");
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // callbackURL: "https://campustrade-kku1.onrender.com/api/v1/auth/google/login"
-    callbackURL: "https://localhost:4725/auth/google/login"
-  },
-  async (accessToken, refreshToken, profile, cb) => {
-    console.log("Profile: ", profile)
-    try {
-      // Find user with Sequelize where clause instead of Mongoose's findOne
-      let seller = await Seller.findOne({
-        where: { email: profile.emails[0].value }
-      });
-      const randomPassword = await bcrypt.hash(profile.id, 10);
-      if (!seller) {
-        // Create new user with Sequelize create method instead of Mongoose's new model
-        seller = await Seller.create({
-          email: profile.emails[0].value,
-          fullName: profile.displayName,
-          // isVerified: profile.emails[0].verified || false,
-          isVerified: true,
-          password: randomPassword
-        });
-        // No need for separate save() call with Sequelize create()
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID:     process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL:  process.env.GOOGLE_CALLBACK_URL,   // swap per‑env
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails[0].value;
+        let seller  = await Seller.findOne({ where: { email } });
+
+        if (!seller) {
+          const randomPassword = await bcrypt.hash(profile.id, 10);
+          seller = await Seller.create({
+            email,
+            fullName:   profile.displayName,
+            isVerified: profile._json.email_verified || false,  // Google flag
+            password:   randomPassword,
+          });
+        }
+
+        return done(null, seller);
+      } catch (err) {
+        return done(err);
       }
-      return cb(null, seller);
-    } catch (error) {
-      return cb(error, null)
     }
-  }
-));
+  )
+);
 
-passport.serializeUser((seller, cb) => {
-  console.log('Seller Serialized:', seller);
-  cb(null, seller.id)
+passport.serializeUser((seller, done) => {
+  done(null, seller.id);        // stores only the PK in the session
 });
 
-// Fixed the deserializeUser function (it was incorrectly named serializeUser again)
-passport.deserializeUser(async (id, cb) => {
+passport.deserializeUser(async (id, done) => {
   try {
-    // Using Sequelize's findByPk instead of Sequelize's findById
     const seller = await Seller.findByPk(id);
-    
-    // Changed Seller to User to match the model name in the rest of the code
-    if (!seller) {
-      return cb(new Error('Seller not found'), null)
-    }
-    cb(null, seller)
-  } catch (error) {
-    cb(error, null)
+    if (!seller) return done(new Error("Seller not found"));
+    done(null, seller);
+  } catch (err) {
+    done(err);
   }
 });
 
