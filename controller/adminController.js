@@ -5,14 +5,11 @@ const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/mailtemplates');
 const JWT = require('jsonwebtoken');
 
-// Admin registration (only accessible to super_admin)
 exports.createAdmin = async (req, res) => {
   try {
 
-    // Check if request is from a super_admin
     const { email, password, confirmPassword } = req.body;
 
-    // Validate required fields
     if (!email  || !password || !confirmPassword) {
       return res.status(400).json({
         message: 'Email and password are required'

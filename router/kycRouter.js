@@ -1,6 +1,5 @@
 const express = require('express');
 const { profileDetails, getSellerKyc,updateSellerKyc } = require('../controller/kycController');
-const { registerValidation } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const kycRouter = express.Router();
 
