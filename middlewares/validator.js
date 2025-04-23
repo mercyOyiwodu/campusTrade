@@ -68,55 +68,38 @@ const schema = Joi.object().keys({
 next()
 }
 
+
 exports.kycValidator = (req, res, next) => {
-  const schema = Joi.object().keys({
-    email: Joi.string()
-      .email() // Validates general email format
-      .required()
-      .messages({
-        "string.email": "Invalid email format",
-        "string.empty": "Email cannot be empty",
-        "any.required": "Email is required",
-      }),
-
+  const schema = Joi.object({
     jambRegNo: Joi.string()
-      .pattern(/^[0-9]{8}[A-Z]{2}$/)
+      .pattern(/^[0-9]{8}[A-Z]{2}$/)        // 12345678AB
       .required()
-      .messages({
-        "string.empty": "JAMB number cannot be empty",
-        "any.required": "JAMB number is required",
-        "string.pattern.base":
-          "Invalid JAMB number format. It must be 8 digits followed by 2 uppercase letters (e.g., 12345678AB).",
-      }),
-
+      .messages({ /* … */ }),
+  
     whatsappLink: Joi.string()
-      .pattern(/^https:\/\/(wa\.me\/|api\.whatsapp\.com\/send\?phone=)\+?[0-9]{10,15}$/)
+      .pattern(/^https:\/\/(?:wa\.me\/\+?|api\.whatsapp\.com\/send\?phone=)\d{10,15}$/i)
       .required()
-      .messages({
-        "string.empty": "WhatsApp link cannot be empty",
-        "any.required": "WhatsApp link is required",
-        "string.pattern.base":
-          "Invalid WhatsApp link format. Must be a valid WhatsApp URL (e.g., https://wa.me/2348012345678).",
-      }),
-
+      .messages({ /* … */ }),
+  
     phoneNumber: Joi.string()
       .pattern(/^\+234\d{10}$/)
       .required()
-      .messages({
-        "string.empty": "Phone number cannot be empty",
-        "any.required": "Phone number is required",
-        "string.pattern.base":
-          "Invalid phone number format. Use the format: +234XXXXXXXXXX (e.g., +2348012345678).",
-      }),
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: false });
-  if (error) {
-    const errorMessages = error.details.map(err => err.message);
-    return res.status(400).json({
-      message: errorMessages
-    });
-  }
-
-  next();
+      .messages({ /* … */ }),
+  
+    //  👇 OPTIONAL — won’t complain if missing or empty
+    gender: Joi.string()
+      .valid("Male", "Female")
+      .optional(),      // ← or simply remove the rule
+  
+    profilePic: Joi.string()
+      .uri({ scheme: ["http", "https"] })
+      .optional(),
+  
+    fullName: Joi.string()
+      .min(3)
+      .max(100)
+      .pattern(/^[a-zA-Z\s.'-]+$/)
+      .optional(),
+  }).unknown(true);       
+  
 };
