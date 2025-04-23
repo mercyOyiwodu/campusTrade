@@ -1,6 +1,5 @@
 const Seller = require('../models/seller')
 const Admin = require('../models/admin')
-//is the model routing correcting since i am importing seller and product models
 const bcrypt = require('bcryptjs');
 const { sendEmail } = require('../utils/nodemailer');
 const signUpTemplate = require('../utils/mailtemplates');
