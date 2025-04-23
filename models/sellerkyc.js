@@ -12,7 +12,7 @@ SellerKYC.init(
       defaultValue: DataTypes.UUIDV4
     },
     jambRegNo: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     fullName: {

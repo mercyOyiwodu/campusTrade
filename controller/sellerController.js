@@ -146,16 +146,16 @@ exports.forgotPassword = async (req, res) => {
         }
 
         // Generate a token for the user
-        const token = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '30mins' });
+        const newToken = await JWT.sign({ sellerId: seller.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         // Create the reset link
-        const link = `${reset}/${token}`;
+        const link = `${reset}/${newToken}`;
         // const firstName = seller.fullName.split(' ')[0];
         // configure the email details
 
         const mailDetails = {
             subject: 'Password Reset',
             email: seller.email,
-            html: passwordResetTemplate(link, 'User')
+            html: passwordResetTemplate(link, 'Seller')
         }
 
         // Await nodemailer to send the user an email

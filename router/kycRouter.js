@@ -1,8 +1,9 @@
 const express = require('express');
-const { profileDetails, getSellerKyc } = require('../controller/kycController');
+const { profileDetails, getSellerKyc,updateSellerKyc } = require('../controller/kycController');
 const { registerValidation } = require('../middlewares/validator');
 const upload = require('../utils/multer');
 const kycRouter = express.Router();
+const  {kycValidator} = require('../middlewares/validator')
 
 /**
  * @swagger
@@ -104,7 +105,7 @@ const kycRouter = express.Router();
  *         description: Internal server error
  */
 
-kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
+kycRouter.patch('/profile/:id', upload.single('profilePic'), kycValidator, profileDetails);
 
 /**
  * @swagger
@@ -200,6 +201,9 @@ kycRouter.patch('/profile/:id', upload.single('profilePic'), profileDetails);
  *                   example: "There was an issue getting the user detail: Internal Server Error"
  */
 
-kycRouter.get('/get-kyc-details/:id', getSellerKyc);
+kycRouter.get('/get-kyc-details/:id',getSellerKyc);
+
+kycRouter.put('/kyc/:id', upload.single('profilePic'),updateSellerKyc);  
+
 
 module.exports = kycRouter;

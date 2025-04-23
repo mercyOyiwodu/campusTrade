@@ -41,7 +41,7 @@ module.exports = {
         allowNull: false,
       },
       jambRegNo: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       createdAt: {
