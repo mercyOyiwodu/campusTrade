@@ -1,49 +1,83 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = require('../database/sequelize');
-const Seller = require('../models/seller');
+const mongoose = require("mongoose");
 
-class Admin extends Model {}
-
-Admin.init(
+const adminSchema = new mongoose.Schema(
   {
-    id: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
-    },
     email: {
-      type: DataTypes.STRING,
-      allowNull:false
+      type: String,
+      required: true,
+      unique: true, // emails should be unique for admins
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull:false
+      type: String,
+      required: true,
     },
     isAdmin: {
-      type:DataTypes.BOOLEAN,
-      defaultValue:false,
+      type: Boolean,
+      default: false,
     },
-    isVerified:{
-      type:DataTypes.BOOLEAN,
-      defaultValue:false
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    },
-    updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    }
   },
   {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'Admin', 
-    tableName: 'Admins'
-  },
+    timestamps: true, // automatically adds createdAt & updatedAt
+  }
 );
 
+const Admin = mongoose.model("Admin", adminSchema);
+module.exports = Admin;
 
-module.exports= Admin
+
+
+
+
+// const { Sequelize, DataTypes, Model } = require('sequelize');
+// const sequelize = require('../database/sequelize');
+// const Seller = require('../models/seller');
+
+// class Admin extends Model {}
+
+// Admin.init(
+//   {
+//     id: {
+//       allowNull: false,
+//       primaryKey: true,
+//       type: DataTypes.UUID,
+//       defaultValue: DataTypes.UUIDV4
+//     },
+//     email: {
+//       type: DataTypes.STRING,
+//       allowNull:false
+//     },
+//     password: {
+//       type: DataTypes.STRING,
+//       allowNull:false
+//     },
+//     isAdmin: {
+//       type:DataTypes.BOOLEAN,
+//       defaultValue:false,
+//     },
+//     isVerified:{
+//       type:DataTypes.BOOLEAN,
+//       defaultValue:false
+//     },
+//     createdAt: {
+//       allowNull: false,
+//       type: DataTypes.DATE
+//     },
+//     updatedAt: {
+//       allowNull: false,
+//       type: DataTypes.DATE
+//     }
+//   },
+//   {
+//     // Other model options go here
+//     sequelize, // We need to pass the connection instance
+//     modelName: 'Admin', 
+//     tableName: 'Admins'
+//   },
+// );
+
+
+// module.exports= Admin

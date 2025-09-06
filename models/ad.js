@@ -1,51 +1,87 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = require('../database/sequelize');
-const Admin = require('./admin');
+const mongoose = require("mongoose");
 
-class Ad extends Model {}
-
-Ad.init(
+const adSchema = new mongoose.Schema(
   {
-    id: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
-    },
     title: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      required: false, // optional like Sequelize `allowNull: true`
     },
     image: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: String,
+      required: true, // Sequelize `allowNull: false`
     },
     description: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: String, // Sequelize `TEXT` maps to String in MongoDB
+      required: false,
     },
     date: {
-      type:DataTypes.DATE,
-      allowNull:false
+      type: Date,
+      required: true,
     },
     expiresAt: {
-      type: DataTypes.DATE,
-      allowNull: false
+      type: Date,
+      required: true,
     },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    },
-    updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    }
   },
   {
-    sequelize,
-    modelName: 'Ad',
-    tableName: 'Ads'
+    timestamps: true, // ⬅️ replaces `createdAt` & `updatedAt`
   }
 );
 
+const Ad = mongoose.model("Ad", adSchema);
 module.exports = Ad;
+
+
+
+
+// const { Sequelize, DataTypes, Model } = require('sequelize');
+// const sequelize = require('../database/sequelize');
+// const Admin = require('./admin');
+
+// class Ad extends Model {}
+
+// Ad.init(
+//   {
+//     id: {
+//       allowNull: false,
+//       primaryKey: true,
+//       type: DataTypes.UUID,
+//       defaultValue: DataTypes.UUIDV4
+//     },
+//     title: {
+//       type: DataTypes.STRING,
+//       allowNull: true
+//     },
+//     image: {
+//       type: DataTypes.STRING,
+//       allowNull: false
+//     },
+//     description: {
+//       type: DataTypes.TEXT,
+//       allowNull: true
+//     },
+//     date: {
+//       type:DataTypes.DATE,
+//       allowNull:false
+//     },
+//     expiresAt: {
+//       type: DataTypes.DATE,
+//       allowNull: false
+//     },
+//     createdAt: {
+//       allowNull: false,
+//       type: DataTypes.DATE
+//     },
+//     updatedAt: {
+//       allowNull: false,
+//       type: DataTypes.DATE
+//     }
+//   },
+//   {
+//     sequelize,
+//     modelName: 'Ad',
+//     tableName: 'Ads'
+//   }
+// );
+
+// module.exports = Ad;

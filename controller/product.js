@@ -6,7 +6,7 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 const SellerKYC = require('../models/sellerkyc');
 const Category = require('../models/category');
-const { Op } = require('sequelize');
+// const { Op } = require('sequelize');
 
 
 exports.createProduct = async (req, res) => {
